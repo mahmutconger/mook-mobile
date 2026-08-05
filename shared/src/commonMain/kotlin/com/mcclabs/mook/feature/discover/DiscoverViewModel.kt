@@ -63,7 +63,12 @@ class DiscoverViewModel(
         _state.value = _state.value.copy(isLoading = true, error = null)
         try {
             val profiles = repository.getDiscoverProfiles(settings)
-            _state.value = _state.value.copy(profiles = profiles, isLoading = false)
+            val hasSeenTutorial = settingsRepository.getHasSeenLikedMeTutorial()
+            _state.value = _state.value.copy(
+                profiles = profiles, 
+                isLoading = false,
+                hasSeenLikedMeTutorial = hasSeenTutorial
+            )
         } catch (e: Exception) {
             _state.value = _state.value.copy(
                 error = e.message ?: "Something went wrong.",
@@ -77,6 +82,13 @@ class DiscoverViewModel(
         viewModelScope.launch {
             loadCurrentUserAvatar()
             loadProfiles(settingsRepository.getSettings())
+        }
+    }
+
+    fun dismissLikedMeTutorial() {
+        viewModelScope.launch {
+            settingsRepository.setHasSeenLikedMeTutorial(true)
+            _state.value = _state.value.copy(hasSeenLikedMeTutorial = true)
         }
     }
 

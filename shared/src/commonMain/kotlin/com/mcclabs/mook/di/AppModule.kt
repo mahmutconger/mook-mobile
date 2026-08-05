@@ -22,6 +22,8 @@ import com.mcclabs.mook.feature.match.MatchViewModel
 import com.mcclabs.mook.feature.settings.SettingsViewModel
 import com.mcclabs.mook.data.repository.UpdateRepositoryImpl
 import com.mcclabs.mook.feature.update.UpdateViewModel
+import com.mcclabs.mook.feature.sso.SsoAuthorizeViewModel
+import com.mcclabs.mook.feature.profile.edit.EditProfileViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.module.dsl.viewModel
@@ -45,8 +47,10 @@ val appModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::UpdateViewModel)
     viewModelOf(::EulaGateViewModel)
+    viewModelOf(::SsoAuthorizeViewModel)
+    viewModelOf(::EditProfileViewModel)
 
     // These take a screen argument alongside their injected dependencies.
-    viewModel { parameters -> ProfileDetailsViewModel(get(), parameters.get()) }
+    viewModel { parameters -> ProfileDetailsViewModel(get(), get(), parameters.get()) }
     viewModel { parameters -> MatchViewModel(get(), parameters.get()) }
 }

@@ -4,4 +4,5 @@ import com.mcclabs.mook.domain.model.MatchResult
 
 interface InteractionRepository {
     suspend fun swipeUser(toUserId: String, isLike: Boolean): MatchResult
+    suspend fun checkMutualMatch(withUserId: String): Boolean
 }

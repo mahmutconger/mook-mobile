@@ -40,11 +40,13 @@ class SettingsViewModel(
             val settings = settingsRepository.getSettings()
             val visible = settingsRepository.getDiscoverVisible()
             val isDark = settingsRepository.getIsDarkMode()
+            val lang = settingsRepository.getAppLanguage()
             _state.update {
                 it.copy(
                     email = Firebase.auth.currentUser?.email.orEmpty(),
                     discoverVisible = visible,
                     isDarkMode = isDark,
+                    appLanguage = lang,
                     ageRangeStart = settings.ageRangeStart,
                     ageRangeEnd = settings.ageRangeEnd,
                     isLoading = false
@@ -58,6 +60,29 @@ class SettingsViewModel(
         _state.update { it.copy(discoverVisible = visible) }
         viewModelScope.launch {
             settingsRepository.setDiscoverVisible(visible)
+        }
+    }
+
+    fun onThemeChange(isDark: Boolean) {
+        _state.update { it.copy(isDarkMode = isDark) }
+        viewModelScope.launch {
+            settingsRepository.setIsDarkMode(isDark)
+        }
+    }
+
+    fun onLanguageClick() {
+        _state.update { it.copy(showLanguageDialog = true) }
+    }
+
+    fun onLanguageDismiss() {
+        _state.update { it.copy(showLanguageDialog = false) }
+    }
+
+    fun onLanguageSelected(language: String) {
+        _state.update { it.copy(appLanguage = language, showLanguageDialog = false) }
+        viewModelScope.launch {
+            settingsRepository.setAppLanguage(language)
+            // Note: Dynamic UI locale change implementation depends on platform / resources logic
         }
     }
 

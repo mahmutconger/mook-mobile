@@ -5,6 +5,8 @@ import androidx.savedstate.read
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.mcclabs.mook.feature.discover.DiscoverScreen
 import com.mcclabs.mook.feature.eula.EulaGateScreen
 import com.mcclabs.mook.feature.filters.FiltersScreen
@@ -12,8 +14,10 @@ import com.mcclabs.mook.feature.login.LoginScreen
 import com.mcclabs.mook.feature.match.MatchScreen
 import com.mcclabs.mook.feature.liked.LikedScreen
 import com.mcclabs.mook.feature.profile.ProfileDetailsScreen
+import com.mcclabs.mook.feature.profile.edit.EditProfileScreen
 import com.mcclabs.mook.feature.registration.RegistrationScreen
 import com.mcclabs.mook.feature.settings.SettingsScreen
+import com.mcclabs.mook.feature.sso.SsoAuthorizeScreen
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 
@@ -103,7 +107,16 @@ fun AppNavGraph() {
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToSettings = {
                     navController.navigate(NavRoutes.Settings.route)
+                },
+                onNavigateToEditProfile = {
+                    navController.navigate(NavRoutes.EditProfile.route)
                 }
+            )
+        }
+
+        composable(NavRoutes.EditProfile.route) {
+            EditProfileScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -130,6 +143,20 @@ fun AppNavGraph() {
                     .orEmpty(),
                 onKeepSwiping = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.SsoAuthorize.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "mook://authorize?client={client}&callback={callback}" })
+        ) {
+            SsoAuthorizeScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToLogin = {
+                    navController.navigate(NavRoutes.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }

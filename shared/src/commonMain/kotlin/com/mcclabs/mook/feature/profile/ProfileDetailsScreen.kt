@@ -30,11 +30,11 @@ import com.mcclabs.mook.ui.components.WalkTalkRedirectDialog
 import com.mcclabs.mook.ui.theme.BrandGradient
 import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.coroutines.launch
-import mook.shared.generated.resources.Res
-import mook.shared.generated.resources.back_svgrepo_com
-import mook.shared.generated.resources.flag_svgrepo_com
-import mook.shared.generated.resources.ic_settings_minimalistic
+import mook.shared.generated.resources.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -48,6 +48,7 @@ fun ProfileDetailsScreen(
     profileId: String,
     onNavigateBack: () -> Unit,
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToEditProfile: () -> Unit = {},
     viewModel: ProfileDetailsViewModel = koinViewModel<ProfileDetailsViewModel>(
         parameters = { parametersOf(profileId) }
     )
@@ -85,7 +86,7 @@ fun ProfileDetailsScreen(
             containerColor = NeonColors.Card,
             title = {
                 Text(
-                    text = "Kullanıcıyı Engelle",
+                    text = stringResource(Res.string.profile_block_user_title),
                     style = MaterialTheme.typography.titleMedium,
                     color = NeonColors.TextPrimary,
                     fontWeight = FontWeight.Bold
@@ -93,7 +94,7 @@ fun ProfileDetailsScreen(
             },
             text = {
                 Text(
-                    text = "Bu kullanıcıyı engellersen bir daha profilini göremezsin ve seni bulamazlar.",
+                    text = stringResource(Res.string.profile_block_user_message),
                     style = MaterialTheme.typography.bodyMedium,
                     color = NeonColors.TextSecondary
                 )
@@ -103,12 +104,12 @@ fun ProfileDetailsScreen(
                     onClick = viewModel::confirmBlock,
                     colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Error)
                 ) {
-                    Text("Engelle", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.profile_block_confirm), color = Color.White, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onBlockDismiss) {
-                    Text("İptal", color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.profile_block_cancel), color = NeonColors.TextSecondary)
                 }
             }
         )
@@ -158,6 +159,7 @@ fun ProfileDetailsScreen(
                     ProfileSheetContent(
                         profile = profile,
                         isOwnProfile = state.isOwnProfile,
+                        isMatched = state.isMatched,
                         onSendMessage = { viewModel.onSendMessageClicked() },
                         onBlock = { viewModel.onBlockClick() }
                     )
@@ -204,6 +206,24 @@ fun ProfileDetailsScreen(
                         )
                     }
 
+                    if (state.isOwnProfile) {
+                        IconButton(
+                            onClick = onNavigateToEditProfile,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 48.dp, end = 64.dp)
+                                .clip(CircleShape)
+                                .background(IconScrim)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit Profile",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+
                     // Own profile → Settings; someone else's → Report.
                     IconButton(
                         onClick = {
@@ -235,7 +255,7 @@ fun ProfileDetailsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = state.error ?: "Error loading profile",
+                    text = state.error ?: stringResource(Res.string.profile_error_loading),
                     color = NeonColors.Error
                 )
             }
@@ -253,6 +273,7 @@ fun ProfileDetailsScreen(
 private fun ProfileSheetContent(
     profile: DiscoverProfile,
     isOwnProfile: Boolean,
+    isMatched: Boolean,
     onSendMessage: () -> Unit,
     onBlock: () -> Unit = {},
 ) {
@@ -296,7 +317,7 @@ private fun ProfileSheetContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Details",
+            text = stringResource(Res.string.profile_details_title),
             style = MaterialTheme.typography.titleMedium,
             color = NeonColors.TextPrimary,
             fontWeight = FontWeight.Bold
@@ -307,13 +328,13 @@ private fun ProfileSheetContent(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             InfoCard(
-                title = "Country",
-                value = profile.country?.name ?: "—",
+                title = stringResource(Res.string.profile_country),
+                value = profile.country?.name ?: stringResource(Res.string.profile_country_empty),
                 modifier = Modifier.weight(1f)
             )
             InfoCard(
-                title = "Language",
-                value = profile.language?.let { "${it.flagEmoji} ${it.name}" } ?: "—",
+                title = stringResource(Res.string.profile_language),
+                value = profile.language?.let { "${it.flagEmoji} ${it.name}" } ?: stringResource(Res.string.profile_language_empty),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -321,14 +342,14 @@ private fun ProfileSheetContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "About Me",
+            text = stringResource(Res.string.profile_about_me),
             style = MaterialTheme.typography.titleMedium,
             color = NeonColors.TextPrimary,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = profile.bio.ifBlank { "No description provided." },
+            text = profile.bio.ifBlank { stringResource(Res.string.profile_no_description) },
             style = MaterialTheme.typography.bodyMedium,
             color = NeonColors.TextSecondary
         )
@@ -336,7 +357,7 @@ private fun ProfileSheetContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Interests",
+            text = stringResource(Res.string.profile_interests),
             style = MaterialTheme.typography.titleMedium,
             color = NeonColors.TextPrimary,
             fontWeight = FontWeight.Bold
@@ -354,7 +375,8 @@ private fun ProfileSheetContent(
         }
 
         // Only other people's profiles get a message CTA; you don't message yourself.
-        if (!isOwnProfile) {
+        // Additionally, we only show it if there is a mutual match.
+        if (!isOwnProfile && isMatched) {
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = onSendMessage,
@@ -374,7 +396,7 @@ private fun ProfileSheetContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "💬 Send Message",
+                        text = stringResource(Res.string.profile_send_message),
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
@@ -394,7 +416,29 @@ private fun ProfileSheetContent(
                 border = androidx.compose.foundation.BorderStroke(1.dp, NeonColors.Error)
             ) {
                 Text(
-                    text = "🚫 Kullanıcıyı Engelle",
+                    text = stringResource(Res.string.profile_block_user),
+                    color = NeonColors.Error,
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        } else if (!isOwnProfile && !isMatched) {
+            // Block button should still be visible even if they are not matched
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // ── Block User button (Google Play dating-app safety requirement) ────────
+            OutlinedButton(
+                onClick = onBlock,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(24.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, NeonColors.Error)
+            ) {
+                Text(
+                    text = stringResource(Res.string.profile_block_user),
                     color = NeonColors.Error,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /Users/mahmutcanconger/WalkMatch/storage.rules /private/tmp/claude-501/-Users-mahmutcanconger-WalkMatch/0c9d0cd7-93f8-4f5d-916a-e383a177bf2b/scratchpad/storagetest/)",
+      "Bash(firebase emulators:exec --only storage --project walkmatch-storage-test \"node test.mjs\")",
+      "Bash(./gradlew :shared:compileKotlinMetadata -q)",
+      "Bash(echo \"EXIT=$?\")"
+    ]
+  }
+}

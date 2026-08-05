@@ -17,5 +17,6 @@ data class DiscoverProfile(
     val photoUrls: List<String>,
     val bio: String,
     val interests: List<String>,
-    val verified: Boolean = false
+    val verified: Boolean = false,
+    val hasLikedMe: Boolean = false
 )

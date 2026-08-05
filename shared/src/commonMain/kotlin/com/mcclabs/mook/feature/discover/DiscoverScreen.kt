@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import coil3.compose.AsyncImage
 import com.mcclabs.mook.feature.filters.FiltersScreen
 import com.mcclabs.mook.ui.components.BottomNavBar
@@ -24,11 +26,9 @@ import com.mcclabs.mook.ui.components.ReportBottomSheet
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.SwipeableProfileCard
 import com.mcclabs.mook.ui.theme.NeonColors
-import mook.shared.generated.resources.Res
-import mook.shared.generated.resources.ic_info_circle
-import mook.shared.generated.resources.ic_warning
-import mook.shared.generated.resources.menu_svgrepo_com
+import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
 
@@ -157,7 +157,7 @@ fun DiscoverScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "Couldn't load profiles",
+                            text = stringResource(Res.string.discover_error_couldnt_load_profiles),
                             color = NeonColors.TextPrimary,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
@@ -171,7 +171,7 @@ fun DiscoverScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         NeonPrimaryButton(
-                            text = "Retry",
+                            text = stringResource(Res.string.discover_retry),
                             onClick = { viewModel.retry() },
                             modifier = Modifier.height(48.dp)
                         )
@@ -189,7 +189,7 @@ fun DiscoverScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "No more profiles",
+                            text = stringResource(Res.string.discover_no_more_profiles),
                             color = NeonColors.TextSecondary,
                             style = MaterialTheme.typography.titleMedium
                         )
@@ -202,27 +202,75 @@ fun DiscoverScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         state.profiles.getOrNull(1)?.let { behind ->
-                            SwipeableProfileCard(
-                                profile = behind,
-                                onSwipeLeft = {},
-                                onSwipeRight = {},
-                                onClick = {},
-                                interactive = false,
-                                modifier = Modifier.graphicsLayer {
-                                    scaleX = 0.95f
-                                    scaleY = 0.95f
-                                }
-                            )
+                            key(behind.id) {
+                                SwipeableProfileCard(
+                                    profile = behind,
+                                    onSwipeLeft = {},
+                                    onSwipeRight = {},
+                                    onClick = {},
+                                    interactive = false,
+                                    modifier = Modifier.graphicsLayer {
+                                        scaleX = 0.95f
+                                        scaleY = 0.95f
+                                    }
+                                )
+                            }
                         }
                         state.profiles.firstOrNull()?.let { top ->
-                            SwipeableProfileCard(
-                                profile = top,
-                                onSwipeLeft = { viewModel.swipeLeft(top.id) },
-                                onSwipeRight = { viewModel.swipeRight(top.id) },
-                                onClick = { viewModel.onProfileClicked(top.id) },
-                                onReportClick = { viewModel.onReportClick(top.id) },
-                                onBlockClick = { viewModel.onBlockClick(top.id) }
-                            )
+                            key(top.id) {
+                                SwipeableProfileCard(
+                                    profile = top,
+                                    onSwipeLeft = { viewModel.swipeLeft(top.id) },
+                                    onSwipeRight = { viewModel.swipeRight(top.id) },
+                                    onClick = { viewModel.onProfileClicked(top.id) },
+                                    onReportClick = { viewModel.onReportClick(top.id) },
+                                    onBlockClick = { viewModel.onBlockClick(top.id) }
+                                )
+                            }
+                        }
+                    }
+
+                    // Liked me tutorial overlay
+                    val topProfile = state.profiles.firstOrNull()
+                    if (topProfile != null && topProfile.hasLikedMe && !state.hasSeenLikedMeTutorial) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.5f))
+                                .pointerInput(Unit) { detectTapGestures { } }, // intercept taps
+                            contentAlignment = Alignment.Center
+                        ) {
+                            androidx.compose.material3.Card(
+                                modifier = Modifier.padding(32.dp),
+                                colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = com.mcclabs.mook.ui.theme.NeonColors.Card),
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = stringResource(Res.string.discover_liked_me_title),
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = stringResource(Res.string.discover_liked_me_body),
+                                        color = com.mcclabs.mook.ui.theme.NeonColors.TextSecondary,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    com.mcclabs.mook.ui.components.NeonPrimaryButton(
+                                        text = stringResource(Res.string.discover_liked_me_dismiss),
+                                        onClick = { viewModel.dismissLikedMeTutorial() },
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -243,18 +291,18 @@ fun DiscoverScreen(
         if (state.showBlockConfirmDialog) {
             AlertDialog(
                 onDismissRequest = { viewModel.onBlockDismiss() },
-                title = { Text("Block User", color = NeonColors.Error) },
+                title = { Text(stringResource(Res.string.discover_block_user), color = NeonColors.Error) },
                 text = {
-                    Text("Are you sure you want to block this user? They will no longer see you, and you will no longer see them in your feed.", color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.discover_block_user_message), color = NeonColors.TextSecondary)
                 },
                 confirmButton = {
                     TextButton(onClick = { viewModel.confirmBlock() }) {
-                        Text("Block", color = NeonColors.Error)
+                        Text(stringResource(Res.string.discover_block_confirm), color = NeonColors.Error)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.onBlockDismiss() }) {
-                        Text("Cancel", color = NeonColors.TextSecondary)
+                        Text(stringResource(Res.string.discover_block_cancel), color = NeonColors.TextSecondary)
                     }
                 },
                 containerColor = NeonColors.Card

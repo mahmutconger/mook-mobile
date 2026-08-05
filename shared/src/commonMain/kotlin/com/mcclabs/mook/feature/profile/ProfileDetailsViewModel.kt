@@ -3,6 +3,7 @@ package com.mcclabs.mook.feature.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.repository.DiscoverRepository
+import com.mcclabs.mook.domain.repository.InteractionRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FieldValue
@@ -24,6 +25,7 @@ sealed class ProfileDetailsEvent {
 
 class ProfileDetailsViewModel(
     private val repository: DiscoverRepository,
+    private val interactionRepository: InteractionRepository,
     private val profileId: String
 ) : ViewModel() {
 
@@ -134,15 +136,21 @@ class ProfileDetailsViewModel(
     }
 
     private fun loadProfile() {
+        _state.value = _state.value.copy(isLoading = true, error = null)
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, error = null)
             try {
                 val profile = repository.getProfileDetails(profileId)
+                
+                // If it's not our own profile, check if there is a mutual match
+                val isMatched = if (!isOwnProfile) {
+                    interactionRepository.checkMutualMatch(profileId)
+                } else false
+
                 if (profile != null) {
                     _state.value = _state.value.copy(
-                        profile = profile,
+                        profile = profile, 
                         isLoading = false,
-                        error = null
+                        isMatched = isMatched
                     )
                 } else {
                     _state.value = _state.value.copy(

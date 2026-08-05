@@ -24,4 +24,11 @@ sealed class NavRoutes(val route: String) {
         const val ARG_MATCHED_USER_ID = "matchedUserId"
         fun createRoute(matchedUserId: String) = "match/$matchedUserId"
     }
+
+    data object SsoAuthorize : NavRoutes("sso_authorize?client={client}&callback={callback}") {
+        const val ARG_CLIENT = "client"
+        const val ARG_CALLBACK = "callback"
+    }
+
+    data object EditProfile : NavRoutes("edit_profile")
 }

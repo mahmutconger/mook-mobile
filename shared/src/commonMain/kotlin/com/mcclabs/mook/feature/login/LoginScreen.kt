@@ -35,12 +35,13 @@ import com.mcclabs.mook.ui.components.CustomAuthTextField
 import com.mcclabs.mook.ui.components.GlassmorphismCard
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.theme.NeonColors
-import mook.shared.generated.resources.Res
-import mook.shared.generated.resources.eye_closed_svgrepo_com
-import mook.shared.generated.resources.eye_svgrepo_com
+import mook.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.painterResource
 import mook.shared.generated.resources.ic_email
 import mook.shared.generated.resources.lock_keyhole_minimalistic_svgrepo_com__1_
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -79,7 +80,7 @@ fun LoginScreen(
 
         // App name
         Text(
-            text = "Mook",
+            text = stringResource(Res.string.login_app_name),
             style = MaterialTheme.typography.headlineLarge,
             color = NeonColors.Primary,
             fontWeight = FontWeight.Bold,
@@ -90,7 +91,7 @@ fun LoginScreen(
 
         // Subtitle
         Text(
-            text = "Connect. Learn. Match.",
+            text = stringResource(Res.string.login_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = NeonColors.TextSecondary,
             textAlign = TextAlign.Center
@@ -106,8 +107,8 @@ fun LoginScreen(
             CustomAuthTextField(
                 value = state.email,
                 onValueChange = viewModel::onEmailChange,
-                label = "EMAIL",
-                placeholder = "Enter your email",
+                label = stringResource(Res.string.login_email_label),
+                placeholder = stringResource(Res.string.login_email_placeholder),
                 modifier = Modifier.fillMaxWidth(),
                 isPassword = false,
                 isError = state.emailError != null,
@@ -121,8 +122,8 @@ fun LoginScreen(
             CustomAuthTextField(
                 value = state.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = "PASSWORD",
-                placeholder = "Enter your password",
+                label = stringResource(Res.string.login_password_label),
+                placeholder = stringResource(Res.string.login_password_placeholder),
                 modifier = Modifier.fillMaxWidth(),
                 isPassword = !state.isPasswordVisible,
                 isError = state.passwordError != null,
@@ -139,9 +140,9 @@ fun LoginScreen(
                                 }
                             ),
                             contentDescription = if (state.isPasswordVisible) {
-                                "Hide password"
+                                stringResource(Res.string.login_hide_password_cd)
                             } else {
-                                "Show password"
+                                stringResource(Res.string.login_show_password_cd)
                             },
                             tint = NeonColors.TextTertiary,
                             modifier = Modifier.size(20.dp)
@@ -158,7 +159,7 @@ fun LoginScreen(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Text(
-                    text = "Forgot Password?",
+                    text = stringResource(Res.string.login_forgot_password),
                     style = MaterialTheme.typography.bodySmall,
                     color = NeonColors.Primary,
                     modifier = Modifier.clickable(
@@ -175,7 +176,7 @@ fun LoginScreen(
 
         // Sign In button
         NeonPrimaryButton(
-            text = "Sign In",
+            text = stringResource(Res.string.login_sign_in_button),
             onClick = viewModel::login,
             modifier = Modifier.fillMaxWidth(),
             isLoading = state.isLoading,
@@ -203,12 +204,12 @@ fun LoginScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Don't have an account? ",
+                text = stringResource(Res.string.login_dont_have_account),
                 style = MaterialTheme.typography.bodyMedium,
                 color = NeonColors.TextSecondary
             )
             Text(
-                text = "Sign Up",
+                text = stringResource(Res.string.login_sign_up),
                 style = MaterialTheme.typography.bodyMedium,
                 color = NeonColors.Primary,
                 fontWeight = FontWeight.Bold,

@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -40,10 +41,9 @@ import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.coroutines.launch
-import mook.shared.generated.resources.Res
-import mook.shared.generated.resources.ic_check_circle
-import mook.shared.generated.resources.ic_user
+import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
 // Card palette, aligned to the MOOK light tokens.
@@ -105,18 +105,35 @@ fun SwipeableProfileCard(
             .graphicsLayer { rotationZ = offsetX.value / 20f }
             .then(dragModifier),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = CardSurface)
+        colors = CardDefaults.cardColors(containerColor = Color.Black)
     ) {
-        Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+        Box(modifier = Modifier.fillMaxSize()) {
             PhotoCarousel(
                 photoUrls = profile.photoUrls,
                 interactive = interactive,
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier.fillMaxSize()
             )
 
-            Spacer(Modifier.height(12.dp))
+            // Gradient Overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f) // Gradient on bottom half
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f))
+                        )
+                    )
+            )
 
-            // Avatar + name + verified + language·country. Tapping opens the profile.
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+            ) {
+                // Avatar + name + verified + language·country. Tapping opens the profile.
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -129,9 +146,9 @@ fun SwipeableProfileCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = profile.age?.let { "${profile.name}, $it" } ?: profile.name,
-                            color = CardName,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleLarge // Increased size
                         )
                         if (profile.verified) {
                             Spacer(Modifier.width(4.dp))
@@ -139,7 +156,20 @@ fun SwipeableProfileCard(
                                 painter = painterResource(Res.drawable.ic_check_circle),
                                 contentDescription = "Verified",
                                 tint = VerifiedBadge,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        if (profile.hasLikedMe) {
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(Res.string.swipeable_card_liked_me),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(NeonColors.Primary.copy(alpha = 0.4f))
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
                     }
@@ -150,7 +180,7 @@ fun SwipeableProfileCard(
                     if (subtitle.isNotBlank()) {
                         Text(
                             text = subtitle,
-                            color = CardSubtitle,
+                            color = Color.White.copy(alpha = 0.8f),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -162,7 +192,7 @@ fun SwipeableProfileCard(
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = "Options",
-                            tint = NeonColors.TextSecondary
+                            tint = Color.White
                         )
                     }
                     DropdownMenu(
@@ -171,14 +201,14 @@ fun SwipeableProfileCard(
                         modifier = Modifier.background(NeonColors.Card)
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Report Profile", color = NeonColors.TextPrimary) },
+                            text = { Text(stringResource(Res.string.swipeable_card_report_profile), color = NeonColors.TextPrimary) },
                             onClick = {
                                 expanded = false
                                 onReportClick()
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Block User", color = NeonColors.Error) },
+                            text = { Text(stringResource(Res.string.swipeable_card_block_user), color = NeonColors.Error) },
                             onClick = {
                                 expanded = false
                                 onBlockClick()
@@ -188,59 +218,68 @@ fun SwipeableProfileCard(
                 }
             }
 
-            // Bio — directly under the name block.
-            if (profile.bio.isNotBlank()) {
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    text = profile.bio,
-                    color = CardBio,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 3
-                )
-            }
+                // Bio — directly under the name block.
+                if (profile.bio.isNotBlank()) {
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = profile.bio,
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 3
+                    )
+                }
 
-            // Interests — a horizontal row under the bio.
-            if (profile.interests.isNotEmpty()) {
-                Spacer(Modifier.height(10.dp))
+                // Interests — a horizontal row under the bio.
+                if (profile.interests.isNotEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        profile.interests.forEach { 
+                            InterestChip(
+                                text = it, 
+                                textColor = Color.White,
+                                backgroundColor = Color.White.copy(alpha = 0.2f)
+                            ) 
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(14.dp))
+
+                // Pass / Like buttons.
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    profile.interests.forEach { InterestChip(text = it) }
-                }
-            }
-
-            Spacer(Modifier.height(14.dp))
-
-            // Pass / Like buttons.
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircleActionButton(
-                    enabled = interactive,
-                    onClick = {
-                        coroutineScope.launch {
-                            offsetX.animateTo(-2000f)
-                            onSwipeLeft()
+                    CircleActionButton(
+                        enabled = interactive,
+                        containerColor = Color.White.copy(alpha = 0.2f),
+                        onClick = {
+                            coroutineScope.launch {
+                                offsetX.animateTo(-2000f)
+                                onSwipeLeft()
+                            }
                         }
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Pass", tint = Color.White, modifier = Modifier.size(28.dp))
                     }
-                ) {
-                    Icon(Icons.Default.Close, contentDescription = "Pass", tint = CardName, modifier = Modifier.size(28.dp))
-                }
-                CircleActionButton(
-                    enabled = interactive,
-                    onClick = {
-                        coroutineScope.launch {
-                            offsetX.animateTo(2000f)
-                            onSwipeRight()
+                    CircleActionButton(
+                        enabled = interactive,
+                        containerColor = Color.White,
+                        onClick = {
+                            coroutineScope.launch {
+                                offsetX.animateTo(2000f)
+                                onSwipeRight()
+                            }
                         }
+                    ) {
+                        Icon(Icons.Default.Favorite, contentDescription = "Like", tint = NeonColors.Accent, modifier = Modifier.size(28.dp))
                     }
-                ) {
-                    Icon(Icons.Default.Favorite, contentDescription = "Like", tint = NeonColors.Accent, modifier = Modifier.size(28.dp))
                 }
             }
         }
@@ -314,11 +353,11 @@ private fun PhotoCarousel(
                     )
             )
 
-            // Story-style segmented progress bars along the bottom of the photo.
+            // Story-style segmented progress bars along the top of the photo.
             if (count > 1) {
                 Row(
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
+                        .align(Alignment.TopCenter)
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -381,14 +420,18 @@ private fun Avatar(photoUrl: String?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun InterestChip(text: String) {
+private fun InterestChip(
+    text: String, 
+    textColor: Color = ChipText,
+    backgroundColor: Color = ChipBackground
+) {
     Text(
         text = text,
-        color = ChipText,
+        color = textColor,
         style = MaterialTheme.typography.labelMedium,
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(ChipBackground)
+            .background(backgroundColor)
             .padding(horizontal = 14.dp, vertical = 7.dp)
     )
 }
@@ -397,13 +440,14 @@ private fun InterestChip(text: String) {
 private fun CircleActionButton(
     onClick: () -> Unit,
     enabled: Boolean = true,
+    containerColor: Color = ChipBackground,
     content: @Composable () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(52.dp)
             .clip(CircleShape)
-            .background(ChipBackground)
+            .background(containerColor)
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {

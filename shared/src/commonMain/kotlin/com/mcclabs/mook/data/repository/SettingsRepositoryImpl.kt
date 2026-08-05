@@ -120,4 +120,54 @@ class SettingsRepositoryImpl : SettingsRepository {
         isDarkModeFlow.value = isDark
         isDarkModeLoaded = true
     }
+
+    private val appLanguageFlow = MutableStateFlow("en")
+    private var appLanguageLoaded = false
+
+    override fun observeAppLanguage(): Flow<String> = appLanguageFlow.asStateFlow()
+
+    override suspend fun getAppLanguage(): String {
+        val userId = Firebase.auth.currentUser?.uid ?: return appLanguageFlow.value
+        if (appLanguageLoaded) return appLanguageFlow.value
+
+        val language = try {
+            val document = appFirestore.collection("users").document(userId).get()
+            runCatching { document.get<String>("appLanguage") }.getOrNull() ?: "en"
+        } catch (e: Exception) {
+            Log.e("Uygulama dili okunamadı, varsayılana dönülüyor", e)
+            "en"
+        }
+
+        appLanguageFlow.value = language
+        appLanguageLoaded = true
+        return language
+    }
+
+    override suspend fun setAppLanguage(language: String) {
+        val userId = Firebase.auth.currentUser?.uid ?: return
+        appFirestore.collection("users").document(userId).set(
+            mapOf("appLanguage" to language),
+            merge = true
+        )
+        appLanguageFlow.value = language
+        appLanguageLoaded = true
+    }
+
+    override suspend fun getHasSeenLikedMeTutorial(): Boolean {
+        val userId = Firebase.auth.currentUser?.uid ?: return false
+        return try {
+            val document = appFirestore.collection("users").document(userId).get()
+            runCatching { document.get<Boolean>("hasSeenLikedMeTutorial") }.getOrNull() ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun setHasSeenLikedMeTutorial(seen: Boolean) {
+        val userId = Firebase.auth.currentUser?.uid ?: return
+        appFirestore.collection("users").document(userId).set(
+            mapOf("hasSeenLikedMeTutorial" to seen),
+            merge = true
+        )
+    }
 }

@@ -70,4 +70,17 @@ class InteractionRepositoryImpl : InteractionRepository {
             MatchResult.Error(e.message ?: "Unknown error occurred during swipe")
         }
     }
+
+    override suspend fun checkMutualMatch(withUserId: String): Boolean {
+        return try {
+            val currentUserId = Firebase.auth.currentUser?.uid ?: return false
+            val matchId = if (currentUserId < withUserId) "${currentUserId}_${withUserId}" else "${withUserId}_${currentUserId}"
+            
+            val matchDoc = appFirestore.collection("matches").document(matchId).get()
+            matchDoc.exists
+        } catch (e: Exception) {
+            Log.e("Karşılıklı eşleşme kontrolünde hata (withUserId=$withUserId)", e)
+            false
+        }
+    }
 }

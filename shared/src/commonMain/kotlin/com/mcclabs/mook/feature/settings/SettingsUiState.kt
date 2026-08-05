@@ -11,4 +11,6 @@ data class SettingsUiState(
     val showDeleteConfirmDialog: Boolean = false,
     /** Non-null when account deletion failed; shown as an error message in the UI. */
     val deleteError: String? = null,
+    val appLanguage: String = "en",
+    val showLanguageDialog: Boolean = false
 )

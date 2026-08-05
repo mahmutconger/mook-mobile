@@ -8,5 +8,18 @@
 	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Mook requires access to your photo library so you can select and upload profile photos for your language exchange profile.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.mcclabs.mook</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mook</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

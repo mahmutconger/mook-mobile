@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalUriHandler
 import com.mcclabs.mook.ui.components.NeonToggle
 import com.mcclabs.mook.ui.theme.NeonColors
-import mook.shared.generated.resources.Res
-import mook.shared.generated.resources.back_svgrepo_com
+import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -66,7 +66,7 @@ fun SettingsScreen(
             containerColor = NeonColors.Card,
             title = {
                 Text(
-                    text = "Hesabı Sil",
+                    text = stringResource(Res.string.settings_delete_account_title),
                     style = MaterialTheme.typography.titleMedium,
                     color = NeonColors.TextPrimary,
                     fontWeight = FontWeight.Bold
@@ -74,9 +74,7 @@ fun SettingsScreen(
             },
             text = {
                 Text(
-                    text = "Hesabını kalıcı olarak silmek istediğinden emin misin? " +
-                        "Profil bilgilerin, fotoğrafların ve tüm eşleşmelerin silinecek. " +
-                        "Bu işlem geri alınamaz.",
+                    text = stringResource(Res.string.settings_delete_account_message),
                     style = MaterialTheme.typography.bodyMedium,
                     color = NeonColors.TextSecondary
                 )
@@ -86,7 +84,7 @@ fun SettingsScreen(
                     onClick = viewModel::onDeleteConfirm,
                     colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Error)
                 ) {
-                    Text("Evet, Sil", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.settings_delete_account_confirm), color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -94,7 +92,7 @@ fun SettingsScreen(
                     onClick = viewModel::onDeleteDismiss,
                     colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder)
                 ) {
-                    Text("İptal", color = NeonColors.TextPrimary)
+                    Text(stringResource(Res.string.settings_delete_account_cancel), color = NeonColors.TextPrimary)
                 }
             }
         )
@@ -124,23 +122,78 @@ fun SettingsScreen(
                 )
             }
             Text(
-                text = "Settings",
+                text = stringResource(Res.string.settings_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = NeonColors.TextPrimary,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // ── Language Selection Dialog ───────────────────────────────────────────
+        if (state.showLanguageDialog) {
+            AlertDialog(
+                onDismissRequest = viewModel::onLanguageDismiss,
+                containerColor = NeonColors.Card,
+                title = {
+                    Text(
+                        text = stringResource(Res.string.settings_language_dialog_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = NeonColors.TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Column {
+                        val languages = listOf(
+                            "en" to "English",
+                            "tr" to "Türkçe",
+                            "es" to "Español",
+                            "fr" to "Français",
+                            "de" to "Deutsch",
+                            "it" to "Italiano",
+                            "pt" to "Português",
+                            "ru" to "Русский",
+                            "zh" to "中文",
+                            "ja" to "日本語"
+                        )
+                        languages.forEach { (code, name) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { viewModel.onLanguageSelected(code) }
+                                    .padding(vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = name,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (state.appLanguage == code) NeonColors.Primary else NeonColors.TextPrimary,
+                                    fontWeight = if (state.appLanguage == code) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = viewModel::onLanguageDismiss,
+                        colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder)
+                    ) {
+                        Text(stringResource(Res.string.settings_language_dialog_close), color = NeonColors.TextPrimary)
+                    }
+                }
+            )
+        }
 
-        // Account
-        SectionLabel("ACCOUNT")
-        SettingsRow(title = "Email", value = state.email.ifEmpty { "—" })
+        // Account Details Section
+        Spacer(modifier = Modifier.height(24.dp))
+        SectionLabel(stringResource(Res.string.settings_account_section))
+        SettingsRow(title = stringResource(Res.string.settings_email_label), value = state.email.ifEmpty { "—" })
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // Appearance
-        SectionLabel("APPEARANCE")
+        SectionLabel(stringResource(Res.string.settings_appearance_section))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -149,12 +202,12 @@ fun SettingsScreen(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Koyu Tema",
+                    text = stringResource(Res.string.settings_dark_mode_title),
                     style = MaterialTheme.typography.bodyLarge,
                     color = NeonColors.TextPrimary
                 )
                 Text(
-                    text = "Uygulama genelinde koyu tema kullan",
+                    text = stringResource(Res.string.settings_dark_mode_subtitle),
                     style = MaterialTheme.typography.labelSmall,
                     color = NeonColors.TextSecondary
                 )
@@ -165,10 +218,23 @@ fun SettingsScreen(
             )
         }
 
+        val languageMap = mapOf(
+            "en" to "English", "tr" to "Türkçe", "es" to "Español", "fr" to "Français",
+            "de" to "Deutsch", "it" to "Italiano", "pt" to "Português", "ru" to "Русский",
+            "zh" to "中文", "ja" to "日本語"
+        )
+        val currentLangName = languageMap[state.appLanguage] ?: "English"
+
+        SettingsRow(
+            title = stringResource(Res.string.settings_app_language_label),
+            value = currentLangName,
+            onClick = viewModel::onLanguageClick
+        )
+
         Spacer(modifier = Modifier.height(24.dp))
 
         // Discovery
-        SectionLabel("DISCOVERY")
+        SectionLabel(stringResource(Res.string.settings_discovery_section))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -177,12 +243,12 @@ fun SettingsScreen(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Show me in Discover",
+                    text = stringResource(Res.string.settings_show_in_discover_title),
                     style = MaterialTheme.typography.bodyLarge,
                     color = NeonColors.TextPrimary
                 )
                 Text(
-                    text = "Let others discover your profile",
+                    text = stringResource(Res.string.settings_show_in_discover_subtitle),
                     style = MaterialTheme.typography.labelSmall,
                     color = NeonColors.TextSecondary
                 )
@@ -193,7 +259,7 @@ fun SettingsScreen(
             )
         }
         SettingsRow(
-            title = "Age preferences",
+            title = stringResource(Res.string.settings_age_preferences_label),
             value = "${state.ageRangeStart} - ${state.ageRangeEnd}",
             onClick = onNavigateToFilters
         )
@@ -201,10 +267,10 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Legal
-        SectionLabel("LEGAL")
+        SectionLabel(stringResource(Res.string.settings_legal_section))
         SettingsRow(
-            title = "Privacy Policy & Terms of Use",
-            value = "View",
+            title = stringResource(Res.string.settings_privacy_policy_label),
+            value = stringResource(Res.string.settings_view_label),
             onClick = { uriHandler.openUri("https://walktalkk.com/legal.html") }
         )
 
@@ -220,7 +286,7 @@ fun SettingsScreen(
             colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Çıkış Yap", color = NeonColors.Error, fontWeight = FontWeight.Bold)
+            Text(stringResource(Res.string.settings_logout_button), color = NeonColors.Error, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -237,7 +303,7 @@ fun SettingsScreen(
             enabled = !state.isLoading
         ) {
             Text(
-                text = "Hesabı Kalıcı Olarak Sil",
+                text = stringResource(Res.string.settings_delete_account_button),
                 color = androidx.compose.ui.graphics.Color.White,
                 fontWeight = FontWeight.Bold
             )

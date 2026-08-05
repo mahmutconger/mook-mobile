@@ -14,4 +14,6 @@ data class ProfileDetailsUiState(
     val selectedReportReason: String? = null,
     /** Whether the block-user confirmation dialog is visible. */
     val showBlockConfirmDialog: Boolean = false,
+    /** True if there is a mutual match with this profile. Used to show/hide the message button. */
+    val isMatched: Boolean = false
 )

@@ -38,9 +38,9 @@ import com.mcclabs.mook.ui.components.LanguageDropdown
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.StepIndicator
 import com.mcclabs.mook.ui.theme.NeonColors
-import mook.shared.generated.resources.Res
-import mook.shared.generated.resources.sort_from_top_to_bottom_svgrepo_com
+import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -81,7 +81,7 @@ fun OnboardingScreen(
 
         // "STEP 1 OF 3" label
         Text(
-            text = "STEP 1 OF 3",
+            text = stringResource(Res.string.onboarding_step_indicator),
             style = MaterialTheme.typography.labelMedium.copy(
                 letterSpacing = 3.sp
             ),
@@ -92,7 +92,7 @@ fun OnboardingScreen(
 
         // Title
         Text(
-            text = "Select Languages",
+            text = stringResource(Res.string.onboarding_title),
             style = MaterialTheme.typography.headlineLarge,
             color = NeonColors.TextPrimary,
             fontWeight = FontWeight.Bold,
@@ -103,7 +103,7 @@ fun OnboardingScreen(
 
         // Subtitle
         Text(
-            text = "Choose the languages you want to practice tonight.",
+            text = stringResource(Res.string.onboarding_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = NeonColors.TextSecondary,
             textAlign = TextAlign.Center,
@@ -118,14 +118,14 @@ fun OnboardingScreen(
         ) {
             // Native Language
             Text(
-                text = "Native Language",
+                text = stringResource(Res.string.onboarding_native_language_label),
                 style = MaterialTheme.typography.labelLarge,
                 color = NeonColors.TextSecondary,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             LanguageDropdown(
-                label = "Select Native Language",
+                label = stringResource(Res.string.onboarding_select_native_language),
                 selectedLanguage = state.selectedNativeLanguage,
                 onLanguageSelected = viewModel::selectNativeLanguage,
                 languages = state.availableLanguages,
@@ -149,7 +149,7 @@ fun OnboardingScreen(
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.sort_from_top_to_bottom_svgrepo_com),
-                        contentDescription = "Swap languages",
+                        contentDescription = stringResource(Res.string.onboarding_swap_languages_cd),
                         tint = NeonColors.Primary,
                         modifier = Modifier
                             .size(40.dp)
@@ -162,14 +162,14 @@ fun OnboardingScreen(
 
             // Target Language
             Text(
-                text = "Target Language",
+                text = stringResource(Res.string.onboarding_target_language_label),
                 style = MaterialTheme.typography.labelLarge,
                 color = NeonColors.TextSecondary,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             LanguageDropdown(
-                label = "Select Target Language",
+                label = stringResource(Res.string.onboarding_select_target_language),
                 selectedLanguage = state.selectedTargetLanguage,
                 onLanguageSelected = viewModel::selectTargetLanguage,
                 languages = state.availableLanguages,
@@ -180,7 +180,7 @@ fun OnboardingScreen(
 
             // Target Level label + current value
             Text(
-                text = "Target Level",
+                text = stringResource(Res.string.onboarding_target_level_label),
                 style = MaterialTheme.typography.labelLarge,
                 color = NeonColors.TextSecondary,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -236,7 +236,7 @@ fun OnboardingScreen(
 
         // Continue button
         NeonPrimaryButton(
-            text = "Continue",
+            text = stringResource(Res.string.onboarding_continue_button),
             onClick = viewModel::onContinue,
             modifier = Modifier.fillMaxWidth(),
             isLoading = state.isLoading,

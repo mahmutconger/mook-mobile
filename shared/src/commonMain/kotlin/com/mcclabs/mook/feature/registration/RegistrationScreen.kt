@@ -66,18 +66,7 @@ import com.mcclabs.mook.util.rememberGalleryPicker
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import mook.shared.generated.resources.Res
-import mook.shared.generated.resources.back_svgrepo_com
-import mook.shared.generated.resources.ic_email
-import mook.shared.generated.resources.ic_user
-import mook.shared.generated.resources.lock_keyhole_minimalistic_svgrepo_com__1_
-import mook.shared.generated.resources.calendar_svgrepo_com
-import mook.shared.generated.resources.legal_accept_eula
-import mook.shared.generated.resources.legal_accept_terms
-import mook.shared.generated.resources.legal_consent_paragraph
-import mook.shared.generated.resources.legal_eula_error
-import mook.shared.generated.resources.legal_terms_error
-import mook.shared.generated.resources.legal_zero_tolerance
+import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -124,11 +113,11 @@ fun RegistrationScreen(
                 TextButton(onClick = {
                     viewModel.onBirthDateChange(datePickerState.selectedDateMillis)
                     showDatePicker = false
-                }) { Text("OK", color = NeonColors.Primary) }
+                }) { Text(stringResource(Res.string.registration_date_picker_ok), color = NeonColors.Primary) }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel", color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.registration_date_picker_cancel), color = NeonColors.TextSecondary)
                 }
             }
         ) {
@@ -146,7 +135,7 @@ fun RegistrationScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Sorry, you are not eligible to use Mook at this time.",
+                text = stringResource(Res.string.registration_age_blocked_error),
                 style = MaterialTheme.typography.headlineMedium,
                 color = NeonColors.TextPrimary,
                 textAlign = TextAlign.Center
@@ -191,10 +180,10 @@ fun RegistrationScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         val (title, subtitle) = when (state.currentStep) {
-            1 -> "When is your birthday?" to "Please enter your date of birth"
-            2 -> "Your languages" to "The language you speak and where you're from"
-            3 -> "About you" to "Your name and gender"
-            else -> "Finish signing up" to "Add your photos and account details"
+            1 -> stringResource(Res.string.registration_step1_title) to stringResource(Res.string.registration_step1_subtitle)
+            2 -> stringResource(Res.string.registration_step2_title) to stringResource(Res.string.registration_step2_subtitle)
+            3 -> stringResource(Res.string.registration_step3_title) to stringResource(Res.string.registration_step3_subtitle)
+            else -> stringResource(Res.string.registration_step4_title) to stringResource(Res.string.registration_step4_subtitle)
         }
         Text(
             text = title,
@@ -243,7 +232,7 @@ fun RegistrationScreen(
 
         val isLastStep = state.currentStep == TOTAL_STEPS
         NeonPrimaryButton(
-            text = if (isLastStep) "Create Account" else "Continue",
+            text = if (isLastStep) stringResource(Res.string.registration_create_account) else stringResource(Res.string.registration_continue),
             onClick = { if (isLastStep) viewModel.completeProfile() else viewModel.onNextStep() },
             modifier = Modifier.fillMaxWidth(),
             isLoading = state.isLoading,
@@ -264,7 +253,7 @@ private fun ColumnScope.StepAgeGate(
     onOpenDatePicker: () -> Unit
 ) {
     Text(
-        text = "DATE OF BIRTH",
+        text = stringResource(Res.string.registration_date_of_birth_label),
         style = MaterialTheme.typography.labelMedium,
         color = NeonColors.TextSecondary,
         modifier = Modifier.fillMaxWidth()
@@ -280,7 +269,7 @@ private fun ColumnScope.StepAgeGate(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = state.birthDateMillis?.let { formatBirthDate(it) } ?: "Select your birth date",
+            text = state.birthDateMillis?.let { formatBirthDate(it) } ?: stringResource(Res.string.registration_select_birth_date),
             style = MaterialTheme.typography.bodyLarge,
             color = if (state.birthDateMillis != null) NeonColors.TextPrimary else NeonColors.TextTertiary,
             modifier = Modifier.weight(1f)
@@ -302,7 +291,7 @@ private fun ColumnScope.StepAgeGate(
 @Composable
 private fun ColumnScope.StepLanguages(state: RegistrationUiState, viewModel: RegistrationViewModel) {
     LanguageDropdown(
-        label = "LANGUAGE",
+        label = stringResource(Res.string.registration_language_label),
         selectedLanguage = state.selectedLanguage,
         onLanguageSelected = viewModel::onLanguageChange,
         languages = state.availableLanguages
@@ -311,7 +300,7 @@ private fun ColumnScope.StepLanguages(state: RegistrationUiState, viewModel: Reg
     Spacer(modifier = Modifier.height(20.dp))
 
     CountryDropdown(
-        label = "COUNTRY",
+        label = stringResource(Res.string.registration_country_label),
         selectedCountry = state.selectedCountry,
         onCountrySelected = viewModel::onCountryChange,
         countries = state.availableCountries
@@ -331,8 +320,8 @@ private fun ColumnScope.StepAboutYou(
     CustomAuthTextField(
         value = state.displayName,
         onValueChange = viewModel::onDisplayNameChange,
-        label = "FULL NAME",
-        placeholder = "Enter your full name",
+        label = stringResource(Res.string.registration_full_name_label),
+        placeholder = stringResource(Res.string.registration_full_name_placeholder),
         modifier = Modifier.fillMaxWidth(),
         isError = state.displayNameError != null,
         errorMessage = state.displayNameError,
@@ -343,7 +332,7 @@ private fun ColumnScope.StepAboutYou(
 
     // Gender
     Text(
-        text = "GENDER",
+        text = stringResource(Res.string.registration_gender_label),
         style = MaterialTheme.typography.labelMedium,
         color = NeonColors.TextSecondary,
         modifier = Modifier.fillMaxWidth()
@@ -351,9 +340,9 @@ private fun ColumnScope.StepAboutYou(
     Spacer(modifier = Modifier.height(8.dp))
     SegmentedPicker(
         options = listOf(
-            Gender.MALE to "Male",
-            Gender.FEMALE to "Female",
-            Gender.OTHER to "Other"
+            Gender.MALE to stringResource(Res.string.registration_gender_male),
+            Gender.FEMALE to stringResource(Res.string.registration_gender_female),
+            Gender.OTHER to stringResource(Res.string.registration_gender_other)
         ),
         selectedValue = state.gender,
         onSelected = viewModel::onGenderChange
@@ -384,8 +373,8 @@ private fun ColumnScope.StepAccount(
     CustomAuthTextField(
         value = state.email,
         onValueChange = viewModel::onEmailChange,
-        label = "EMAIL",
-        placeholder = "Enter your email",
+        label = stringResource(Res.string.registration_email_label),
+        placeholder = stringResource(Res.string.registration_email_placeholder),
         modifier = Modifier.fillMaxWidth(),
         isError = state.emailError != null,
         errorMessage = state.emailError,
@@ -397,8 +386,8 @@ private fun ColumnScope.StepAccount(
     CustomAuthTextField(
         value = state.password,
         onValueChange = viewModel::onPasswordChange,
-        label = "PASSWORD",
-        placeholder = "Create a password",
+        label = stringResource(Res.string.registration_password_label),
+        placeholder = stringResource(Res.string.registration_password_placeholder),
         modifier = Modifier.fillMaxWidth(),
         isPassword = true,
         isError = state.passwordError != null,
@@ -411,8 +400,8 @@ private fun ColumnScope.StepAccount(
     CustomAuthTextField(
         value = state.confirmPassword,
         onValueChange = viewModel::onConfirmPasswordChange,
-        label = "CONFIRM PASSWORD",
-        placeholder = "Re-enter your password",
+        label = stringResource(Res.string.registration_confirm_password_label),
+        placeholder = stringResource(Res.string.registration_confirm_password_placeholder),
         modifier = Modifier.fillMaxWidth(),
         isPassword = true,
         isError = state.confirmPasswordError != null,
@@ -424,7 +413,7 @@ private fun ColumnScope.StepAccount(
 
     // Discovery photos
     Text(
-        text = "DISCOVERY PHOTOS (At least 1 required)",
+        text = stringResource(Res.string.registration_discovery_photos_label),
         style = MaterialTheme.typography.labelSmall,
         color = NeonColors.TextSecondary,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
@@ -438,7 +427,7 @@ private fun ColumnScope.StepAccount(
         state.discoveryPhotos.forEach { uri ->
             AsyncImage(
                 model = uri,
-                contentDescription = "Discovery photo",
+                contentDescription = stringResource(Res.string.registration_discovery_photo_cd),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(64.dp)
@@ -464,8 +453,8 @@ private fun ColumnScope.StepAccount(
     CustomAuthTextField(
         value = state.bio,
         onValueChange = viewModel::onBioChange,
-        label = "BIO",
-        placeholder = "Tell us about yourself...",
+        label = stringResource(Res.string.registration_bio_label),
+        placeholder = stringResource(Res.string.registration_bio_placeholder),
         modifier = Modifier.fillMaxWidth(),
         singleLine = false,
         minLines = 3,
@@ -477,7 +466,7 @@ private fun ColumnScope.StepAccount(
 
     // Interests
     Text(
-        text = "INTERESTS",
+        text = stringResource(Res.string.registration_interests_label),
         style = MaterialTheme.typography.labelMedium,
         color = NeonColors.TextSecondary,
         modifier = Modifier.fillMaxWidth()
@@ -506,12 +495,12 @@ private fun ColumnScope.StepAccount(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Show me in Discover",
+                text = stringResource(Res.string.registration_show_in_discover_title),
                 style = MaterialTheme.typography.bodyLarge,
                 color = NeonColors.TextPrimary
             )
             Text(
-                text = "Let others discover your profile",
+                text = stringResource(Res.string.registration_show_in_discover_subtitle),
                 style = MaterialTheme.typography.labelSmall,
                 color = NeonColors.TextSecondary
             )
@@ -606,7 +595,7 @@ private fun ColumnScope.StepAccount(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Read Privacy Policy & Terms of Use",
+            text = stringResource(Res.string.registration_read_privacy_policy),
             style = MaterialTheme.typography.labelMedium,
             color = NeonColors.Primary
         )

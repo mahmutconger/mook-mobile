@@ -137,7 +137,19 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         }
 
         Log.d("Discover sonuç: ${profiles.size} profil gösterilecek")
-        return profiles
+        
+        val profilesWithLikeInfo = profiles.map { profile ->
+            val interactionDocId = "${profile.id}_$currentUid"
+            try {
+                val doc = db.collection("interactions").document(interactionDocId).get()
+                val hasLikedMe = doc.exists && runCatching { doc.get<String>("type") }.getOrNull() == "like"
+                profile.copy(hasLikedMe = hasLikedMe)
+            } catch (e: Exception) {
+                profile
+            }
+        }
+
+        return profilesWithLikeInfo
     }
 
     /**

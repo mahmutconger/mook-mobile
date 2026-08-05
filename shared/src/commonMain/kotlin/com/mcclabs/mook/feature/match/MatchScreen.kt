@@ -17,6 +17,9 @@ import com.mcclabs.mook.ui.components.WalkTalkRedirectDialog
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.ParticleBackground
 import com.mcclabs.mook.ui.theme.NeonColors
+import mook.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -65,7 +68,7 @@ fun MatchScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "It's a Match!",
+                text = stringResource(Res.string.match_title),
                 color = NeonColors.Primary,
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
@@ -75,7 +78,7 @@ fun MatchScreen(
 
             state.matchedUserName?.let { name ->
                 Text(
-                    text = "You and $name liked each other",
+                    text = stringResource(Res.string.match_liked_each_other, name),
                     color = NeonColors.TextSecondary,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 32.dp)
@@ -90,7 +93,7 @@ fun MatchScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             NeonPrimaryButton(
-                text = "💬 Chat on WalkTalk",
+                text = stringResource(Res.string.match_chat_walktalk),
                 onClick = { viewModel.onChatClicked() },
                 modifier = Modifier.padding(horizontal = 32.dp).fillMaxWidth().height(56.dp)
             )
@@ -99,7 +102,7 @@ fun MatchScreen(
 
             TextButton(onClick = onKeepSwiping) {
                 Text(
-                    text = "Keep Swiping",
+                    text = stringResource(Res.string.match_keep_swiping),
                     color = NeonColors.TextSecondary,
                     fontWeight = FontWeight.SemiBold
                 )
