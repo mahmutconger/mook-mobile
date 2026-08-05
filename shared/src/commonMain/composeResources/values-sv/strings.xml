@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Chatten fortsätter på WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Träffa %1$s på WalkTalk</string>
+    <string name="walktalk_dialog_body">Meddelanden är som bäst på WalkTalk! Njut av smidigare chattar med högre kvalitet, röstsamtal och direktöversättning så att du kan prata utan språkbarriär.</string>
+    <string name="walktalk_dialog_feature_translation">Direktöversättning — ingen språkbarriär</string>
+    <string name="walktalk_dialog_feature_voice">Röstchatt</string>
+    <string name="walktalk_dialog_feature_quality">En smidigare upplevelse med högre kvalitet</string>
+    <string name="walktalk_dialog_back">Tillbaka</string>
+    <string name="walktalk_dialog_confirm">Hitta på WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Genom att skapa ett konto godkänner du våra användarvillkor och sekretesspolicy. Mook förbjuder strängt att skapa, ladda upp eller dela material för sexuellt övergrepp mot barn (CSAM) eller exploatering (CSAE). Varje överträdelse kommer att resultera i omedelbar kontouppsägning och rapportering till myndigheterna.</string>
+    <string name="legal_accept_terms">Jag accepterar användarvillkoren</string>
+    <string name="legal_accept_eula">Jag accepterar slutanvändarlicensavtalet</string>
+    <string name="legal_zero_tolerance">Det finns nolltolerans för stötande innehåll, kränkande användare, trakasserier eller uppladdning av sexuellt explicit material. Överträdare kommer att förbjudas permanent.</string>
+    <string name="legal_terms_error">Du måste acceptera användarvillkoren för att fortsätta</string>
+    <string name="legal_eula_error">Du måste godkänna EULA för att fortsätta</string>
+    <string name="eula_gate_welcome">Välkommen till Mook</string>
+    <string name="eula_gate_subtitle">Vänligen granska och godkänn för att fortsätta</string>
+    <string name="legal_eula_body">Genom att använda Mook godkänner du våra användarvillkor och slutanvändarlicensavtal (EULA).\n\nDet finns nolltolerans för stötande innehåll, kränkande användare, trakasserier eller uppladdning av sexuellt explicit material. Överträdare kommer att förbjudas permanent.\n\nDu är ansvarig för innehållet du skapar och delar. Rapporterat innehåll och användare granskas och konton som bryter mot denna policy tas bort. Du kan rapportera eller blockera vilken användare som helst från deras profil.</string>
+    <string name="eula_gate_accept">Jag har läst och accepterar användarvillkoren och EULA</string>
+    <string name="eula_gate_continue">Acceptera och fortsätt</string>
+    <string name="eula_gate_logout">Logga ut</string>
+</resources>

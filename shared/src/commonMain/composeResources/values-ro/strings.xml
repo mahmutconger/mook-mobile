@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Conversația continuă pe WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Cunoaște-l pe %1$s pe WalkTalk</string>
+    <string name="walktalk_dialog_body">Mesageria e la superlativ pe WalkTalk! Bucură-te de conversații mai fluide și de calitate, conversație vocală și traducere instantanee, ca să vorbești fără barieră lingvistică.</string>
+    <string name="walktalk_dialog_feature_translation">Traducere instantanee — fără barieră lingvistică</string>
+    <string name="walktalk_dialog_feature_voice">Chat vocal</string>
+    <string name="walktalk_dialog_feature_quality">O experiență mai fluidă și de calitate</string>
+    <string name="walktalk_dialog_back">Înapoi</string>
+    <string name="walktalk_dialog_confirm">Găsește pe WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Prin crearea unui cont, sunteți de acord cu Termenii de utilizare și Politica noastră de confidențialitate. Mook interzice cu strictețe crearea, încărcarea sau partajarea Materialelor de abuz sexual asupra copiilor (CSAM) sau Exploatarea (CSAE). Orice încălcare va avea ca rezultat închiderea imediată a contului și raportarea către autorități.</string>
+    <string name="legal_accept_terms">Accept Termenii de utilizare</string>
+    <string name="legal_accept_eula">Accept Acordul de licență pentru utilizatorul final</string>
+    <string name="legal_zero_tolerance">Există toleranță zero pentru conținutul inacceptabil, utilizatorii abuzivi, hărțuirea sau încărcarea de materiale cu caracter sexual explicit. Încălcatorii vor fi interziși definitiv.</string>
+    <string name="legal_terms_error">Trebuie să acceptați Termenii de utilizare pentru a continua</string>
+    <string name="legal_eula_error">Trebuie să acceptați EULA pentru a continua</string>
+    <string name="eula_gate_welcome">Bun venit la Mook</string>
+    <string name="eula_gate_subtitle">Vă rugăm să examinați și să acceptați pentru a continua</string>
+    <string name="legal_eula_body">Folosind Mook, sunteți de acord cu Termenii de utilizare și Acordul de licență pentru utilizatorul final (EULA).\n\nExistă toleranță zero pentru conținutul inacceptabil, utilizatorii abuzivi, hărțuirea sau încărcarea de materiale cu caracter sexual explicit. Încălcatorii vor fi interziși definitiv.\n\nSunteți responsabil pentru conținutul pe care îl creați și îl distribuiți. Conținutul raportat și utilizatorii sunt examinate, iar conturile care încalcă această politică sunt eliminate. Puteți raporta sau bloca oricând orice utilizator din profilul său.</string>
+    <string name="eula_gate_accept">Am citit și accept Termenii de utilizare și EULA</string>
+    <string name="eula_gate_continue">Acceptați și continuați</string>
+    <string name="eula_gate_logout">Deconectați-vă</string>
+</resources>

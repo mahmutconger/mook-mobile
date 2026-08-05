@@ -1,0 +1,253 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isMe(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // Versiyon kontrolü için herkese açık okuma — sadece settings/app_info belgesi
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if isMe(uid);
+      allow update: if isMe(uid);
+      allow delete: if false;
+    }
+
+    // ---------------------------------------------------------------------
+    // WalkMatch: kaydırma kayıtları. Doküman kimliği "{fromUserId}_{toUserId}".
+    // ---------------------------------------------------------------------
+    match /interactions/{interactionId} {
+      function validInteraction(data) {
+        return data.fromUserId == request.auth.uid
+          && data.toUserId is string
+          && data.toUserId != request.auth.uid
+          && data.type in ["like", "pass"]
+          && data.timestamp is number;
+      }
+
+      // get: Karşılıklı beğeni kontrolü, ters dokümanı ("{onlar}_{ben}") okur.
+      // Bu yüzden bana yönelen kaydı da okuyabilmeliyim. Üçüncü kişiler
+      // arasındaki kayıtlar iki koşula da uymadığı için kapalı kalır.
+      //
+      // resource == null: karşı taraf beni henüz kaydırmadıysa ters doküman
+      // yoktur. Var olmayan dokümanı okumaya izin verilmezse "like" akışındaki
+      // eşleşme kontrolü PERMISSION_DENIED alır. Yokluğu görmek veri sızdırmaz.
+      allow get: if signedIn() && (
+        resource == null ||
+        resource.data.fromUserId == request.auth.uid ||
+        resource.data.toUserId == request.auth.uid
+      );
+
+      // list: Yalnızca kendi kaydırmalarım. Sorgu fromUserId'ye göre
+      // filtrelenmek zorunda; aksi halde Firestore statik analizi reddeder.
+      allow list: if signedIn() && resource.data.fromUserId == request.auth.uid;
+
+      allow create: if signedIn() && validInteraction(request.resource.data);
+
+      // set() mevcut dokümanın üzerine yazabilir (aynı kişiyi tekrar kaydırmak).
+      // Kaydın sahibi ve hedefi değiştirilemez.
+      allow update: if signedIn()
+        && resource.data.fromUserId == request.auth.uid
+        && validInteraction(request.resource.data)
+        && request.resource.data.toUserId == resource.data.toUserId;
+
+      allow delete: if false;
+    }
+
+    // ---------------------------------------------------------------------
+    // WalkMatch: eşleşmeler. Doküman kimliği iki uid'in sıralanmış hali.
+    // Eşleşmeyi istemci yazdığı için, kural iki tarafın da "like" kaydının
+    // gerçekten var olmasını şart koşar — yoksa herkes istediğiyle sahte
+    // eşleşme yaratabilirdi.
+    // ---------------------------------------------------------------------
+    match /matches/{matchId} {
+      function otherUid(users) {
+        return users[0] == request.auth.uid ? users[1] : users[0];
+      }
+
+      // Her iki doküman da yoksa get() null döner ve null.type hata fırlatır;
+      // bu yüzden önce ikisinin de varlığı doğrulanır.
+      function likedEachOther(other) {
+        let mine = /databases/$(database)/documents/interactions/$(request.auth.uid + '_' + other);
+        let theirs = /databases/$(database)/documents/interactions/$(other + '_' + request.auth.uid);
+        return exists(mine) && exists(theirs)
+          && get(mine).data.type == "like"
+          && get(theirs).data.type == "like";
+      }
+
+      function validMatch(data) {
+        return data.users is list
+          && data.users.size() == 2
+          && request.auth.uid in data.users
+          && data.users[0] != data.users[1]
+          && data.timestamp is number
+          // Kimlik, iki uid'in birleşiminden başka bir şey olamaz.
+          && (matchId == data.users[0] + '_' + data.users[1] ||
+              matchId == data.users[1] + '_' + data.users[0])
+          && likedEachOther(otherUid(data.users));
+      }
+
+      // Şu an istemci eşleşmeleri sorgulamıyor; ileride listelemek için
+      // sorgu whereArrayContains("users", uid) ile filtrelenmelidir.
+      allow read: if signedIn() && request.auth.uid in resource.data.users;
+
+      allow create: if signedIn() && validMatch(request.resource.data);
+
+      // İki kişi aynı anda kaydırırsa set() üzerine yazabilir.
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.users
+        && request.resource.data.users == resource.data.users
+        && validMatch(request.resource.data);
+
+      allow delete: if false;
+    }
+
+    match /chats/{chatId} {
+      // READ (tekil + query):
+      // `request.auth.uid in resource.data.users` ifadesi,
+      // `whereArrayContains("users", uid)` ile yapılan sorgularda
+      // Firestore'un statik analizi tarafından kanıtlanabilir.
+      // `resource.data.users is list` eklenmesi statik analizde
+      // sorun çıkardığı için kaldırıldı.
+      allow read: if signedIn() && request.auth.uid in resource.data.users;
+
+      // CREATE: Yeni sohbet — kullanıcı kendi uid'ini eklemiş olmalı.
+      allow create: if signedIn()
+        && request.resource.data.users is list
+        && request.auth.uid in request.resource.data.users;
+
+      // UPDATE: Mesaj gönderirken chat dokümanı güncelleniyor (merge:true).
+      // İki senaryo izin verilir:
+      //   a) Mevcut üye güncelleme yapıyor
+      //   b) İlk mesajda create/update karışımı — yeni veri de uid içeriyor
+      allow update: if signedIn() && (
+        request.auth.uid in resource.data.users ||
+        (request.resource.data.users is list && request.auth.uid in request.resource.data.users)
+      );
+
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        // get() null döner ve null.users hata fırlatır — önce exists() kontrolü zorunlu.
+        function chatExists() {
+          return exists(/databases/$(database)/documents/chats/$(chatId));
+        }
+        function userInChat() {
+          return chatExists()
+            && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
+        }
+
+        // Chat henüz yoksa (yeni sohbet) mesaj listesi zaten boş — okumaya izin ver.
+        // Chat varsa kullanıcı üye olmalı.
+        allow read: if signedIn() && (userInChat() || !chatExists());
+
+        // Yazma: artık chat dokümanı önce yazılıyor (FirestoreMessagesRepository),
+        // bu noktada chat her zaman mevcut olacak.
+        allow create: if signedIn()
+          && userInChat()
+          && request.resource.data.senderUid == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    match /public_chats/{languageCode} {
+      allow read: if signedIn();
+      allow create, update, delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if signedIn();
+        allow create: if signedIn()
+          && request.resource.data.senderUid == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    match /calls/{callId} {
+      function isParticipant() {
+        return signedIn() && (
+          resource.data.callerUid == request.auth.uid ||
+          resource.data.receiverUid == request.auth.uid
+        );
+      }
+
+      function validStatus(status) {
+        return status in ["calling", "ringing", "accepted", "rejected", "ended"];
+      }
+
+      allow read: if isParticipant();
+
+      allow create: if signedIn()
+        && request.resource.data.callerUid == request.auth.uid
+        && request.resource.data.receiverUid is string
+        && request.resource.data.receiverUid != request.auth.uid
+        && request.resource.data.status == "calling"
+        && request.resource.data.timestamp is timestamp;
+
+      allow update: if signedIn()
+        && isParticipant()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status"])
+        && validStatus(request.resource.data.status)
+        && request.resource.data.callerUid == resource.data.callerUid
+        && request.resource.data.receiverUid == resource.data.receiverUid
+        && request.resource.data.timestamp == resource.data.timestamp;
+
+      allow delete: if false;
+    }
+
+    match /posts/{postId} {
+      allow read: if signedIn() && (resource.data.isPublic == true || resource.data.authorUid == request.auth.uid);
+      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
+      allow update: if signedIn() && (
+        resource.data.authorUid == request.auth.uid ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(["likedBy", "likeCount"])
+      );
+      allow delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    match /stories/{storyId} {
+      function storyAuthorUid() {
+        return (resource.data.uid is string) ? resource.data.uid : resource.data.authorUid;
+      }
+
+      function isStoryOwner() {
+        return signedIn() && storyAuthorUid() == request.auth.uid;
+      }
+
+      // list (koleksiyon sorgusu): istemci zaten arkadaş UID'leriyle filtreler
+      allow list: if signedIn();
+
+      // get (tek doküman okuma): sahip veya arkadaş olmalı
+      allow get: if signedIn() && (
+        isStoryOwner() ||
+        request.auth.uid in get(/databases/$(database)/documents/users/$(storyAuthorUid())).data.get("friends", [])
+      );
+
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.photoUrl is string
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.viewers is list;
+
+      allow update: if isStoryOwner() || (
+        signedIn()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["viewers"])
+        && request.resource.data.viewers is list
+        && request.auth.uid in request.resource.data.viewers
+      );
+
+      allow delete: if isStoryOwner();
+    }
+
+    match /reports/{reportId} {
+      // Yalnızca Cloud Function (Admin SDK) okuyabilir ve güncelleyebilir
+      allow read, update, delete: if false;
+      // Kimlik doğrulamalı kullanıcılar rapor oluşturabilir
+      // (içerik doğrulaması Cloud Function içinde yapılır)
+      allow create: if signedIn();
+    }
+  }
+}

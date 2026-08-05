@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">對話在 WalkTalk 上繼續</string>
+    <string name="walktalk_dialog_title_named">在 WalkTalk 上結識 %1$s</string>
+    <string name="walktalk_dialog_body">訊息體驗在 WalkTalk 上更出色！享受更流暢、更高品質的聊天、語音對話和即時翻譯，無語言障礙暢聊。</string>
+    <string name="walktalk_dialog_feature_translation">即時翻譯 — 無語言障礙</string>
+    <string name="walktalk_dialog_feature_voice">語音聊天</string>
+    <string name="walktalk_dialog_feature_quality">更流暢、更高品質的體驗</string>
+    <string name="walktalk_dialog_back">返回</string>
+    <string name="walktalk_dialog_confirm">在 WalkTalk 上尋找</string>
+
+    <string name="legal_consent_paragraph">建立帳戶即表示您同意我們的《使用條款》和《隱私權政策》。Mook 嚴格禁止製作、上傳或分享兒童性虐待內容（CSAM）或剝削內容（CSAE）。任何違規行為都將導致帳戶立即終止並向有關當局檢舉。</string>
+    <string name="legal_accept_terms">我接受《使用條款》</string>
+    <string name="legal_accept_eula">我接受《最終使用者授權合約》</string>
+    <string name="legal_zero_tolerance">對不當內容、辱罵使用者、騷擾或上傳露骨色情素材的行為零容忍。違規者將被永久封鎖。</string>
+    <string name="legal_terms_error">您必須接受《使用條款》才能繼續</string>
+    <string name="legal_eula_error">您必須接受 EULA 才能繼續</string>
+    <string name="eula_gate_welcome">歡迎使用 Mook</string>
+    <string name="eula_gate_subtitle">請閱讀並接受以繼續</string>
+    <string name="legal_eula_body">使用 Mook 即表示您同意我們的《使用條款》和《最終使用者授權合約》(EULA)。\n\n對不當內容、辱罵使用者、騷擾或上傳露骨色情素材的行為零容忍。違規者將被永久封鎖。\n\n您需為自己建立和分享的內容負責。被檢舉的內容和使用者將接受審查，違反本政策的帳戶將被移除。您可以隨時在任何使用者的個人檔案中檢舉或封鎖該使用者。</string>
+    <string name="eula_gate_accept">我已閱讀並接受《使用條款》和 EULA</string>
+    <string name="eula_gate_continue">接受並繼續</string>
+    <string name="eula_gate_logout">登出</string>
+</resources>

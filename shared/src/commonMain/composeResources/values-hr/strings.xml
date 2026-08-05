@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Razgovor se nastavlja na WalkTalku</string>
+    <string name="walktalk_dialog_title_named">Upoznajte %1$s na WalkTalku</string>
+    <string name="walktalk_dialog_body">Razmjena poruka najbolja je na WalkTalku! Uživajte u tečnijim i kvalitetnijim razgovorima, glasovnom razgovoru i trenutačnom prijevodu kako biste razgovarali bez jezične barijere.</string>
+    <string name="walktalk_dialog_feature_translation">Trenutačni prijevod — bez jezične barijere</string>
+    <string name="walktalk_dialog_feature_voice">Glasovni razgovor</string>
+    <string name="walktalk_dialog_feature_quality">Tečnije i kvalitetnije iskustvo</string>
+    <string name="walktalk_dialog_back">Natrag</string>
+    <string name="walktalk_dialog_confirm">Pronađi na WalkTalku</string>
+
+    <string name="legal_consent_paragraph">Stvaranjem računa pristajete na naše Uvjete korištenja i Pravila privatnosti. Mook strogo zabranjuje stvaranje, prijenos ili dijeljenje materijala o seksualnom zlostavljanju djece (CSAM) ili iskorištavanju (CSAE). Svako kršenje rezultirat će trenutnim ukidanjem računa i prijavom nadležnim tijelima.</string>
+    <string name="legal_accept_terms">Prihvaćam Uvjete korištenja</string>
+    <string name="legal_accept_eula">Prihvaćam Licencni ugovor za krajnjeg korisnika</string>
+    <string name="legal_zero_tolerance">Postoji nulta tolerancija prema nepoželjnom sadržaju, uvredljivim korisnicima, uznemiravanju ili prijenosu seksualno eksplicitnog materijala. Prekršitelji će biti trajno zabranjeni.</string>
+    <string name="legal_terms_error">Za nastavak morate prihvatiti Uvjete korištenja</string>
+    <string name="legal_eula_error">Morate prihvatiti EULA da biste nastavili</string>
+    <string name="eula_gate_welcome">Dobrodošli u Mook</string>
+    <string name="eula_gate_subtitle">Pregledajte i prihvatite za nastavak</string>
+    <string name="legal_eula_body">Korištenjem Mooka prihvaćate naše Uvjete korištenja i Licencni ugovor s krajnjim korisnikom (EULA).\n\nPostoji nulta tolerancija prema nepoželjnom sadržaju, uvredljivim korisnicima, uznemiravanju ili prijenosu seksualno eksplicitnog materijala. Prekršitelji će biti trajno zabranjeni.\n\nVi ste odgovorni za sadržaj koji stvarate i dijelite. Prijavljeni sadržaj i korisnici se pregledavaju, a računi koji krše ovo pravilo se uklanjaju. Možete prijaviti ili blokirati bilo kojeg korisnika u bilo kojem trenutku s njegovog profila.</string>
+    <string name="eula_gate_accept">Pročitao sam i prihvaćam Uvjete korištenja i EULA</string>
+    <string name="eula_gate_continue">Prihvati i nastavi</string>
+    <string name="eula_gate_logout">Odjavi se</string>
+</resources>

@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">საუბარი გრძელდება WalkTalk-ზე</string>
+    <string name="walktalk_dialog_title_named">გაიცანით %1$s WalkTalk-ზე</string>
+    <string name="walktalk_dialog_body">მიმოწერა საუკეთესოა WalkTalk-ზე! ისიამოვნეთ უფრო გლუვი და ხარისხიანი საუბრებით, ხმოვანი საუბრითა და მყისიერი თარგმანით, რომ ილაპარაკოთ ენობრივი ბარიერის გარეშე.</string>
+    <string name="walktalk_dialog_feature_translation">მყისიერი თარგმანი — ენობრივი ბარიერის გარეშე</string>
+    <string name="walktalk_dialog_feature_voice">ხმოვანი ჩატი</string>
+    <string name="walktalk_dialog_feature_quality">უფრო გლუვი და ხარისხიანი გამოცდილება</string>
+    <string name="walktalk_dialog_back">უკან</string>
+    <string name="walktalk_dialog_confirm">მოძებნეთ WalkTalk-ზე</string>
+
+    <string name="legal_consent_paragraph">ანგარიშის შექმნით თქვენ ეთანხმებით ჩვენს გამოყენების წესებს და კონფიდენციალურობის პოლიტიკას. Mook მკაცრად კრძალავს ბავშვთა სექსუალური ძალადობის მასალის (CSAM) ან ექსპლუატაციის (CSAE) შექმნას, ატვირთვას ან გაზიარებას. ნებისმიერი დარღვევა გამოიწვევს ანგარიშის დაუყონებლივ შეწყვეტას და ხელისუფლებას მოხსენებას.</string>
+    <string name="legal_accept_terms">მე ვეთანხმები გამოყენების წესებს</string>
+    <string name="legal_accept_eula">მე ვეთანხმები საბოლოო მომხმარებლის სალიცენზიო შეთანხმებას</string>
+    <string name="legal_zero_tolerance">ნულოვანი ტოლერანტობაა არასასიამოვნო შინაარსის, შეურაცხმყოფელი მომხმარებლების, შევიწროების ან სექსუალური ხასიათის მასალის ატვირთვის მიმართ. დამრღვევები სამუდამოდ აიკრძალება.</string>
+    <string name="legal_terms_error">გასაგრძელებლად უნდა დაეთანხმოთ გამოყენების პირობებს</string>
+    <string name="legal_eula_error">გასაგრძელებლად თქვენ უნდა მიიღოთ EULA</string>
+    <string name="eula_gate_welcome">კეთილი იყოს თქვენი მობრძანება მუკში</string>
+    <string name="eula_gate_subtitle">გთხოვთ, გადახედოთ და დაეთანხმოთ გასაგრძელებლად</string>
+    <string name="legal_eula_body">Mook-ის გამოყენებით თქვენ ეთანხმებით ჩვენს გამოყენების პირობებს და საბოლოო მომხმარებლის სალიცენზიო შეთანხმებას (EULA).\n\nნულოვანი ტოლერანტობაა არასასიამოვნო შინაარსის, შეურაცხმყოფელი მომხმარებლების, შევიწროების ან სექსუალური ხასიათის მასალის ატვირთვის მიმართ. დამრღვევები სამუდამოდ აიკრძალება.\n\nთქვენ ხართ პასუხისმგებელი ���ქვენს მიერ შექმნილ და გაზიარებულ კონტენტზე. მოხსენებული კონტენტი და მომხმარებლები განიხილება და ანგარიშები, რომლებიც არღვევს ამ წესს, წაიშლება. თქვენ შეგიძლიათ ნებისმიერ დროს შეატყობინოთ ან დაბლოკოთ ნებისმიერი მომხმარებელი მისი პროფილიდან.</string>
+    <string name="eula_gate_accept">მე წავიკითხე და ვეთანხმები გამოყენების წესებს და EULA-ს</string>
+    <string name="eula_gate_continue">მიღება და გაგრძელება</string>
+    <string name="eula_gate_logout">გასვლა</string>
+</resources>

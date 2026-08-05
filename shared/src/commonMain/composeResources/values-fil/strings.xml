@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Nagpapatuloy ang chat sa WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Kilalanin si %1$s sa WalkTalk</string>
+    <string name="walktalk_dialog_body">Pinakamahusay ang pagmememsahe sa WalkTalk! Mag-enjoy ng mas smooth at mas de-kalidad na chat, voice conversation at instant na pagsasalin para makapag-usap nang walang language barrier.</string>
+    <string name="walktalk_dialog_feature_translation">Instant na pagsasalin — walang language barrier</string>
+    <string name="walktalk_dialog_feature_voice">Voice chat</string>
+    <string name="walktalk_dialog_feature_quality">Mas smooth at mas de-kalidad na karanasan</string>
+    <string name="walktalk_dialog_back">Bumalik</string>
+    <string name="walktalk_dialog_confirm">Hanapin sa WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Sa pamamagitan ng paglikha ng isang account, sumasang-ayon ka sa aming Mga Tuntunin ng Paggamit at Patakaran sa Privacy. Mahigpit na ipinagbabawal ni Mook ang paggawa, pag-upload, o pagbabahagi ng Child Sexual Abuse Material (CSAM) o Exploitation (CSAE). Ang anumang paglabag ay magreresulta sa agarang pagwawakas ng account at pag-uulat sa mga awtoridad.</string>
+    <string name="legal_accept_terms">Tinatanggap ko ang Mga Tuntunin ng Paggamit</string>
+    <string name="legal_accept_eula">Tinatanggap ko ang Kasunduan sa Lisensya ng End User</string>
+    <string name="legal_zero_tolerance">Walang pagpapaubaya para sa hindi kanais-nais na nilalaman, mga mapang-abusong user, panliligalig, o pag-upload ng tahasang sekswal na materyal. Ang mga lumalabag ay permanenteng ipagbabawal.</string>
+    <string name="legal_terms_error">Dapat mong tanggapin ang Mga Tuntunin ng Paggamit upang magpatuloy</string>
+    <string name="legal_eula_error">Dapat mong tanggapin ang EULA upang magpatuloy</string>
+    <string name="eula_gate_welcome">Maligayang pagdating sa Mook</string>
+    <string name="eula_gate_subtitle">Mangyaring suriin at tanggapin upang magpatuloy</string>
+    <string name="legal_eula_body">Sa pamamagitan ng paggamit ng Mook sumasang-ayon ka sa aming Mga Tuntunin ng Paggamit at End User License Agreement (EULA).\n\nWalang pagpapaubaya para sa hindi kanais-nais na nilalaman, mga mapang-abusong user, panliligalig, o pag-upload ng tahasang sekswal na materyal. Ang mga lumalabag ay permanenteng ipagbabawal.\n\nIkaw ay may pananagutan para sa nilalaman na iyong nilikha at ibinabahagi. Ang naiulat na nilalaman at mga user ay sinusuri, at ang mga account na lumalabag sa patakarang ito ay aalisin. Maaari mong iulat o i-block ang sinumang user anumang oras mula sa kanilang profile.</string>
+    <string name="eula_gate_accept">Nabasa ko at tinatanggap ko ang Mga Tuntunin ng Paggamit at EULA</string>
+    <string name="eula_gate_continue">Tanggapin at Magpatuloy</string>
+    <string name="eula_gate_logout">Log out</string>
+</resources>

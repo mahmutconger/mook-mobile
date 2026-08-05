@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Obrolan berlanjut di WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Temui %1$s di WalkTalk</string>
+    <string name="walktalk_dialog_body">Perpesanan terbaik ada di WalkTalk! Nikmati obrolan yang lebih lancar dan berkualitas, percakapan suara, dan terjemahan instan agar bisa mengobrol tanpa hambatan bahasa.</string>
+    <string name="walktalk_dialog_feature_translation">Terjemahan instan — tanpa hambatan bahasa</string>
+    <string name="walktalk_dialog_feature_voice">Obrolan suara</string>
+    <string name="walktalk_dialog_feature_quality">Pengalaman yang lebih lancar dan berkualitas</string>
+    <string name="walktalk_dialog_back">Kembali</string>
+    <string name="walktalk_dialog_confirm">Cari di WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Dengan membuat akun, Anda menyetujui Ketentuan Penggunaan dan Kebijakan Privasi kami. Mook melarang keras pembuatan, pengunggahan, atau pembagian Materi Pelecehan Seksual terhadap Anak (CSAM) atau Eksploitasi (CSAE). Pelanggaran apa pun akan mengakibatkan penghentian akun segera dan pelaporan kepada pihak yang berwenang.</string>
+    <string name="legal_accept_terms">Saya menerima Ketentuan Penggunaan</string>
+    <string name="legal_accept_eula">Saya menerima Perjanjian Lisensi Pengguna Akhir</string>
+    <string name="legal_zero_tolerance">Tidak ada toleransi terhadap konten yang tidak menyenangkan, pengguna yang kasar, pelecehan, atau pengunggahan materi seksual eksplisit. Pelanggar akan dilarang secara permanen.</string>
+    <string name="legal_terms_error">Anda harus menerima Ketentuan Penggunaan untuk melanjutkan</string>
+    <string name="legal_eula_error">Anda harus menerima EULA untuk melanjutkan</string>
+    <string name="eula_gate_welcome">Selamat datang di Mook</string>
+    <string name="eula_gate_subtitle">Harap tinjau dan terima untuk melanjutkan</string>
+    <string name="legal_eula_body">Dengan menggunakan Mook, Anda menyetujui Ketentuan Penggunaan dan Perjanjian Lisensi Pengguna Akhir (EULA) kami.\n\nTidak ada toleransi terhadap konten yang tidak menyenangkan, pengguna yang kasar, pelecehan, atau pengunggahan materi seksual eksplisit. Pelanggar akan dilarang secara permanen.\n\nAnda bertanggung jawab atas konten yang Anda buat dan bagikan. Konten dan pengguna yang dilaporkan akan ditinjau, dan akun yang melanggar kebijakan ini akan dihapus. Anda dapat melaporkan atau memblokir pengguna mana pun kapan saja dari profilnya.</string>
+    <string name="eula_gate_accept">Saya telah membaca dan menerima Ketentuan Penggunaan dan EULA</string>
+    <string name="eula_gate_continue">Terima &amp; Lanjutkan</string>
+    <string name="eula_gate_logout">Keluar</string>
+</resources>

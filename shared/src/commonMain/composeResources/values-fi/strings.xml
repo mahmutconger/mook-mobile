@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Keskustelu jatkuu WalkTalkissa</string>
+    <string name="walktalk_dialog_title_named">Tapaa %1$s WalkTalkissa</string>
+    <string name="walktalk_dialog_body">Viestittely on parhaimmillaan WalkTalkissa! Nauti sujuvammista ja laadukkaammista keskusteluista, äänipuheluista ja välittömästä käännöksestä, jotta voit puhua ilman kielimuuria.</string>
+    <string name="walktalk_dialog_feature_translation">Välitön käännös — ei kielimuuria</string>
+    <string name="walktalk_dialog_feature_voice">Äänichatti</string>
+    <string name="walktalk_dialog_feature_quality">Sujuvampi ja laadukkaampi kokemus</string>
+    <string name="walktalk_dialog_back">Takaisin</string>
+    <string name="walktalk_dialog_confirm">Etsi WalkTalkista</string>
+
+    <string name="legal_consent_paragraph">Luomalla tilin hyväksyt käyttöehtomme ja tietosuojakäytäntömme. Mook kieltää tiukasti lasten seksuaalisen hyväksikäytön materiaalin (CSAM) tai hyväksikäytön (CSAE) luomisen, lataamisen tai jakamisen. Kaikki rikkomukset johtavat välittömään tilin sulkemiseen ja ilmoittamiseen viranomaisille.</string>
+    <string name="legal_accept_terms">Hyväksyn käyttöehdot</string>
+    <string name="legal_accept_eula">Hyväksyn loppukäyttäjän lisenssisopimuksen</string>
+    <string name="legal_zero_tolerance">Sopimatonta sisältöä, loukkaavia käyttäjiä, häirintää tai seksuaalisen materiaalin lataamista ei sallita nollatoleranssilla. Rikkomukset estetään pysyvästi.</string>
+    <string name="legal_terms_error">Sinun on hyväksyttävä käyttöehdot jatkaaksesi</string>
+    <string name="legal_eula_error">Sinun on hyväksyttävä EULA jatkaaksesi</string>
+    <string name="eula_gate_welcome">Tervetuloa Mookiin</string>
+    <string name="eula_gate_subtitle">Tarkista ja hyväksy jatkaaksesi</string>
+    <string name="legal_eula_body">Käyttämällä Mookia hyväksyt käyttöehtomme ja loppukäyttäjän lisenssisopimuksen (EULA).\n\nSopimatonta sisältöä, loukkaavia käyttäjiä, häirintää tai seksuaalisen materiaalin lataamista ei sallita nollatoleranssilla. Rikkomukset estetään pysyvästi.\n\nOlet vastuussa luomastasi ja jakamastasi sisällöstä. Ilmoitettu sisältö ja käyttäjät tarkistetaan, ja tätä käytäntöä rikkovat tilit poistetaan. Voit ilmoittaa tai estää minkä tahansa käyttäjän milloin tahansa hänen profiilistaan.</string>
+    <string name="eula_gate_accept">Olen lukenut ja hyväksyn käyttöehdot ja EULA:n</string>
+    <string name="eula_gate_continue">Hyväksy ja jatka</string>
+    <string name="eula_gate_logout">Kirjaudu ulos</string>
+</resources>

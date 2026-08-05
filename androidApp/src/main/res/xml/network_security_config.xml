@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Mook — Network Security Configuration
+    All cleartext (HTTP) traffic is blocked in production.
+    Firebase Auth, Firestore, and Storage already use HTTPS — this
+    config simply makes that explicit and prevents any accidental
+    plain-text connections through third-party SDKs.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust the device's system CA store. -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

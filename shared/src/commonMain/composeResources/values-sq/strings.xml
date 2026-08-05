@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Biseda vazhdon në WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Njihu me %1$s në WalkTalk</string>
+    <string name="walktalk_dialog_body">Mesazhet janë më të mirat në WalkTalk! Shijo biseda më të rrjedhshme dhe cilësore, bisedë me zë dhe përkthim të menjëhershëm, që të flasësh pa barrierë gjuhësore.</string>
+    <string name="walktalk_dialog_feature_translation">Përkthim i menjëhershëm — pa barrierë gjuhësore</string>
+    <string name="walktalk_dialog_feature_voice">Bisedë me zë</string>
+    <string name="walktalk_dialog_feature_quality">Një përvojë më e rrjedhshme dhe cilësore</string>
+    <string name="walktalk_dialog_back">Prapa</string>
+    <string name="walktalk_dialog_confirm">Gjej në WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Duke krijuar një llogari, ju pranoni Kushtet tona të Përdorimit dhe Politikën e Privatësisë. Mook ndalon rreptësisht krijimin, ngarkimin ose ndarjen e Materialeve të Abuzimit Seksual të Fëmijëve (CSAM) ose Shfrytëzimit (CSAE). Çdo shkelje do të rezultojë në mbyllje të menjëhershme të llogarisë dhe raportim tek autoritetet.</string>
+    <string name="legal_accept_terms">Unë pranoj Kushtet e Përdorimit</string>
+    <string name="legal_accept_eula">Unë pranoj Marrëveshjen e Licencës së Përdoruesit Fundor</string>
+    <string name="legal_zero_tolerance">Nuk ka tolerancë zero për përmbajtje të pakëndshme, përdorues abuziv, ngacmim ose ngarkim të materialeve të qarta seksuale. Shkelësit do të ndalohen përgjithmonë.</string>
+    <string name="legal_terms_error">Ju duhet të pranoni Kushtet e Përdorimit për të vazhduar</string>
+    <string name="legal_eula_error">Ju duhet të pranoni EULA për të vazhduar</string>
+    <string name="eula_gate_welcome">Mirë se vini në Mook</string>
+    <string name="eula_gate_subtitle">Ju lutemi rishikoni dhe pranoni për të vazhduar</string>
+    <string name="legal_eula_body">Duke përdorur Mook, ju pranoni Kushtet tona të Përdorimit dhe Marrëveshjen e Licencës së Përdoruesit Fund (EULA).\n\nNuk ka tolerancë zero për përmbajtje të pakëndshme, përdorues abuziv, ngacmim ose ngarkim të materialeve të qarta seksuale. Shkelësit do të ndalohen përgjithmonë.\n\nJu jeni përgjegjës për përmbajtjen që krijoni dhe shpërndani. Përmbajtja dhe përdoruesit e raportuar shqyrtohen dhe llogaritë që shkelin këtë politikë hiqen. Ju mund të raportoni ose bllokoni çdo përdorues në çdo kohë nga profili i tij.</string>
+    <string name="eula_gate_accept">Kam lexuar dhe pranuar Kushtet e Përdorimit dhe EULA</string>
+    <string name="eula_gate_continue">Prano &amp; Vazhdo</string>
+    <string name="eula_gate_logout">Dilni</string>
+</resources>

@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Konverzace pokračuje ve WalkTalku</string>
+    <string name="walktalk_dialog_title_named">Seznamte se s %1$s ve WalkTalku</string>
+    <string name="walktalk_dialog_body">Zprávy jsou nejlepší ve WalkTalku! Užijte si plynulejší a kvalitnější konverzace, hlasové hovory a okamžitý překlad, abyste mohli mluvit bez jazykové bariéry.</string>
+    <string name="walktalk_dialog_feature_translation">Okamžitý překlad — žádná jazyková bariéra</string>
+    <string name="walktalk_dialog_feature_voice">Hlasový chat</string>
+    <string name="walktalk_dialog_feature_quality">Plynulejší a kvalitnější zážitek</string>
+    <string name="walktalk_dialog_back">Zpět</string>
+    <string name="walktalk_dialog_confirm">Najít na WalkTalku</string>
+
+    <string name="legal_consent_paragraph">Vytvořením účtu souhlasíte s našimi Podmínkami použití a Zásadami ochrany osobních údajů. Mook přísně zakazuje vytváření, nahrávání nebo sdílení materiálů zobrazujících sexuální zneužívání dětí (CSAM) nebo jejich vykořisťování (CSAE). Jakékoli porušení povede k okamžitému zrušení účtu a nahlášení úřadům.</string>
+    <string name="legal_accept_terms">Souhlasím s Podmínkami použití</string>
+    <string name="legal_accept_eula">Souhlasím s Licenční smlouvou s koncovým uživatelem</string>
+    <string name="legal_zero_tolerance">Vůči závadnému obsahu, urážlivým uživatelům, obtěžování nebo nahrávání sexuálně explicitního materiálu platí nulová tolerance. Porušovatelé budou trvale zablokováni.</string>
+    <string name="legal_terms_error">Pro pokračování musíte souhlasit s Podmínkami použití</string>
+    <string name="legal_eula_error">Pro pokračování musíte souhlasit s EULA</string>
+    <string name="eula_gate_welcome">Vítejte v Mooku</string>
+    <string name="eula_gate_subtitle">Před pokračováním si prosím přečtěte a odsouhlaste</string>
+    <string name="legal_eula_body">Používáním Mooku souhlasíte s našimi Podmínkami použití a Licenční smlouvou s koncovým uživatelem (EULA).\n\nVůči závadnému obsahu, urážlivým uživatelům, obtěžování nebo nahrávání sexuálně explicitního materiálu platí nulová tolerance. Porušovatelé budou trvale zablokováni.\n\nZa obsah, který vytváříte a sdílíte, nesete odpovědnost vy. Nahlášený obsah a uživatelé jsou kontrolováni a účty porušující tyto zásady jsou odstraněny. Kteréhokoli uživatele můžete kdykoli nahlásit nebo zablokovat z jeho profilu.</string>
+    <string name="eula_gate_accept">Přečetl(a) jsem si Podmínky použití a EULA a souhlasím s nimi</string>
+    <string name="eula_gate_continue">Přijmout a pokračovat</string>
+    <string name="eula_gate_logout">Odhlásit se</string>
+</resources>

@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Elkarrizketak WalkTalk-en jarraitzen du</string>
+    <string name="walktalk_dialog_title_named">Ezagutu %1$s WalkTalk-en</string>
+    <string name="walktalk_dialog_body">Mezularitza onena WalkTalk-en dago! Gozatu elkarrizketa arinago eta kalitatezkoagoez, ahots-elkarrizketaz eta berehalako itzulpenaz, hizkuntza-oztoporik gabe hitz egiteko.</string>
+    <string name="walktalk_dialog_feature_translation">Berehalako itzulpena — hizkuntza-oztoporik gabe</string>
+    <string name="walktalk_dialog_feature_voice">Ahots-elkarrizketa</string>
+    <string name="walktalk_dialog_feature_quality">Esperientzia arinago eta kalitatezkoagoa</string>
+    <string name="walktalk_dialog_back">Atzera</string>
+    <string name="walktalk_dialog_confirm">Bilatu WalkTalk-en</string>
+
+    <string name="legal_consent_paragraph">Kontu bat sortuz gero, gure Erabilera Baldintzak eta Pribatutasun Politika onartzen dituzu. Mook-ek erabat debekatzen du Haurren Sexu Abusu Materiala (CSAM) edo esplotazioa (CSAE) sortzea, kargatzea edo partekatzea. Urratze orok berehala itxiko du kontua eta agintariei jakinaraziko die.</string>
+    <string name="legal_accept_terms">Erabilera Baldintzak onartzen ditut</string>
+    <string name="legal_accept_eula">Azken erabiltzailearen lizentzia-kontratua onartzen dut</string>
+    <string name="legal_zero_tolerance">Ez dago inolako tolerantzia gaitzesgarria den edukiarekin, abusuzko erabiltzaileekin, jazarpenarekin edo sexualki esplizitua den materiala kargatzearekin. Urratzaileak behin betiko debekatuta egongo dira.</string>
+    <string name="legal_terms_error">Jarraitzeko, Erabilera Baldintzak onartu behar dituzu</string>
+    <string name="legal_eula_error">EULA onartu behar duzu aurrera egiteko</string>
+    <string name="eula_gate_welcome">Ongi etorri Mook-era</string>
+    <string name="eula_gate_subtitle">Mesedez, berrikusi eta onartu jarraitzeko</string>
+    <string name="legal_eula_body">Mook erabiliz, gure Erabilera Baldintzak eta Azken Erabiltzaileen Lizentzia Kontratua (EULA) onartzen dituzu.\n\nEz dago inolako tolerantzia gaitzesgarria den edukiarekin, abusuzko erabiltzaileekin, jazarpenarekin edo sexualki esplizitua den materiala kargatzearekin. Urratzaileak betiko debekatuta egongo dira.\n\nSortzen eta partekatzen duzun edukiaren arduraduna zara. Salatutako edukia eta erabiltzaileak berrikusten dira, eta gidalerro hau urratzen duten kontuak kentzen dira. Edozein erabiltzaile salatu edo blokeatu dezakezu edozein unetan bere profiletik.</string>
+    <string name="eula_gate_accept">Irakurri eta onartzen ditut Erabilera Baldintzak eta EULA</string>
+    <string name="eula_gate_continue">Onartu eta Jarraitu</string>
+    <string name="eula_gate_logout">Amaitu saioa</string>
+</resources>

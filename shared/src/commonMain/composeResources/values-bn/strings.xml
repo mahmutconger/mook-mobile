@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">চ্যাট WalkTalk-এ চলতে থাকে</string>
+    <string name="walktalk_dialog_title_named">WalkTalk-এ %1$s-এর সাথে পরিচিত হন</string>
+    <string name="walktalk_dialog_body">মেসেজিংয়ের সেরা অভিজ্ঞতা WalkTalk-এ! আরও মসৃণ ও উন্নত মানের চ্যাট, ভয়েস কথোপকথন এবং তাৎক্ষণিক অনুবাদের মাধ্যমে ভাষার বাধা ছাড়াই কথা বলুন।</string>
+    <string name="walktalk_dialog_feature_translation">তাৎক্ষণিক অনুবাদ — ভাষার কোনো বাধা নেই</string>
+    <string name="walktalk_dialog_feature_voice">ভয়েস চ্যাট</string>
+    <string name="walktalk_dialog_feature_quality">আরও মসৃণ ও উন্নত মানের অভিজ্ঞতা</string>
+    <string name="walktalk_dialog_back">ফিরে যান</string>
+    <string name="walktalk_dialog_confirm">WalkTalk-এ খুঁজুন</string>
+
+    <string name="legal_consent_paragraph">একটি অ্যাকাউন্ট তৈরি করে, আপনি আমাদের ব্যবহারের শর্তাবলী এবং গোপনীয়তা নীতিতে সম্মত হন। মুক শিশু যৌন নির্যাতনের উপাদান (CSAM) বা শোষণ (CSAE) তৈরি, আপলোড বা ভাগ করাকে কঠোরভাবে নিষিদ্ধ করে। যেকোনো লঙ্ঘনের ফলে অবিলম্বে অ্যাকাউন্ট বন্ধ করা হবে এবং কর্তৃপক্ষকে রিপোর্ট করা হবে।</string>
+    <string name="legal_accept_terms">আমি ব্যবহারের শর্তাবলী স্বীকার করি</string>
+    <string name="legal_accept_eula">আমি শেষ ব্যবহারকারী লাইসেন্স চুক্তি স্বীকার করি</string>
+    <string name="legal_zero_tolerance">আপত্তিকর বিষয়বস্তু, অপমানজনক ব্যবহারকারী, হয়রানি বা যৌনতাপূর্ণ সামগ্রী আপলোডের জন্য শূন্য সহনশীলতা রয়েছে। লঙ্ঘনকারীদের স্থায়ীভাবে নিষিদ্ধ করা হবে।</string>
+    <string name="legal_terms_error">চালিয়ে যেতে আপনাকে অবশ্যই ব্যবহারের শর্তাবলী মেনে নিতে হবে</string>
+    <string name="legal_eula_error">এগিয়ে যাওয়ার জন্য আপনাকে অবশ্যই EULA স্বীকার করতে হবে</string>
+    <string name="eula_gate_welcome">Mook স্বাগতম</string>
+    <string name="eula_gate_subtitle">অনুগ্রহ করে পর্যালোচনা করুন এবং চালিয়ে যেতে স্বীকার করুন</string>
+    <string name="legal_eula_body">মুক ব্যবহার করে আপনি আমাদের ব্যবহারের শর্তাবলী এবং শেষ ব্যবহারকারী লাইসেন্স চুক্তিতে (EULA) সম্মত হন৷\n\nআপত্তিকর বিষয়বস্তু, অপমানজনক ব্যবহারকারী, হয়রানি বা যৌনতাপূর্ণ সামগ্রী আপলোডের জন্য শূন্য সহনশীলতা রয়েছে। লঙ্ঘনকারীদের স্থায়ীভাবে নিষিদ্ধ করা হবে।\n\nআপনি যে বিষয়বস্তু তৈরি এবং ভাগ করেন তার জন্য আপনি দায়ী৷ রিপোর্ট করা বিষয়বস্তু এবং ব্যবহারকারীদের পর্যালোচনা করা হয় এবং এই নীতি লঙ্ঘন করে এমন অ্যাকাউন্টগুলি সরানো হয়। আপনি যেকোনো ব্যবহারকারীর প্রোফাইল থেকে যেকোনো সময় রিপোর্ট করতে বা ব্লক করতে পারেন।</string>
+    <string name="eula_gate_accept">আমি ব্যবহারের শর্তাবলী এবং EULA পড়েছি এবং স্বীকার করেছি</string>
+    <string name="eula_gate_continue">স্বীকার করুন এবং চালিয়ে যান</string>
+    <string name="eula_gate_logout">লগ আউট করুন</string>
+</resources>

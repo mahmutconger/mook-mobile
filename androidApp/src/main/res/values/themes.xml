@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Mook app theme — based on Theme.Material3 with no action bar.
+    Compose draws its own top bars, so we use the NoActionBar variant
+    to avoid a duplicate bar flash before Compose content is ready.
+-->
+<resources>
+    <style name="Theme.Mook" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <!-- Window background matches NeonColors.Background (white).
+             Compose will paint over this on the first frame. -->
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+    </style>
+</resources>

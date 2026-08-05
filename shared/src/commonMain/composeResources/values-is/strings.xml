@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Spjallið heldur áfram á WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Kynnstu %1$s á WalkTalk</string>
+    <string name="walktalk_dialog_body">Skilaboð eru best á WalkTalk! Njóttu liprari og vandaðri spjalls, raddsamtala og samstundis þýðingar svo þú getir talað án tungumálahindrana.</string>
+    <string name="walktalk_dialog_feature_translation">Samstundis þýðing — engin tungumálahindrun</string>
+    <string name="walktalk_dialog_feature_voice">Raddspjall</string>
+    <string name="walktalk_dialog_feature_quality">Liprari og vandaðri upplifun</string>
+    <string name="walktalk_dialog_back">Til baka</string>
+    <string name="walktalk_dialog_confirm">Finna á WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Með því að stofna reikning samþykkir þú notkunarskilmála okkar og persónuverndarstefnu. Mook bannar stranglega að búa til, hlaða upp eða deila efni um kynferðisofbeldi gegn börnum (CSAM) eða misnotkun (CSAE). Öll brot munu leiða til tafarlausrar uppsagnar reiknings og tilkynningar til yfirvalda.</string>
+    <string name="legal_accept_terms">Ég samþykki notkunarskilmálana</string>
+    <string name="legal_accept_eula">Ég samþykki notendaleyfissamninginn</string>
+    <string name="legal_zero_tolerance">Það er ekkert umburðarlyndi fyrir hneykslanlegu efni, móðgandi notendum, áreitni eða upphleðslu kynferðislegs efnis. Þeir sem brjóta gegn þeim verða settir í varanlega bann.</string>
+    <string name="legal_terms_error">Þú verður að samþykkja notkunarskilmálana til að halda áfram</string>
+    <string name="legal_eula_error">Þú verður að samþykkja ESBLA til að halda áfram</string>
+    <string name="eula_gate_welcome">Velkomin til Mook</string>
+    <string name="eula_gate_subtitle">Vinsamlegast skoðaðu og samþykktu til að halda áfram</string>
+    <string name="legal_eula_body">Með því að nota Mook samþykkir þú notkunarskilmála okkar og notendaleyfissamning (EULA).\n\nÞað er ekkert umburðarlyndi fyrir hneykslanlegu efni, móðgandi notendum, áreitni eða upphleðslu kynferðislegs efnis. Þeir sem brjóta gegn þeim verða settir í varanlega bann.\n\nÞú berð ábyrgð á efninu sem þú býrð til og deilir. Tilkynnt efni og notendur eru skoðaðir og reikningar sem brjóta í bága við þessa stefnu eru fjarlægðir. Þú getur tilkynnt eða lokað á hvaða notanda sem er hvenær sem er af prófílnum þeirra.</string>
+    <string name="eula_gate_accept">Ég hef lesið og samþykki notkunarskilmálana og ESBLA</string>
+    <string name="eula_gate_continue">Samþykkja og halda áfram</string>
+    <string name="eula_gate_logout">Skráðu þig út</string>
+</resources>

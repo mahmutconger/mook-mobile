@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">会話は WalkTalk で続きます</string>
+    <string name="walktalk_dialog_title_named">WalkTalk で %1$s とつながろう</string>
+    <string name="walktalk_dialog_body">メッセージングは WalkTalk が一番！よりスムーズで高品質なチャット、音声会話、リアルタイム翻訳で、言語の壁なく話せます。</string>
+    <string name="walktalk_dialog_feature_translation">リアルタイム翻訳 — 言語の壁なし</string>
+    <string name="walktalk_dialog_feature_voice">音声チャット</string>
+    <string name="walktalk_dialog_feature_quality">よりスムーズで高品質な体験</string>
+    <string name="walktalk_dialog_back">戻る</string>
+    <string name="walktalk_dialog_confirm">WalkTalk で探す</string>
+
+    <string name="legal_consent_paragraph">アカウントを作成すると、利用規約およびプライバシーポリシーに同意したものとみなされます。Mook は児童性的虐待コンテンツ（CSAM）または搾取（CSAE）の作成・アップロード・共有を固く禁止します。違反した場合、アカウントは直ちに停止され、当局に通報されます。</string>
+    <string name="legal_accept_terms">利用規約に同意します</string>
+    <string name="legal_accept_eula">エンドユーザーライセンス契約に同意します</string>
+    <string name="legal_zero_tolerance">不適切なコンテンツ、迷惑行為を行うユーザー、嫌がらせ、性的に露骨な素材のアップロードには一切の猶予がありません。違反者は永久に利用禁止となります。</string>
+    <string name="legal_terms_error">続行するには利用規約に同意する必要があります</string>
+    <string name="legal_eula_error">続行するには EULA に同意する必要があります</string>
+    <string name="eula_gate_welcome">Mook へようこそ</string>
+    <string name="eula_gate_subtitle">続行するにはご確認のうえ同意してください</string>
+    <string name="legal_eula_body">Mook を利用すると、利用規約およびエンドユーザーライセンス契約（EULA）に同意したものとみなされます。\n\n不適切なコンテンツ、迷惑行為を行うユーザー、嫌がらせ、性的に露骨な素材のアップロードには一切の猶予がありません。違反者は永久に利用禁止となります。\n\n作成・共有するコンテンツについてはご自身が責任を負います。報告されたコンテンツやユーザーは審査され、このポリシーに違反するアカウントは削除されます。いつでも相手のプロフィールから、任意のユーザーを報告またはブロックできます。</string>
+    <string name="eula_gate_accept">利用規約と EULA を読み、同意します</string>
+    <string name="eula_gate_continue">同意して続行</string>
+    <string name="eula_gate_logout">ログアウト</string>
+</resources>

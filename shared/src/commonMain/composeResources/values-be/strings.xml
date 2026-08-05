@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Размова працягваецца ў WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Пазнаёмцеся з %1$s у WalkTalk</string>
+    <string name="walktalk_dialog_body">Абмен паведамленнямі найлепшы ў WalkTalk! Атрымлівайце асалоду ад больш плаўных і якасных размоў, галасавой сувязі і імгненнага перакладу, каб размаўляць без моўнага бар\'ера.</string>
+    <string name="walktalk_dialog_feature_translation">Імгненны пераклад — без моўнага бар\'ера</string>
+    <string name="walktalk_dialog_feature_voice">Галасавая размова</string>
+    <string name="walktalk_dialog_feature_quality">Больш плаўны і якасны вопыт</string>
+    <string name="walktalk_dialog_back">Назад</string>
+    <string name="walktalk_dialog_confirm">Знайсці ў WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Ствараючы ўліковы запіс, вы згаджаецеся з нашымі Умовамі выкарыстання і Палітыкай прыватнасці. Mook строга забараняе ствараць, загружаць або абагульваць матэрыялы аб сэксуальным гвалце над дзецьмі (CSAM) або эксплуатацыі (CSAE). Любое парушэнне прывядзе да неадкладнага спынення ўліковага запісу і паведамлення ўладам.</string>
+    <string name="legal_accept_terms">Я прымаю ўмовы выкарыстання</string>
+    <string name="legal_accept_eula">Я прымаю Ліцэнзійнае пагадненне канчатковага карыстальніка</string>
+    <string name="legal_zero_tolerance">Існуе нулявая цярпімасць да непажаданага кантэнту, абразлівых карыстальнікаў, пераследу або загрузкі матэрыялаў сексуальнага характару. Парушальнікі будуць назаўжды забанены.</string>
+    <string name="legal_terms_error">Вы павінны прыняць Умовы выкарыстання, каб працягнуць</string>
+    <string name="legal_eula_error">Вы павінны прыняць EULA, каб працягнуць</string>
+    <string name="eula_gate_welcome">Сардэчна запрашаем у Mook</string>
+    <string name="eula_gate_subtitle">Калі ласка, праглядзіце і прыміце, каб працягнуць</string>
+    <string name="legal_eula_body">Выкарыстоўваючы Mook, вы згаджаецеся з нашымі Умовамі выкарыстання і Ліцэнзійным пагадненнем канчатковага карыстальніка (EULA).\n\nІснуе нулявая цярпімасць да непажаданага кантэнту, абразлівых карыстальнікаў, пераследу або загрузкі матэрыялаў сексуальнага характару. Парушальнікі будуць назаўжды забанены.\n\nВы несяце адказнасць за кантэнт, які вы ствараеце і дзеліцеся. Павед��мленае змесціва і карыстальнікі разглядаюцца, а ўліковыя запісы, якія парушаюць гэтую палітыку, выдаляюцца. Вы можаце паведаміць або заблакіраваць любога карыстальніка ў любы час з яго профілю.</string>
+    <string name="eula_gate_accept">Я прачытаў і прымаю ўмовы выкарыстання і EULA</string>
+    <string name="eula_gate_continue">Прыняць і працягнуць</string>
+    <string name="eula_gate_logout">Выйсці</string>
+</resources>

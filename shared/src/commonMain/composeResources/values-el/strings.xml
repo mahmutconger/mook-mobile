@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Η συνομιλία συνεχίζεται στο WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Γνωρίστε τον/την %1$s στο WalkTalk</string>
+    <string name="walktalk_dialog_body">Τα μηνύματα είναι στα καλύτερά τους στο WalkTalk! Απολαύστε πιο ομαλές και ποιοτικές συνομιλίες, φωνητική επικοινωνία και άμεση μετάφραση, ώστε να μιλάτε χωρίς γλωσσικό εμπόδιο.</string>
+    <string name="walktalk_dialog_feature_translation">Άμεση μετάφραση — κανένα γλωσσικό εμπόδιο</string>
+    <string name="walktalk_dialog_feature_voice">Φωνητική συνομιλία</string>
+    <string name="walktalk_dialog_feature_quality">Μια πιο ομαλή και ποιοτική εμπειρία</string>
+    <string name="walktalk_dialog_back">Πίσω</string>
+    <string name="walktalk_dialog_confirm">Βρείτε στο WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Δημιουργώντας λογαριασμό, συμφωνείτε με τους Όρους Χρήσης και την Πολιτική Απορρήτου μας. Το Mook απαγορεύει αυστηρά τη δημιουργία, τη μεταφόρτωση ή την κοινοποίηση Υλικού Σεξουαλικής Κακοποίησης Παιδιών (CSAM) ή Εκμετάλλευσης (CSAE). Οποιαδήποτε παράβαση θα οδηγήσει σε άμεση διαγραφή του λογαριασμού και αναφορά στις αρχές.</string>
+    <string name="legal_accept_terms">Αποδέχομαι τους Όρους Χρήσης</string>
+    <string name="legal_accept_eula">Αποδέχομαι την Άδεια Χρήσης Τελικού Χρήστη</string>
+    <string name="legal_zero_tolerance">Υπάρχει μηδενική ανοχή σε απαράδεκτο περιεχόμενο, καταχρηστικούς χρήστες, παρενόχληση ή μεταφόρτωση σεξουαλικού περιεχομένου. Οι παραβάτες θα αποκλείονται οριστικά.</string>
+    <string name="legal_terms_error">Πρέπει να αποδεχτείτε τους Όρους Χρήσης για να συνεχίσετε</string>
+    <string name="legal_eula_error">Πρέπει να αποδεχτείτε την EULA για να συνεχίσετε</string>
+    <string name="eula_gate_welcome">Καλώς ήρθατε στο Mook</string>
+    <string name="eula_gate_subtitle">Παρακαλούμε διαβάστε και αποδεχτείτε για να συνεχίσετε</string>
+    <string name="legal_eula_body">Χρησιμοποιώντας το Mook, συμφωνείτε με τους Όρους Χρήσης και την Άδεια Χρήσης Τελικού Χρήστη (EULA).\n\nΥπάρχει μηδενική ανοχή σε απαράδεκτο περιεχόμενο, καταχρηστικούς χρήστες, παρενόχληση ή μεταφόρτωση σεξουαλικού περιεχομένου. Οι παραβάτες θα αποκλείονται οριστικά.\n\nΕίστε υπεύθυνοι για το περιεχόμενο που δημιουργείτε και μοιράζεστε. Το περιεχόμενο και οι χρήστες που αναφέρονται ελέγχονται, και οι λογαριασμοί που παραβιάζουν αυτήν την πολιτική αφαιρούνται. Μπορείτε να αναφέρετε ή να αποκλείσετε οποιονδήποτε χρήστη ανά πάσα στιγμή από το προφίλ του.</string>
+    <string name="eula_gate_accept">Διάβασα και αποδέχομαι τους Όρους Χρήσης και την EULA</string>
+    <string name="eula_gate_continue">Αποδοχή και συνέχεια</string>
+    <string name="eula_gate_logout">Αποσύνδεση</string>
+</resources>

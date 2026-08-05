@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Разговор продолжается в WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Познакомьтесь с %1$s в WalkTalk</string>
+    <string name="walktalk_dialog_body">Обмен сообщениями лучше всего в WalkTalk! Наслаждайтесь более плавным и качественным общением, голосовыми чатами и мгновенным переводом, чтобы говорить без языкового барьера.</string>
+    <string name="walktalk_dialog_feature_translation">Мгновенный перевод — без языкового барьера</string>
+    <string name="walktalk_dialog_feature_voice">Голосовой чат</string>
+    <string name="walktalk_dialog_feature_quality">Более плавный и качественный опыт</string>
+    <string name="walktalk_dialog_back">Назад</string>
+    <string name="walktalk_dialog_confirm">Найти в WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Создавая аккаунт, вы соглашаетесь с нашими Условиями использования и Политикой конфиденциальности. Mook строго запрещает создание, загрузку и распространение материалов о сексуальном насилии над детьми (CSAM) или их эксплуатации (CSAE). Любое нарушение приведёт к немедленной блокировке аккаунта и передаче данных властям.</string>
+    <string name="legal_accept_terms">Я принимаю Условия использования</string>
+    <string name="legal_accept_eula">Я принимаю Лицензионное соглашение с конечным пользователем</string>
+    <string name="legal_zero_tolerance">Недопустимы оскорбительный контент, злоупотребляющие пользователи, преследование или загрузка материалов сексуального характера. Нарушители будут заблокированы навсегда.</string>
+    <string name="legal_terms_error">Чтобы продолжить, необходимо принять Условия использования</string>
+    <string name="legal_eula_error">Чтобы продолжить, необходимо принять EULA</string>
+    <string name="eula_gate_welcome">Добро пожаловать в Mook</string>
+    <string name="eula_gate_subtitle">Ознакомьтесь и примите, чтобы продолжить</string>
+    <string name="legal_eula_body">Используя Mook, вы соглашаетесь с нашими Условиями использования и Лицензионным соглашением с конечным пользователем (EULA).\n\nНедопустимы оскорбительный контент, злоупотребляющие пользователи, преследование или загрузка материалов сексуального характера. Нарушители будут заблокированы навсегда.\n\nВы несёте ответственность за контент, который создаёте и публикуете. Контент и пользователи, на которых поступили жалобы, проверяются, а аккаунты, нарушающие эту политику, удаляются. Вы можете пожаловаться на любого пользователя или заблокировать его в любое время в его профиле.</string>
+    <string name="eula_gate_accept">Я прочитал(а) и принимаю Условия использования и EULA</string>
+    <string name="eula_gate_continue">Принять и продолжить</string>
+    <string name="eula_gate_logout">Выйти</string>
+</resources>

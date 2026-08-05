@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">تستمر المحادثة على WalkTalk</string>
+    <string name="walktalk_dialog_title_named">تعرّف على %1$s على WalkTalk</string>
+    <string name="walktalk_dialog_body">المراسلة في أفضل حالاتها على WalkTalk! استمتع بمحادثات أكثر سلاسة وجودة، ومحادثة صوتية وترجمة فورية لتتحدث بلا حاجز لغوي.</string>
+    <string name="walktalk_dialog_feature_translation">ترجمة فورية — لا حاجز لغوي</string>
+    <string name="walktalk_dialog_feature_voice">محادثة صوتية</string>
+    <string name="walktalk_dialog_feature_quality">تجربة أكثر سلاسة وجودة</string>
+    <string name="walktalk_dialog_back">رجوع</string>
+    <string name="walktalk_dialog_confirm">ابحث على WalkTalk</string>
+
+    <string name="legal_consent_paragraph">بإنشاء حساب، فإنك توافق على شروط الاستخدام وسياسة الخصوصية الخاصة بنا. يحظر Mook حظرًا صارمًا إنشاء أو تحميل أو مشاركة مواد الاعتداء الجنسي على الأطفال (CSAM) أو استغلالهم (CSAE). وسيؤدي أي انتهاك إلى إنهاء الحساب فورًا وإبلاغ السلطات.</string>
+    <string name="legal_accept_terms">أوافق على شروط الاستخدام</string>
+    <string name="legal_accept_eula">أوافق على اتفاقية ترخيص المستخدم النهائي</string>
+    <string name="legal_zero_tolerance">لا تسامح مطلقًا مع المحتوى المخالف أو المستخدمين المسيئين أو التحرش أو تحميل مواد جنسية صريحة. وسيتم حظر المخالفين نهائيًا.</string>
+    <string name="legal_terms_error">يجب أن توافق على شروط الاستخدام للمتابعة</string>
+    <string name="legal_eula_error">يجب أن توافق على اتفاقية EULA للمتابعة</string>
+    <string name="eula_gate_welcome">مرحبًا بك في Mook</string>
+    <string name="eula_gate_subtitle">يُرجى المراجعة والموافقة للمتابعة</string>
+    <string name="legal_eula_body">باستخدام Mook فإنك توافق على شروط الاستخدام واتفاقية ترخيص المستخدم النهائي (EULA) الخاصة بنا.\n\nلا تسامح مطلقًا مع المحتوى المخالف أو المستخدمين المسيئين أو التحرش أو تحميل مواد جنسية صريحة. وسيتم حظر المخالفين نهائيًا.\n\nأنت مسؤول عن المحتوى الذي تنشئه وتشاركه. تتم مراجعة المحتوى والمستخدمين المُبلَّغ عنهم، وتُزال الحسابات التي تنتهك هذه السياسة. يمكنك الإبلاغ عن أي مستخدم أو حظره في أي وقت من ملفه الشخصي.</string>
+    <string name="eula_gate_accept">لقد قرأت شروط الاستخدام واتفاقية EULA وأوافق عليهما</string>
+    <string name="eula_gate_continue">الموافقة والمتابعة</string>
+    <string name="eula_gate_logout">تسجيل الخروج</string>
+</resources>

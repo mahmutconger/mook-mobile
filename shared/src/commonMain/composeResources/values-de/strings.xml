@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Der Chat geht auf WalkTalk weiter</string>
+    <string name="walktalk_dialog_title_named">Lerne %1$s auf WalkTalk kennen</string>
+    <string name="walktalk_dialog_body">Nachrichten sind auf WalkTalk am besten! Genieße flüssigere, hochwertigere Chats, Sprachunterhaltungen und sofortige Übersetzung, damit du ohne Sprachbarriere sprechen kannst.</string>
+    <string name="walktalk_dialog_feature_translation">Sofortige Übersetzung — keine Sprachbarriere</string>
+    <string name="walktalk_dialog_feature_voice">Sprachchat</string>
+    <string name="walktalk_dialog_feature_quality">Ein flüssigeres, hochwertigeres Erlebnis</string>
+    <string name="walktalk_dialog_back">Zurück</string>
+    <string name="walktalk_dialog_confirm">Auf WalkTalk finden</string>
+
+    <string name="legal_consent_paragraph">Mit der Erstellung eines Kontos stimmst du unseren Nutzungsbedingungen und unserer Datenschutzrichtlinie zu. Mook verbietet strengstens die Erstellung, das Hochladen oder das Teilen von Material über sexuellen Kindesmissbrauch (CSAM) oder Ausbeutung (CSAE). Jeder Verstoß führt zur sofortigen Kontosperrung und zur Meldung an die Behörden.</string>
+    <string name="legal_accept_terms">Ich akzeptiere die Nutzungsbedingungen</string>
+    <string name="legal_accept_eula">Ich akzeptiere den Endbenutzer-Lizenzvertrag</string>
+    <string name="legal_zero_tolerance">Für anstößige Inhalte, missbräuchliche Nutzer, Belästigung oder das Hochladen sexuell expliziten Materials gilt null Toleranz. Verstöße führen zu einer dauerhaften Sperre.</string>
+    <string name="legal_terms_error">Du musst die Nutzungsbedingungen akzeptieren, um fortzufahren</string>
+    <string name="legal_eula_error">Du musst die EULA akzeptieren, um fortzufahren</string>
+    <string name="eula_gate_welcome">Willkommen bei Mook</string>
+    <string name="eula_gate_subtitle">Bitte lies und akzeptiere, um fortzufahren</string>
+    <string name="legal_eula_body">Durch die Nutzung von Mook stimmst du unseren Nutzungsbedingungen und dem Endbenutzer-Lizenzvertrag (EULA) zu.\n\nFür anstößige Inhalte, missbräuchliche Nutzer, Belästigung oder das Hochladen sexuell expliziten Materials gilt null Toleranz. Verstöße führen zu einer dauerhaften Sperre.\n\nDu bist für die von dir erstellten und geteilten Inhalte verantwortlich. Gemeldete Inhalte und Nutzer werden überprüft, und Konten, die gegen diese Richtlinie verstoßen, werden entfernt. Du kannst jeden Nutzer jederzeit über sein Profil melden oder blockieren.</string>
+    <string name="eula_gate_accept">Ich habe die Nutzungsbedingungen und die EULA gelesen und akzeptiere sie</string>
+    <string name="eula_gate_continue">Akzeptieren &amp; Fortfahren</string>
+    <string name="eula_gate_logout">Abmelden</string>
+</resources>

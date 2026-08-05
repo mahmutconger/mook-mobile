@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">La conversation continue sur WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Rencontrez %1$s sur WalkTalk</string>
+    <string name="walktalk_dialog_body">La messagerie est à son meilleur sur WalkTalk ! Profitez de conversations plus fluides et de meilleure qualité, de la conversation vocale et de la traduction instantanée pour parler sans barrière linguistique.</string>
+    <string name="walktalk_dialog_feature_translation">Traduction instantanée — aucune barrière linguistique</string>
+    <string name="walktalk_dialog_feature_voice">Chat vocal</string>
+    <string name="walktalk_dialog_feature_quality">Une expérience plus fluide et de meilleure qualité</string>
+    <string name="walktalk_dialog_back">Retour</string>
+    <string name="walktalk_dialog_confirm">Trouver sur WalkTalk</string>
+
+    <string name="legal_consent_paragraph">En créant un compte, vous acceptez nos Conditions d\'utilisation et notre Politique de confidentialité. Mook interdit strictement la création, le téléversement ou le partage de matériel d\'abus sexuel sur mineur (CSAM) ou d\'exploitation (CSAE). Toute violation entraînera la fermeture immédiate du compte et un signalement aux autorités.</string>
+    <string name="legal_accept_terms">J\'accepte les Conditions d\'utilisation</string>
+    <string name="legal_accept_eula">J\'accepte le Contrat de licence utilisateur final</string>
+    <string name="legal_zero_tolerance">Aucune tolérance n\'est accordée aux contenus répréhensibles, aux utilisateurs abusifs, au harcèlement ou au téléversement de contenu sexuellement explicite. Les contrevenants seront bannis définitivement.</string>
+    <string name="legal_terms_error">Vous devez accepter les Conditions d\'utilisation pour continuer</string>
+    <string name="legal_eula_error">Vous devez accepter le CLUF pour continuer</string>
+    <string name="eula_gate_welcome">Bienvenue sur Mook</string>
+    <string name="eula_gate_subtitle">Veuillez lire et accepter pour continuer</string>
+    <string name="legal_eula_body">En utilisant Mook, vous acceptez nos Conditions d\'utilisation et le Contrat de licence utilisateur final (CLUF).\n\nAucune tolérance n\'est accordée aux contenus répréhensibles, aux utilisateurs abusifs, au harcèlement ou au téléversement de contenu sexuellement explicite. Les contrevenants seront bannis définitivement.\n\nVous êtes responsable du contenu que vous créez et partagez. Les contenus et utilisateurs signalés sont examinés, et les comptes qui enfreignent cette politique sont supprimés. Vous pouvez signaler ou bloquer n\'importe quel utilisateur à tout moment depuis son profil.</string>
+    <string name="eula_gate_accept">J\'ai lu et j\'accepte les Conditions d\'utilisation et le CLUF</string>
+    <string name="eula_gate_continue">Accepter et continuer</string>
+    <string name="eula_gate_logout">Se déconnecter</string>
+</resources>

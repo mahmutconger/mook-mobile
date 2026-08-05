@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">A beszélgetés a WalkTalkon folytatódik</string>
+    <string name="walktalk_dialog_title_named">Ismerd meg %1$s-t a WalkTalkon</string>
+    <string name="walktalk_dialog_body">Az üzenetküldés a WalkTalkon a legjobb! Élvezd a gördülékenyebb és jobb minőségű beszélgetéseket, a hangos csevegést és az azonnali fordítást, hogy nyelvi akadály nélkül beszélgethess.</string>
+    <string name="walktalk_dialog_feature_translation">Azonnali fordítás — nincs nyelvi akadály</string>
+    <string name="walktalk_dialog_feature_voice">Hangos csevegés</string>
+    <string name="walktalk_dialog_feature_quality">Gördülékenyebb és jobb minőségű élmény</string>
+    <string name="walktalk_dialog_back">Vissza</string>
+    <string name="walktalk_dialog_confirm">Keresés a WalkTalkon</string>
+
+    <string name="legal_consent_paragraph">A fiók létrehozásával elfogadod a Felhasználási feltételeinket és az Adatvédelmi szabályzatunkat. A Mook szigorúan tiltja a gyermekek szexuális bántalmazását ábrázoló tartalom (CSAM) vagy kizsákmányolás (CSAE) létrehozását, feltöltését vagy megosztását. Bármilyen jogsértés a fiók azonnali megszüntetését és a hatóságoknak való bejelentését vonja maga után.</string>
+    <string name="legal_accept_terms">Elfogadom a Felhasználási feltételeket</string>
+    <string name="legal_accept_eula">Elfogadom a végfelhasználói licencszerződést</string>
+    <string name="legal_zero_tolerance">Nulla tolerancia van a kifogásolható tartalommal, a visszaélő felhasználókkal, a zaklatással vagy a szexuálisan explicit anyagok feltöltésével szemben. A szabálysértőket véglegesen kitiltjuk.</string>
+    <string name="legal_terms_error">A folytatáshoz el kell fogadnod a Felhasználási feltételeket</string>
+    <string name="legal_eula_error">A folytatáshoz el kell fogadnod az EULA-t</string>
+    <string name="eula_gate_welcome">Üdvözlünk a Mookban</string>
+    <string name="eula_gate_subtitle">A folytatáshoz kérjük, olvasd el és fogadd el</string>
+    <string name="legal_eula_body">A Mook használatával elfogadod a Felhasználási feltételeinket és a végfelhasználói licencszerződést (EULA).\n\nNulla tolerancia van a kifogásolható tartalommal, a visszaélő felhasználókkal, a zaklatással vagy a szexuálisan explicit anyagok feltöltésével szemben. A szabálysértőket véglegesen kitiltjuk.\n\nAz általad létrehozott és megosztott tartalomért te vagy felelős. A bejelentett tartalmakat és felhasználókat átvizsgáljuk, és a szabályzatot megsértő fiókokat eltávolítjuk. Bármely felhasználót bármikor bejelenthetsz vagy letilthatsz a profiljáról.</string>
+    <string name="eula_gate_accept">Elolvastam és elfogadom a Felhasználási feltételeket és az EULA-t</string>
+    <string name="eula_gate_continue">Elfogadás és folytatás</string>
+    <string name="eula_gate_logout">Kijelentkezés</string>
+</resources>

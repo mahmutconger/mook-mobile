@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Die geselsie gaan voort op WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Ontmoet %1$s op WalkTalk</string>
+    <string name="walktalk_dialog_body">Boodskappe is op hul beste op WalkTalk! Geniet gladder geselsies van hoër gehalte, stemgesprekke en onmiddellike vertaling sodat jy sonder \'n taalgrens kan gesels.</string>
+    <string name="walktalk_dialog_feature_translation">Onmiddellike vertaling — geen taalgrens nie</string>
+    <string name="walktalk_dialog_feature_voice">Stemgeselsie</string>
+    <string name="walktalk_dialog_feature_quality">\'n Gladder ervaring van hoër gehalte</string>
+    <string name="walktalk_dialog_back">Terug</string>
+    <string name="walktalk_dialog_confirm">Vind op WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Deur \'n rekening te skep, stem jy in tot ons Gebruiksvoorwaardes en Privaatheidsbeleid. Mook verbied die skepping, oplaai of deel van materiaal vir seksuele misbruik van kinders (CSAM) of uitbuiting (CSAE) streng. Enige oortreding sal lei tot onmiddellike beëindiging van die rekening en verslagdoening aan die owerhede.</string>
+    <string name="legal_accept_terms">Ek aanvaar die Gebruiksvoorwaardes</string>
+    <string name="legal_accept_eula">Ek aanvaar die Eindgebruikerslisensie-ooreenkoms</string>
+    <string name="legal_zero_tolerance">Daar is geen verdraagsaamheid vir aanstootlike inhoud, beledigende gebruikers, teistering of die oplaai van seksueel eksplisiete materiaal nie. Oortreders sal permanent verbied word.</string>
+    <string name="legal_terms_error">Jy moet die Gebruiksvoorwaardes aanvaar om voort te gaan</string>
+    <string name="legal_eula_error">Jy moet die EULA aanvaar om voort te gaan</string>
+    <string name="eula_gate_welcome">Welkom by Mook</string>
+    <string name="eula_gate_subtitle">Gaan asseblief na en aanvaar om voort te gaan</string>
+    <string name="legal_eula_body">Deur Mook te gebruik, stem jy in tot ons Gebruiksvoorwaardes en Eindgebruikerslisensie-ooreenkoms (EULA).\n\nDaar is geen verdraagsaamheid vir aanstootlike inhoud, beledigende gebruikers, teistering of die oplaai van seksueel eksplisiete materiaal nie. Oortreders sal permanent verbied word.\n\nJy is verantwoordelik vir die inhoud wat jy skep en deel. Gerapporteerde inhoud en gebruikers word hersien, en rekeninge wat hierdie beleid oortree, word verwyder. Jy kan enige gebruiker enige tyd vanaf hul profiel rapporteer of blokkeer.</string>
+    <string name="eula_gate_accept">Ek het die Gebruiksvoorwaardes en EULA gelees en aanvaar</string>
+    <string name="eula_gate_continue">Aanvaar en gaan voort</string>
+    <string name="eula_gate_logout">Teken uit</string>
+</resources>

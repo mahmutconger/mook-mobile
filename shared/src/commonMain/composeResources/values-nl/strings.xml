@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Het gesprek gaat verder op WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Ontmoet %1$s op WalkTalk</string>
+    <string name="walktalk_dialog_body">Berichten sturen is op z\'n best op WalkTalk! Geniet van vloeiendere chats van hogere kwaliteit, spraakgesprekken en directe vertaling zodat je kunt praten zonder taalbarrière.</string>
+    <string name="walktalk_dialog_feature_translation">Directe vertaling — geen taalbarrière</string>
+    <string name="walktalk_dialog_feature_voice">Spraakchat</string>
+    <string name="walktalk_dialog_feature_quality">Een vloeiendere ervaring van hogere kwaliteit</string>
+    <string name="walktalk_dialog_back">Terug</string>
+    <string name="walktalk_dialog_confirm">Vinden op WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Door een account aan te maken, ga je akkoord met onze Gebruiksvoorwaarden en ons Privacybeleid. Mook verbiedt ten strengste het maken, uploaden of delen van materiaal van seksueel kindermisbruik (CSAM) of uitbuiting (CSAE). Elke overtreding leidt tot onmiddellijke beëindiging van het account en melding aan de autoriteiten.</string>
+    <string name="legal_accept_terms">Ik accepteer de Gebruiksvoorwaarden</string>
+    <string name="legal_accept_eula">Ik accepteer de Licentieovereenkomst voor eindgebruikers</string>
+    <string name="legal_zero_tolerance">Er geldt geen tolerantie voor aanstootgevende inhoud, misbruikende gebruikers, intimidatie of het uploaden van seksueel expliciet materiaal. Overtreders worden permanent verbannen.</string>
+    <string name="legal_terms_error">Je moet de Gebruiksvoorwaarden accepteren om door te gaan</string>
+    <string name="legal_eula_error">Je moet de EULA accepteren om door te gaan</string>
+    <string name="eula_gate_welcome">Welkom bij Mook</string>
+    <string name="eula_gate_subtitle">Lees en accepteer om door te gaan</string>
+    <string name="legal_eula_body">Door Mook te gebruiken ga je akkoord met onze Gebruiksvoorwaarden en de Licentieovereenkomst voor eindgebruikers (EULA).\n\nEr geldt geen tolerantie voor aanstootgevende inhoud, misbruikende gebruikers, intimidatie of het uploaden van seksueel expliciet materiaal. Overtreders worden permanent verbannen.\n\nJe bent verantwoordelijk voor de inhoud die je maakt en deelt. Gemelde inhoud en gebruikers worden beoordeeld en accounts die dit beleid schenden, worden verwijderd. Je kunt elke gebruiker op elk moment vanaf hun profiel melden of blokkeren.</string>
+    <string name="eula_gate_accept">Ik heb de Gebruiksvoorwaarden en de EULA gelezen en accepteer ze</string>
+    <string name="eula_gate_continue">Accepteren en doorgaan</string>
+    <string name="eula_gate_logout">Uitloggen</string>
+</resources>

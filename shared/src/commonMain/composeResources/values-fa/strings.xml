@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">گفتگو در WalkTalk ادامه دارد</string>
+    <string name="walktalk_dialog_title_named">با %1$s در WalkTalk آشنا شوید</string>
+    <string name="walktalk_dialog_body">بهترین تجربه پیام‌رسانی در WalkTalk است! از گفتگوهای روان‌تر و باکیفیت‌تر، مکالمه صوتی و ترجمه فوری لذت ببرید تا بدون مانع زبانی صحبت کنید.</string>
+    <string name="walktalk_dialog_feature_translation">ترجمه فوری — بدون مانع زبانی</string>
+    <string name="walktalk_dialog_feature_voice">گفتگوی صوتی</string>
+    <string name="walktalk_dialog_feature_quality">تجربه‌ای روان‌تر و باکیفیت‌تر</string>
+    <string name="walktalk_dialog_back">بازگشت</string>
+    <string name="walktalk_dialog_confirm">یافتن در WalkTalk</string>
+
+    <string name="legal_consent_paragraph">با ایجاد حساب، شما با شرایط استفاده و سیاست حریم خصوصی ما موافقت می‌کنید. Mook ساخت، بارگذاری یا اشتراک‌گذاری محتوای سوءاستفاده جنسی از کودکان (CSAM) یا بهره‌کشی (CSAE) را اکیداً ممنوع می‌کند. هرگونه تخلف منجر به بستن فوری حساب و گزارش به مقامات خواهد شد.</string>
+    <string name="legal_accept_terms">شرایط استفاده را می‌پذیرم</string>
+    <string name="legal_accept_eula">توافق‌نامه مجوز کاربر نهایی را می‌پذیرم</string>
+    <string name="legal_zero_tolerance">هیچ تحملی نسبت به محتوای نامناسب، کاربران متخلف، آزار و اذیت یا بارگذاری محتوای جنسی صریح وجود ندارد. متخلفان برای همیشه مسدود خواهند شد.</string>
+    <string name="legal_terms_error">برای ادامه باید شرایط استفاده را بپذیرید</string>
+    <string name="legal_eula_error">برای ادامه باید EULA را بپذیرید</string>
+    <string name="eula_gate_welcome">به Mook خوش آمدید</string>
+    <string name="eula_gate_subtitle">لطفاً برای ادامه بررسی کرده و بپذیرید</string>
+    <string name="legal_eula_body">با استفاده از Mook، شما با شرایط استفاده و توافق‌نامه مجوز کاربر نهایی (EULA) ما موافقت می‌کنید.\n\nهیچ تحملی نسبت به محتوای نامناسب، کاربران متخلف، آزار و اذیت یا بارگذاری محتوای جنسی صریح وجود ندارد. متخلفان برای همیشه مسدود خواهند شد.\n\nشما مسئول محتوایی هستید که ایجاد و به اشتراک می‌گذارید. محتوا و کاربران گزارش‌شده بررسی می‌شوند و حساب‌هایی که این سیاست را نقض کنند حذف می‌شوند. می‌توانید هر کاربری را در هر زمان از نمایه‌اش گزارش یا مسدود کنید.</string>
+    <string name="eula_gate_accept">شرایط استفاده و EULA را خوانده‌ام و می‌پذیرم</string>
+    <string name="eula_gate_continue">پذیرش و ادامه</string>
+    <string name="eula_gate_logout">خروج</string>
+</resources>

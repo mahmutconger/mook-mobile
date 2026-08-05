@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Sohbet WalkTalk\'ta devam ediyor</string>
+    <string name="walktalk_dialog_title_named">%1$s ile WalkTalk\'ta tanışın</string>
+    <string name="walktalk_dialog_body">Mesajlaşmanın en iyi hâli WalkTalk\'ta! Daha akıcı ve kaliteli sohbetler, sesli konuşma ve anlık çeviri sayesinde dil engeli olmadan konuşun.</string>
+    <string name="walktalk_dialog_feature_translation">Anlık çeviri — dil engeli yok</string>
+    <string name="walktalk_dialog_feature_voice">Sesli sohbet</string>
+    <string name="walktalk_dialog_feature_quality">Daha akıcı ve kaliteli deneyim</string>
+    <string name="walktalk_dialog_back">Geri</string>
+    <string name="walktalk_dialog_confirm">WalkTalk\'ta Bul</string>
+
+    <string name="legal_consent_paragraph">Hesap oluşturarak Kullanım Koşullarımızı ve Gizlilik Politikamızı kabul etmiş olursunuz. Mook; Çocukların Cinsel İstismarı Materyali (CSAM) veya İstismarının (CSAE) oluşturulmasını, yüklenmesini ya da paylaşılmasını kesinlikle yasaklar. Her ihlal, hesabın anında kapatılmasıyla ve yetkililere bildirilmesiyle sonuçlanır.</string>
+    <string name="legal_accept_terms">Kullanım Koşullarını kabul ediyorum</string>
+    <string name="legal_accept_eula">Son Kullanıcı Lisans Sözleşmesini kabul ediyorum</string>
+    <string name="legal_zero_tolerance">Sakıncalı içeriğe, kötüye kullanan kullanıcılara, tacize veya cinsel içerikli materyal yüklenmesine sıfır tolerans gösterilir. İhlal edenler kalıcı olarak yasaklanır.</string>
+    <string name="legal_terms_error">Devam etmek için Kullanım Koşullarını kabul etmelisiniz</string>
+    <string name="legal_eula_error">Devam etmek için EULA\'yı kabul etmelisiniz</string>
+    <string name="eula_gate_welcome">Mook\'a hoş geldiniz</string>
+    <string name="eula_gate_subtitle">Devam etmek için lütfen inceleyip kabul edin</string>
+    <string name="legal_eula_body">Mook\'u kullanarak Kullanım Koşullarımızı ve Son Kullanıcı Lisans Sözleşmesini (EULA) kabul edersiniz.\n\nSakıncalı içeriğe, kötüye kullanan kullanıcılara, tacize veya cinsel içerikli materyal yüklenmesine sıfır tolerans gösterilir. İhlal edenler kalıcı olarak yasaklanır.\n\nOluşturduğunuz ve paylaştığınız içerikten siz sorumlusunuz. Bildirilen içerik ve kullanıcılar incelenir; bu politikayı ihlal eden hesaplar kaldırılır. Herhangi bir kullanıcıyı istediğiniz zaman profilinden bildirebilir veya engelleyebilirsiniz.</string>
+    <string name="eula_gate_accept">Kullanım Koşullarını ve EULA\'yı okudum ve kabul ediyorum</string>
+    <string name="eula_gate_continue">Kabul Et ve Devam Et</string>
+    <string name="eula_gate_logout">Çıkış yap</string>
+</resources>

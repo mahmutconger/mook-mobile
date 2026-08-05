@@ -1,0 +1,87 @@
+{
+  "project_info": {
+    "project_number": "198992547952",
+    "firebase_url": "https://walktalk-1123f-default-rtdb.firebaseio.com",
+    "project_id": "walktalk-1123f",
+    "storage_bucket": "walktalk-1123f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198992547952:android:51e61d0f06f2a0569fe4b5",
+        "android_client_info": {
+          "package_name": "com.example.walktalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6lNKFwJ5pXL7JNWnFxbsgrDit3t1rsKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198992547952:android:f38cd3382e76dee59fe4b5",
+        "android_client_info": {
+          "package_name": "com.example.walktalk2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6lNKFwJ5pXL7JNWnFxbsgrDit3t1rsKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198992547952:android:74ce147eb2ca19709fe4b5",
+        "android_client_info": {
+          "package_name": "com.istaps.walktalk2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6lNKFwJ5pXL7JNWnFxbsgrDit3t1rsKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198992547952:android:743cdd848c7055089fe4b5",
+        "android_client_info": {
+          "package_name": "com.mcclabs.mook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6lNKFwJ5pXL7JNWnFxbsgrDit3t1rsKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

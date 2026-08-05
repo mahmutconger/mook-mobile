@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">La conversación continúa en WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Conoce a %1$s en WalkTalk</string>
+    <string name="walktalk_dialog_body">¡La mensajería es mejor en WalkTalk! Disfruta de conversaciones más fluidas y de mayor calidad, chat de voz y traducción instantánea para hablar sin barreras idiomáticas.</string>
+    <string name="walktalk_dialog_feature_translation">Traducción instantánea — sin barreras idiomáticas</string>
+    <string name="walktalk_dialog_feature_voice">Chat de voz</string>
+    <string name="walktalk_dialog_feature_quality">Una experiencia más fluida y de mayor calidad</string>
+    <string name="walktalk_dialog_back">Atrás</string>
+    <string name="walktalk_dialog_confirm">Buscar en WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Al crear una cuenta, aceptas nuestras Condiciones de uso y nuestra Política de privacidad. Mook prohíbe estrictamente la creación, subida o difusión de Material de Abuso Sexual Infantil (CSAM) o de Explotación (CSAE). Cualquier infracción conllevará el cierre inmediato de la cuenta y su denuncia a las autoridades.</string>
+    <string name="legal_accept_terms">Acepto las Condiciones de uso</string>
+    <string name="legal_accept_eula">Acepto el Contrato de licencia de usuario final</string>
+    <string name="legal_zero_tolerance">Hay tolerancia cero con el contenido inapropiado, los usuarios abusivos, el acoso o la subida de material sexualmente explícito. Los infractores serán expulsados de forma permanente.</string>
+    <string name="legal_terms_error">Debes aceptar las Condiciones de uso para continuar</string>
+    <string name="legal_eula_error">Debes aceptar el EULA para continuar</string>
+    <string name="eula_gate_welcome">Te damos la bienvenida a Mook</string>
+    <string name="eula_gate_subtitle">Revisa y acepta para continuar</string>
+    <string name="legal_eula_body">Al usar Mook, aceptas nuestras Condiciones de uso y el Contrato de licencia de usuario final (EULA).\n\nHay tolerancia cero con el contenido inapropiado, los usuarios abusivos, el acoso o la subida de material sexualmente explícito. Los infractores serán expulsados de forma permanente.\n\nEres responsable del contenido que creas y compartes. El contenido y los usuarios denunciados se revisan, y las cuentas que infringen esta política se eliminan. Puedes denunciar o bloquear a cualquier usuario en cualquier momento desde su perfil.</string>
+    <string name="eula_gate_accept">He leído y acepto las Condiciones de uso y el EULA</string>
+    <string name="eula_gate_continue">Aceptar y continuar</string>
+    <string name="eula_gate_logout">Cerrar sesión</string>
+</resources>

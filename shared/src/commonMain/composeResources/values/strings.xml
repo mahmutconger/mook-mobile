@@ -1,0 +1,24 @@
+<resources>
+    <string name="walktalk_dialog_title">The chat continues on WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Meet %1$s on WalkTalk</string>
+    <string name="walktalk_dialog_body">Messaging is at its best on WalkTalk! Enjoy smoother, higher-quality chats, voice conversation and instant translation so you can talk without a language barrier.</string>
+    <string name="walktalk_dialog_feature_translation">Instant translation — no language barrier</string>
+    <string name="walktalk_dialog_feature_voice">Voice chat</string>
+    <string name="walktalk_dialog_feature_quality">A smoother, higher-quality experience</string>
+    <string name="walktalk_dialog_back">Back</string>
+    <string name="walktalk_dialog_confirm">Find on WalkTalk</string>
+
+    <string name="legal_consent_paragraph">By creating an account, you agree to our Terms of Use and Privacy Policy. Mook strictly prohibits the creation, upload, or sharing of Child Sexual Abuse Material (CSAM) or Exploitation (CSAE). Any violation will result in immediate account termination and reporting to the authorities.</string>
+    <string name="legal_accept_terms">I accept the Terms of Use</string>
+    <string name="legal_accept_eula">I accept the End User License Agreement</string>
+    <string name="legal_zero_tolerance">There is zero tolerance for objectionable content, abusive users, harassment, or the upload of sexually explicit material. Violators will be permanently banned.</string>
+    <string name="legal_terms_error">You must accept the Terms of Use to continue</string>
+    <string name="legal_eula_error">You must accept the EULA to proceed</string>
+
+    <string name="eula_gate_welcome">Welcome to Mook</string>
+    <string name="eula_gate_subtitle">Please review and accept to continue</string>
+    <string name="legal_eula_body">By using Mook you agree to our Terms of Use and End User License Agreement (EULA).\n\nThere is zero tolerance for objectionable content, abusive users, harassment, or the upload of sexually explicit material. Violators will be permanently banned.\n\nYou are responsible for the content you create and share. Reported content and users are reviewed, and accounts that violate this policy are removed. You can report or block any user at any time from their profile.</string>
+    <string name="eula_gate_accept">I have read and accept the Terms of Use and EULA</string>
+    <string name="eula_gate_continue">Accept &amp; Continue</string>
+    <string name="eula_gate_logout">Log out</string>
+</resources>

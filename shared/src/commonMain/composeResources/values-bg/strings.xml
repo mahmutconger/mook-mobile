@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Разговорът продължава в WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Запознайте се с %1$s в WalkTalk</string>
+    <string name="walktalk_dialog_body">Съобщенията са най-добри в WalkTalk! Насладете се на по-плавни и качествени разговори, гласова комуникация и незабавен превод, за да говорите без езикова бариера.</string>
+    <string name="walktalk_dialog_feature_translation">Незабавен превод — без езикова бариера</string>
+    <string name="walktalk_dialog_feature_voice">Гласов чат</string>
+    <string name="walktalk_dialog_feature_quality">По-плавно и качествено изживяване</string>
+    <string name="walktalk_dialog_back">Назад</string>
+    <string name="walktalk_dialog_confirm">Намери в WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Създавайки акаунт, вие се съгласявате с нашите Условия за ползване и Политика за поверителност. Mook строго забранява създаването, качването или споделянето на материали със сексуално малтретиране на деца (CSAM) или експлоатация (CSAE). Всяко нарушение ще доведе до незабавно прекратяване на акаунта и докладване на властите.</string>
+    <string name="legal_accept_terms">Приемам Условията за ползване</string>
+    <string name="legal_accept_eula">Приемам Лицензионното споразумение с краен потребител</string>
+    <string name="legal_zero_tolerance">Има нулева толерантност към нежелателно съдържание, злоупотребяващи потребители, тормоз или качване на сексуално явен материал. Нарушителите ще бъдат забранени за постоянно.</string>
+    <string name="legal_terms_error">You must accept the Terms of Use to continue</string>
+    <string name="legal_eula_error">Трябва да приемете EULA, за да продължите</string>
+    <string name="eula_gate_welcome">Добре дошли в Mook</string>
+    <string name="eula_gate_subtitle">Моля, прегледайте и приемете, за да продължите</string>
+    <string name="legal_eula_body">Използвайки Mook, вие се съгласявате с нашите Условия за използване и Лицензионно споразумение с краен потребител (EULA).\n\nИма нулева толерантност към нежелателно съдържание, злоупотребяващи потребители, тормоз или качване на сексуално явен материал. Нарушителите ще бъдат забранени за постоянно.\n\nВие носите отговорност за съдържанието, което създавате и споделяте. Докладваното съдържание и потребители се преглеждат, а акаунтите, които нарушават тази политика, се премахват. Можете да докладвате или блокирате всеки потребител по всяко време от неговия профил.</string>
+    <string name="eula_gate_accept">Прочетох и приемам Условията за ползване и EULA</string>
+    <string name="eula_gate_continue">Приеми и продължи</string>
+    <string name="eula_gate_logout">Излезте</string>
+</resources>

@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Vestlus jätkub WalkTalkis</string>
+    <string name="walktalk_dialog_title_named">Kohtu kasutajaga %1$s WalkTalkis</string>
+    <string name="walktalk_dialog_body">Sõnumivahetus on parim WalkTalkis! Naudi sujuvamaid ja kvaliteetsemaid vestlusi, häälvestlust ja kohest tõlget, et rääkida ilma keelebarjäärita.</string>
+    <string name="walktalk_dialog_feature_translation">Kohene tõlge — keelebarjääri pole</string>
+    <string name="walktalk_dialog_feature_voice">Häälvestlus</string>
+    <string name="walktalk_dialog_feature_quality">Sujuvam ja kvaliteetsem kogemus</string>
+    <string name="walktalk_dialog_back">Tagasi</string>
+    <string name="walktalk_dialog_confirm">Leia WalkTalkist</string>
+
+    <string name="legal_consent_paragraph">Konto loomisega nõustute meie kasutustingimuste ja privaatsuspoliitikaga. Mook keelab rangelt laste seksuaalse kuritarvitamise materjali (CSAM) või ekspluateerimise (CSAE) loomise, üleslaadimise või jagamise. Iga rikkumine toob kaasa konto viivitamatu sulgemise ja ametiasutustele teatamise.</string>
+    <string name="legal_accept_terms">Nõustun kasutustingimustega</string>
+    <string name="legal_accept_eula">Nõustun lõppkasutaja litsentsilepinguga</string>
+    <string name="legal_zero_tolerance">Nulltolerants on taunitava sisu, kuritarvitavate kasutajate, ahistamise või seksuaalse sisuga materjali üleslaadimise suhtes. Rikkujad keelatakse jäädavalt.</string>
+    <string name="legal_terms_error">Jätkamiseks peate nõustuma kasutustingimustega</string>
+    <string name="legal_eula_error">Jätkamiseks peate nõustuma EULA-ga</string>
+    <string name="eula_gate_welcome">Tere tulemast Mooki</string>
+    <string name="eula_gate_subtitle">Jätkamiseks vaadake üle ja nõustuge</string>
+    <string name="legal_eula_body">Mooki kasutades nõustute meie kasutustingimuste ja lõppkasutaja litsentsilepinguga (EULA).\n\nNulltolerants on taunitava sisu, kuritarvitavate kasutajate, ahistamise või seksuaalse sisuga materjali üleslaadimise suhtes. Rikkujad keelatakse jäädavalt.\n\nTeie vastutate loodud ja jagatava sisu eest. Teatatud sisu ja kasutajad vaadatakse üle ning neid eeskirju rikkuvad kontod eemaldatakse. Saate iga kasutaja profiili kaudu igal ajal teatada või blokeerida.</string>
+    <string name="eula_gate_accept">Olen lugenud kasutustingimusi ja EULA-d ning nõustun nendega</string>
+    <string name="eula_gate_continue">Nõustu ja jätka</string>
+    <string name="eula_gate_logout">Logi välja</string>
+</resources>

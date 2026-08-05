@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Söhbət WalkTalk-da davam edir</string>
+    <string name="walktalk_dialog_title_named">%1$s ilə WalkTalk-da tanış olun</string>
+    <string name="walktalk_dialog_body">Mesajlaşmanın ən yaxşı yeri WalkTalk-dadır! Daha rəvan və keyfiyyətli söhbətlər, səsli danışıq və ani tərcümə ilə dil maneəsi olmadan danışın.</string>
+    <string name="walktalk_dialog_feature_translation">Ani tərcümə — dil maneəsi yoxdur</string>
+    <string name="walktalk_dialog_feature_voice">Səsli söhbət</string>
+    <string name="walktalk_dialog_feature_quality">Daha rəvan və keyfiyyətli təcrübə</string>
+    <string name="walktalk_dialog_back">Geri</string>
+    <string name="walktalk_dialog_confirm">WalkTalk-da tap</string>
+
+    <string name="legal_consent_paragraph">Hesab yaratmaqla, İstifadə Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız. Mook Uşaq Cinsi İstismar Materialının (CSAM) və ya İstismarının (CSAE) yaradılmasını, yüklənməsini və ya paylaşılmasını qəti şəkildə qadağan edir. İstənilən pozuntu hesabın dərhal dayandırılması və səlahiyyətli orqanlara məlumat verilməsi ilə nəticələnəcək.</string>
+    <string name="legal_accept_terms">Mən İstifadə Şərtlərini qəbul edirəm</string>
+    <string name="legal_accept_eula">Mən Son İstifadəçi Lisenziya Müqaviləsini qəbul edirəm</string>
+    <string name="legal_zero_tolerance">Narahat məzmuna, təhqiramiz istifadəçilərə, təqiblərə və ya açıq-saçıq seksual materialın yüklənməsinə sıfır dözümlülük yoxdur. Qanunu pozanlar daimi olaraq qadağan olunacaq.</string>
+    <string name="legal_terms_error">Davam etmək üçün İstifadə Şərtlərini qəbul etməlisiniz</string>
+    <string name="legal_eula_error">Davam etmək üçün EULA-nı qəbul etməlisiniz</string>
+    <string name="eula_gate_welcome">Mook-a xoş gəlmisiniz</string>
+    <string name="eula_gate_subtitle">Davam etmək üçün nəzərdən keçirin və qəbul edin</string>
+    <string name="legal_eula_body">Mook-dan istifadə etməklə siz İstifadə Şərtlərimiz və Son İstifadəçi Lisenziya Müqaviləsi (EULA) ilə razılaşırsınız.\n\nNarahat məzmuna, təhqiramiz istifadəçilərə, təcavüzə və ya açıq-saçıq cinsi materialın yüklənməsinə sıfır dözümlülük yoxdur. Qanunu pozanlar daimi olaraq qadağan olunacaq.\n\nYaratdığınız və paylaşdığınız məzmuna görə məsuliyyət daşıyırsınız. Şikayət edilən məzmun və istifadəçilər nəzərdən keçirilir və bu siyasəti pozan hesablar silinir. İstənilən istifadəçini istənilən vaxt profilindən şikayət edə və ya bloklaya bilərsiniz.</string>
+    <string name="eula_gate_accept">Mən İstifadə Şərtlərini və EULA-nı oxudum və qəbul etdim</string>
+    <string name="eula_gate_continue">Qəbul et və Davam et</string>
+    <string name="eula_gate_logout">Çıxın</string>
+</resources>

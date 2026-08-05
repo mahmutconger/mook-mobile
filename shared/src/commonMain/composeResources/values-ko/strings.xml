@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">대화가 WalkTalk에서 계속됩니다</string>
+    <string name="walktalk_dialog_title_named">WalkTalk에서 %1$s님과 만나보세요</string>
+    <string name="walktalk_dialog_body">메시지는 WalkTalk에서 최고예요! 더 부드럽고 고품질의 대화, 음성 대화, 실시간 번역으로 언어 장벽 없이 이야기하세요.</string>
+    <string name="walktalk_dialog_feature_translation">실시간 번역 — 언어 장벽 없음</string>
+    <string name="walktalk_dialog_feature_voice">음성 채팅</string>
+    <string name="walktalk_dialog_feature_quality">더 부드럽고 고품질의 경험</string>
+    <string name="walktalk_dialog_back">뒤로</string>
+    <string name="walktalk_dialog_confirm">WalkTalk에서 찾기</string>
+
+    <string name="legal_consent_paragraph">계정을 만들면 이용약관과 개인정보 처리방침에 동의하는 것입니다. Mook은 아동 성착취물(CSAM) 또는 착취(CSAE)의 제작, 업로드, 공유를 엄격히 금지합니다. 위반 시 계정이 즉시 정지되고 당국에 신고됩니다.</string>
+    <string name="legal_accept_terms">이용약관에 동의합니다</string>
+    <string name="legal_accept_eula">최종 사용자 라이선스 계약에 동의합니다</string>
+    <string name="legal_zero_tolerance">부적절한 콘텐츠, 악의적 사용자, 괴롭힘, 노골적인 성적 자료 업로드는 일절 용납되지 않습니다. 위반자는 영구적으로 이용이 차단됩니다.</string>
+    <string name="legal_terms_error">계속하려면 이용약관에 동의해야 합니다</string>
+    <string name="legal_eula_error">계속하려면 EULA에 동의해야 합니다</string>
+    <string name="eula_gate_welcome">Mook에 오신 것을 환영합니다</string>
+    <string name="eula_gate_subtitle">계속하려면 검토 후 동의해 주세요</string>
+    <string name="legal_eula_body">Mook을 사용하면 이용약관과 최종 사용자 라이선스 계약(EULA)에 동의하는 것입니다.\n\n부적절한 콘텐츠, 악의적 사용자, 괴롭힘, 노골적인 성적 자료 업로드는 일절 용납되지 않습니다. 위반자는 영구적으로 이용이 차단됩니다.\n\n회원님이 만들고 공유하는 콘텐츠에 대한 책임은 회원님에게 있습니다. 신고된 콘텐츠와 사용자는 검토되며, 이 정책을 위반하는 계정은 삭제됩니다. 언제든지 상대방의 프로필에서 사용자를 신고하거나 차단할 수 있습니다.</string>
+    <string name="eula_gate_accept">이용약관과 EULA를 읽었으며 이에 동의합니다</string>
+    <string name="eula_gate_continue">동의하고 계속하기</string>
+    <string name="eula_gate_logout">로그아웃</string>
+</resources>

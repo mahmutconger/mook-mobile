@@ -1,0 +1,23 @@
+<resources>
+    <string name="walktalk_dialog_title">Chatten fortsætter på WalkTalk</string>
+    <string name="walktalk_dialog_title_named">Mød %1$s på WalkTalk</string>
+    <string name="walktalk_dialog_body">Beskeder er bedst på WalkTalk! Nyd mere flydende chats i højere kvalitet, stemmesamtaler og øjeblikkelig oversættelse, så du kan tale uden sprogbarriere.</string>
+    <string name="walktalk_dialog_feature_translation">Øjeblikkelig oversættelse — ingen sprogbarriere</string>
+    <string name="walktalk_dialog_feature_voice">Stemmechat</string>
+    <string name="walktalk_dialog_feature_quality">En mere flydende oplevelse i højere kvalitet</string>
+    <string name="walktalk_dialog_back">Tilbage</string>
+    <string name="walktalk_dialog_confirm">Find på WalkTalk</string>
+
+    <string name="legal_consent_paragraph">Ved at oprette en konto accepterer du vores Brugervilkår og Privatlivspolitik. Mook forbyder strengt oprettelse, upload eller deling af materiale om seksuelt misbrug af børn (CSAM) eller udnyttelse (CSAE). Enhver overtrædelse vil medføre øjeblikkelig lukning af kontoen og anmeldelse til myndighederne.</string>
+    <string name="legal_accept_terms">Jeg accepterer Brugervilkårene</string>
+    <string name="legal_accept_eula">Jeg accepterer slutbrugerlicensaftalen</string>
+    <string name="legal_zero_tolerance">Der er nultolerance over for anstødeligt indhold, krænkende brugere, chikane eller upload af seksuelt eksplicit materiale. Overtrædere bliver permanent bortvist.</string>
+    <string name="legal_terms_error">Du skal acceptere Brugervilkårene for at fortsætte</string>
+    <string name="legal_eula_error">Du skal acceptere EULA\'en for at fortsætte</string>
+    <string name="eula_gate_welcome">Velkommen til Mook</string>
+    <string name="eula_gate_subtitle">Læs og accepter for at fortsætte</string>
+    <string name="legal_eula_body">Ved at bruge Mook accepterer du vores Brugervilkår og slutbrugerlicensaftalen (EULA).\n\nDer er nultolerance over for anstødeligt indhold, krænkende brugere, chikane eller upload af seksuelt eksplicit materiale. Overtrædere bliver permanent bortvist.\n\nDu er ansvarlig for det indhold, du opretter og deler. Anmeldt indhold og anmeldte brugere gennemgås, og konti, der overtræder denne politik, fjernes. Du kan til enhver tid anmelde eller blokere enhver bruger fra deres profil.</string>
+    <string name="eula_gate_accept">Jeg har læst og accepterer Brugervilkårene og EULA\'en</string>
+    <string name="eula_gate_continue">Accepter og fortsæt</string>
+    <string name="eula_gate_logout">Log ud</string>
+</resources>
