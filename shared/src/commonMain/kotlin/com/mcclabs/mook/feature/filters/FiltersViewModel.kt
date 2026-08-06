@@ -3,7 +3,6 @@ package com.mcclabs.mook.feature.filters
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.model.MatchSettings
-import com.mcclabs.mook.domain.repository.LanguageRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
 import com.mcclabs.mook.util.getAvailableCountries
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,19 +12,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FiltersViewModel(
-    private val settingsRepository: SettingsRepository,
-    private val languageRepository: LanguageRepository
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FiltersUiState(isLoading = true))
     val state: StateFlow<FiltersUiState> = _state.asStateFlow()
 
     init {
-        // The full ISO country list (localized) and the language list are the
-        // same sources registration uses, so filters stay in sync with sign-up.
+        // The full ISO country list (localized) is the same source registration
+        // uses, so the country filter stays in sync with sign-up.
         val countries = getAvailableCountries()
-        val languages = languageRepository.getAvailableLanguages().map { it.name }
-        _state.update { it.copy(availableCountries = countries, availableLanguages = languages) }
+        _state.update { it.copy(availableCountries = countries) }
 
         viewModelScope.launch {
             try {
@@ -59,24 +56,9 @@ class FiltersViewModel(
         _state.update { it.copy(settings = it.settings.copy(targetCountries = current - country)) }
     }
 
-    fun addLanguage(language: String) {
-        if (language == "Any") {
-            _state.update { it.copy(settings = it.settings.copy(targetLanguages = emptyList())) }
-            return
-        }
-        val current = _state.value.settings.targetLanguages
-        if (!current.contains(language)) {
-            _state.update { it.copy(settings = it.settings.copy(targetLanguages = current + language)) }
-        }
-    }
-
-    fun removeLanguage(language: String) {
-        val current = _state.value.settings.targetLanguages
-        _state.update { it.copy(settings = it.settings.copy(targetLanguages = current - language)) }
-    }
-
     fun onReset() {
-        _state.update { it.copy(settings = MatchSettings()) }
+        // Age/country only: the room is chosen separately and must survive a reset here.
+        _state.update { it.copy(settings = MatchSettings(roomLanguageCode = it.settings.roomLanguageCode)) }
     }
 
     fun onApply(navigateBack: () -> Unit) {

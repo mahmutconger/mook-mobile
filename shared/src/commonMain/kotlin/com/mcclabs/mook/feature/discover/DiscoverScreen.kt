@@ -4,22 +4,17 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.clickable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
-import coil3.compose.AsyncImage
 import com.mcclabs.mook.feature.filters.FiltersScreen
 import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.components.ReportBottomSheet
@@ -38,6 +33,7 @@ fun DiscoverScreen(
     onNavigateToProfile: (String) -> Unit,
     onNavigateToMatch: (String) -> Unit = {},
     onNavigateToLiked: () -> Unit = {},
+    onNavigateToRoomSwitch: () -> Unit = {},
     viewModel: DiscoverViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -102,19 +98,13 @@ fun DiscoverScreen(
                         }
                     },
                     actions = {
-                        AsyncImage(
-                            model = state.currentUserAvatarUrl,
-                            contentDescription = "Your profile",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(NeonColors.Card)
-                                .clickable(enabled = currentUserId.isNotEmpty()) {
-                                    onNavigateToProfile(currentUserId)
-                                }
-                        )
+                        IconButton(onClick = onNavigateToRoomSwitch) {
+                            Icon(
+                                painter = painterResource(Res.drawable.flag_svgrepo_com),
+                                contentDescription = stringResource(Res.string.discover_switch_room_cd),
+                                tint = NeonColors.TextPrimary
+                            )
+                        }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = NeonColors.Background

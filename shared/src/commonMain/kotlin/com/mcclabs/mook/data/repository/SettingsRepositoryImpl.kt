@@ -33,13 +33,13 @@ class SettingsRepositoryImpl : SettingsRepository {
             val start = runCatching { document.get<Long>("ageRangeStart") }.getOrNull()?.toInt()
             val end = runCatching { document.get<Long>("ageRangeEnd") }.getOrNull()?.toInt()
             val countries = runCatching { document.get<List<String>>("targetCountries") }.getOrNull() ?: emptyList()
-            val languages = runCatching { document.get<List<String>>("targetLanguages") }.getOrNull() ?: emptyList()
+            val roomLanguageCode = runCatching { document.get<String>("roomLanguageCode") }.getOrNull()
             // A user who has never opened Filters has no stored range; fall back to defaults.
             MatchSettings(
                 ageRangeStart = start ?: MatchSettings().ageRangeStart,
                 ageRangeEnd = end ?: MatchSettings().ageRangeEnd,
                 targetCountries = countries,
-                targetLanguages = languages
+                roomLanguageCode = roomLanguageCode
             )
         } catch (e: Exception) {
             Log.e("Filtreler okunamadı, varsayılana dönülüyor", e)
@@ -57,9 +57,9 @@ class SettingsRepositoryImpl : SettingsRepository {
         val updateMap = mutableMapOf<String, Any>(
             "ageRangeStart" to settings.ageRangeStart,
             "ageRangeEnd" to settings.ageRangeEnd,
-            "targetCountries" to settings.targetCountries,
-            "targetLanguages" to settings.targetLanguages
+            "targetCountries" to settings.targetCountries
         )
+        settings.roomLanguageCode?.let { updateMap["roomLanguageCode"] = it }
 
         appFirestore.collection("users").document(userId).set(
             updateMap,
@@ -169,5 +169,13 @@ class SettingsRepositoryImpl : SettingsRepository {
             mapOf("hasSeenLikedMeTutorial" to seen),
             merge = true
         )
+    }
+
+    override suspend fun getRoomLanguageCode(): String? {
+        return getSettings().roomLanguageCode
+    }
+
+    override suspend fun setRoomLanguageCode(code: String) {
+        saveSettings(getSettings().copy(roomLanguageCode = code))
     }
 }

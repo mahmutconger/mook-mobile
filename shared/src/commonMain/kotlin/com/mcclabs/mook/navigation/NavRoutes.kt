@@ -8,6 +8,12 @@ sealed class NavRoutes(val route: String) {
     /** Mandatory EULA/UGC-policy acceptance gate shown after login. */
     data object EulaGate : NavRoutes("eula_gate")
 
+    /** Mandatory language-room selection gate shown after the EULA gate, before Discover. */
+    data object RoomGate : NavRoutes("room_gate")
+
+    /** Lets the user change their current language room from Discover. */
+    data object RoomSwitch : NavRoutes("room_switch")
+
     data object Discover : NavRoutes("discover")
     data object Filters : NavRoutes("filters")
     data object Settings : NavRoutes("settings")

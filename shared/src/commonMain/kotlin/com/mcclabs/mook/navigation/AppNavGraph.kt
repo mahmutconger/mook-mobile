@@ -16,6 +16,8 @@ import com.mcclabs.mook.feature.liked.LikedScreen
 import com.mcclabs.mook.feature.profile.ProfileDetailsScreen
 import com.mcclabs.mook.feature.profile.edit.EditProfileScreen
 import com.mcclabs.mook.feature.registration.RegistrationScreen
+import com.mcclabs.mook.feature.room.RoomGateScreen
+import com.mcclabs.mook.feature.room.RoomSwitchScreen
 import com.mcclabs.mook.feature.settings.SettingsScreen
 import com.mcclabs.mook.feature.sso.SsoAuthorizeScreen
 import dev.gitlive.firebase.Firebase
@@ -49,7 +51,7 @@ fun AppNavGraph() {
         composable(NavRoutes.EulaGate.route) {
             EulaGateScreen(
                 onAccepted = {
-                    navController.navigate(NavRoutes.Discover.route) {
+                    navController.navigate(NavRoutes.RoomGate.route) {
                         popUpTo(NavRoutes.EulaGate.route) { inclusive = true }
                     }
                 },
@@ -66,10 +68,26 @@ fun AppNavGraph() {
             RegistrationScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToHome = {
-                    navController.navigate(NavRoutes.Discover.route) {
+                    navController.navigate(NavRoutes.RoomGate.route) {
                         popUpTo(NavRoutes.Login.route) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        composable(NavRoutes.RoomGate.route) {
+            RoomGateScreen(
+                onProceed = {
+                    navController.navigate(NavRoutes.Discover.route) {
+                        popUpTo(NavRoutes.RoomGate.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(NavRoutes.RoomSwitch.route) {
+            RoomSwitchScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -83,6 +101,9 @@ fun AppNavGraph() {
                 },
                 onNavigateToLiked = {
                     navController.navigate(NavRoutes.Liked.route) { launchSingleTop = true }
+                },
+                onNavigateToRoomSwitch = {
+                    navController.navigate(NavRoutes.RoomSwitch.route)
                 }
             )
         }

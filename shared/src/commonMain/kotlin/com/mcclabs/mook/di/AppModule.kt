@@ -15,6 +15,8 @@ import com.mcclabs.mook.feature.onboarding.OnboardingViewModel
 import com.mcclabs.mook.feature.registration.RegistrationViewModel
 import com.mcclabs.mook.feature.discover.DiscoverViewModel
 import com.mcclabs.mook.feature.eula.EulaGateViewModel
+import com.mcclabs.mook.feature.room.RoomGateViewModel
+import com.mcclabs.mook.feature.room.RoomSwitchViewModel
 import com.mcclabs.mook.feature.profile.ProfileDetailsViewModel
 import com.mcclabs.mook.feature.filters.FiltersViewModel
 import com.mcclabs.mook.feature.liked.LikedViewModel
@@ -47,6 +49,8 @@ val appModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::UpdateViewModel)
     viewModelOf(::EulaGateViewModel)
+    viewModelOf(::RoomGateViewModel)
+    viewModelOf(::RoomSwitchViewModel)
     viewModelOf(::SsoAuthorizeViewModel)
     viewModelOf(::EditProfileViewModel)
 

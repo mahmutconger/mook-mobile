@@ -40,7 +40,6 @@ class DiscoverViewModel(
     val events: SharedFlow<DiscoverEvent> = _events.asSharedFlow()
 
     init {
-        loadCurrentUserAvatar()
         observeSettingsAndReload()
     }
 
@@ -80,7 +79,6 @@ class DiscoverViewModel(
     /** Re-runs the query after a failure; the settings flow does not re-emit on its own. */
     fun retry() {
         viewModelScope.launch {
-            loadCurrentUserAvatar()
             loadProfiles(settingsRepository.getSettings())
         }
     }
@@ -89,25 +87,6 @@ class DiscoverViewModel(
         viewModelScope.launch {
             settingsRepository.setHasSeenLikedMeTutorial(true)
             _state.value = _state.value.copy(hasSeenLikedMeTutorial = true)
-        }
-    }
-
-    private fun loadCurrentUserAvatar() {
-        viewModelScope.launch {
-            val uid = Firebase.auth.currentUser?.uid
-            if (uid == null) {
-                Log.e("Discover: oturum açık değil, avatar yüklenemiyor")
-                return@launch
-            }
-            val profile = try {
-                repository.getProfileDetails(uid)
-            } catch (e: Exception) {
-                Log.e("Discover: kendi profilim okunamadı (uid=$uid)", e)
-                null
-            }
-            _state.value = _state.value.copy(
-                currentUserAvatarUrl = profile?.photoUrls?.firstOrNull()
-            )
         }
     }
 

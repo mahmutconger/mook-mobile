@@ -11,5 +11,6 @@ data class MatchSettings(
     val ageRangeStart: Int = 18,
     val ageRangeEnd: Int = 35,
     val targetCountries: List<String> = emptyList(),
-    val targetLanguages: List<String> = emptyList()
+    /** The language code (DeepL format) of the room the user is currently in, or `null` if none chosen yet. */
+    val roomLanguageCode: String? = null
 )

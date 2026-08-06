@@ -13,9 +13,6 @@ data class DiscoverUiState(
     val showBlockConfirmDialog: Boolean = false,
     val selectedProfileToReportOrBlock: String? = null,
 
-    /** The signed-in user's own avatar, shown in the top bar. */
-    val currentUserAvatarUrl: String? = null,
-    
     /** Whether the user has seen the "this person liked you" overlay. */
     val hasSeenLikedMeTutorial: Boolean = false
 )

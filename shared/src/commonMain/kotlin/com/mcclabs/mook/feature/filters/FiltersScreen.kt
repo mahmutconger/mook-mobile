@@ -1,6 +1,5 @@
 package com.mcclabs.mook.feature.filters
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,7 +26,6 @@ import com.mcclabs.mook.ui.theme.BrandGradient
 import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.calendar_svgrepo_com
-import mook.shared.generated.resources.chat_round_line_svgrepo_com
 import mook.shared.generated.resources.flag_svgrepo_com
 import mook.shared.generated.resources.ic_settings_minimalistic
 import mook.shared.generated.resources.search_normal_1_svgrepo_com
@@ -108,13 +106,6 @@ fun FiltersScreen(
                     available = state.availableCountries,
                     onAdd = { viewModel.addCountry(it) },
                     onRemove = { viewModel.removeCountry(it) }
-                )
-
-                LanguageSection(
-                    selected = state.settings.targetLanguages,
-                    available = state.availableLanguages,
-                    onAdd = { viewModel.addLanguage(it) },
-                    onRemove = { viewModel.removeLanguage(it) }
                 )
 
                 FilterSection(
@@ -244,45 +235,6 @@ private fun CountrySection(
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-/**
- * Language filter. The list is short, so every option is shown as a toggle chip
- * (plus an "Any" chip that clears the selection).
- */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun LanguageSection(
-    selected: List<String>,
-    available: List<String>,
-    onAdd: (String) -> Unit,
-    onRemove: (String) -> Unit,
-) {
-    FilterSection(
-        icon = Res.drawable.chat_round_line_svgrepo_com,
-        title = "Target Language",
-        subtitle = if (selected.isEmpty()) "Any language" else "${selected.size} selected"
-    ) {
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            ChoiceChip(
-                text = "Any",
-                selected = selected.isEmpty(),
-                onClick = { onAdd("Any") }
-            )
-            available.forEach { language ->
-                val isSelected = language in selected
-                ChoiceChip(
-                    text = language,
-                    selected = isSelected,
-                    onClick = { if (isSelected) onRemove(language) else onAdd(language) }
-                )
             }
         }
     }
@@ -437,43 +389,6 @@ private fun RemovableChip(
             color = Color.White,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-/**
- * A toggleable pill chip. Selected chips fill with the brand gradient; unselected
- * chips use the input-fill token so they read cleanly in both light and dark modes.
- */
-@Composable
-private fun ChoiceChip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val shape = RoundedCornerShape(50)
-    val textColor by animateColorAsState(
-        if (selected) Color.White else NeonColors.TextSecondary
-    )
-    val base = Modifier
-        .clip(shape)
-        .clickable(onClick = onClick)
-
-    Box(
-        modifier = if (selected) {
-            base.background(BrandGradient)
-        } else {
-            base
-                .background(NeonColors.InputBackground)
-                .border(1.dp, NeonColors.CardBorder, shape)
-        }.padding(horizontal = 16.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
         )
     }
 }

@@ -21,6 +21,12 @@
     <string name="eula_gate_accept">I have read and accept the Terms of Use and EULA</string>
     <string name="eula_gate_continue">Accept &amp; Continue</string>
     <string name="eula_gate_logout">Log out</string>
+
+    <string name="room_gate_title">Choose your room</string>
+    <string name="room_gate_subtitle">Pick the language you want to practice. You\'ll be matched with people who speak it natively.</string>
+    <string name="room_switch_title">Switch room</string>
+    <string name="room_switch_back_cd">Back</string>
+    <string name="discover_switch_room_cd">Switch room</string>
     <string name="discover_error_couldnt_load_profiles">Couldn\'t load profiles</string>
     <string name="discover_retry">Retry</string>
     <string name="discover_no_more_profiles">No more profiles</string>

@@ -134,4 +134,10 @@
     <string name="eula_gate_accept">Kullanım Koşullarını ve EULA\'yı okudum ve kabul ediyorum</string>
     <string name="eula_gate_continue">Kabul Et ve Devam Et</string>
     <string name="eula_gate_logout">Çıkış Yap</string>
+
+    <string name="room_gate_title">Odanı seç</string>
+    <string name="room_gate_subtitle">Pratik yapmak istediğin dili seç. Bu dili ana dili olarak konuşan kişilerle eşleştirileceksin.</string>
+    <string name="room_switch_title">Oda değiştir</string>
+    <string name="room_switch_back_cd">Geri</string>
+    <string name="discover_switch_room_cd">Oda değiştir</string>
 </resources>

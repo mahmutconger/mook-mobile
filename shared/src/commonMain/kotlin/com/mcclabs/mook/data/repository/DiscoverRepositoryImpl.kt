@@ -68,11 +68,25 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         val currentUid = currentUser?.uid ?: return emptyList()
         val db = appFirestore
 
+        // A stale/corrupted roomLanguageCode equal to the viewer's own native language
+        // would otherwise hide everyone; treat the room filter as absent in that case.
+        val ownLanguageCode = runCatching {
+            db.collection("users").document(currentUid).get().get<String>("languageCode")
+        }.getOrNull()
+        val effectiveSettings = if (
+            settings.roomLanguageCode != null &&
+            settings.roomLanguageCode.equals(ownLanguageCode, ignoreCase = true)
+        ) {
+            settings.copy(roomLanguageCode = null)
+        } else {
+            settings
+        }
+
         // New filters mean a different result set, so paging must start from the top
         // instead of continuing after the last document of the previous filter.
-        if (settings != lastSettings) {
+        if (effectiveSettings != lastSettings) {
             lastVisibleDocument = null
-            lastSettings = settings
+            lastSettings = effectiveSettings
         }
 
         Log.d("Discover sorgusu başlıyor (uid=$currentUid, yaş=${settings.ageRangeStart}-${settings.ageRangeEnd})")
@@ -95,7 +109,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             } catch (e: Exception) {
                 // Ignore if blockedUsers doesn't exist
             }
-            
+
             isInteractionsFetched = true
             Log.d("Daha önce kaydırılan: ${swipedUserIds.size} kullanıcı")
         }
@@ -125,7 +139,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 if (document.id == currentUid || swipedUserIds.contains(document.id)) continue
                 try {
                     val profile = mapToProfile(document)
-                    if (profile.matches(settings)) {
+                    if (profile.matches(effectiveSettings)) {
                         profiles.add(profile)
                     } else {
                         Log.d("Discover: ${document.id} filtrelere takıldı (yaş=${profile.age}, ülke=${profile.country?.name}, dil=${profile.language?.name})")
@@ -169,9 +183,8 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             if (!hasCountry) return false
         }
         
-        if (settings.targetLanguages.isNotEmpty()) {
-            val hasLanguage = settings.targetLanguages.any { language?.name?.contains(it, ignoreCase = true) == true }
-            if (!hasLanguage) return false
+        if (settings.roomLanguageCode != null) {
+            if (!language?.code.equals(settings.roomLanguageCode, ignoreCase = true)) return false
         }
         
         return true
