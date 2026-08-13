@@ -26,21 +26,26 @@
     <string name="room_gate_subtitle">Pick the language you want to practice. You\'ll be matched with people who speak it natively.</string>
     <string name="room_switch_title">Switch room</string>
     <string name="room_switch_back_cd">Back</string>
+    <string name="room_info_title">How rooms work</string>
+    <string name="room_info_body">A room is the language you want to practice. Pick a language to discover and match with people who speak it — everything here revolves around that language. You can switch your room anytime from this screen.</string>
+    <string name="room_info_confirm">Got it</string>
     <string name="discover_switch_room_cd">Switch room</string>
+    <string name="discover_empty_room_message">Sorry, we couldn\'t find anyone here yet. You can check out other rooms if you\'d like.</string>
+    <string name="room_language_independent">Language-independent</string>
     <string name="discover_error_couldnt_load_profiles">Couldn\'t load profiles</string>
     <string name="discover_retry">Retry</string>
     <string name="discover_no_more_profiles">No more profiles</string>
-    <string name="discover_liked_me_title">Bu kişi sizi beğendi ✨</string>
-    <string name="discover_liked_me_body">Siz de onu beğenerek eşleşebilir ve hemen mesajlaşmaya başlayabilirsiniz.</string>
-    <string name="discover_liked_me_dismiss">Anladım</string>
+    <string name="discover_liked_me_title">This person liked you ✨</string>
+    <string name="discover_liked_me_body">Like them back to match and start chatting right away.</string>
+    <string name="discover_liked_me_dismiss">Got it</string>
     <string name="discover_block_user">Block User</string>
     <string name="discover_block_user_message">Are you sure you want to block this user? They will no longer see you, and you will no longer see them in your feed.</string>
     <string name="discover_block_confirm">Block</string>
     <string name="discover_block_cancel">Cancel</string>
-    <string name="profile_block_user_title">Kullanıcıyı Engelle</string>
-    <string name="profile_block_user_message">Bu kullanıcıyı engellersen bir daha profilini göremezsin ve seni bulamazlar.</string>
-    <string name="profile_block_confirm">Engelle</string>
-    <string name="profile_block_cancel">İptal</string>
+    <string name="profile_block_user_title">Block User</string>
+    <string name="profile_block_user_message">If you block this user, you won\'t see their profile again and they won\'t be able to find you.</string>
+    <string name="profile_block_confirm">Block</string>
+    <string name="profile_block_cancel">Cancel</string>
     <string name="profile_error_loading">Error loading profile</string>
     <string name="profile_details_title">Details</string>
     <string name="profile_country">Country</string>
@@ -51,12 +56,12 @@
     <string name="profile_no_description">No description provided.</string>
     <string name="profile_interests">Interests</string>
     <string name="profile_send_message">💬 Send Message</string>
-    <string name="profile_block_user">🚫 Kullanıcıyı Engelle</string>
+    <string name="profile_block_user">🚫 Block User</string>
     <string name="match_title">It\'s a Match!</string>
     <string name="match_liked_each_other">You and %1$s liked each other</string>
     <string name="match_chat_walktalk">💬 Chat on WalkTalk</string>
     <string name="match_keep_swiping">Keep Swiping</string>
-    <string name="swipeable_card_liked_me">Sizi beğendi ✨</string>
+    <string name="swipeable_card_liked_me">Liked you ✨</string>
     <string name="swipeable_card_report_profile">Report Profile</string>
     <string name="swipeable_card_block_user">Block User</string>
     <string name="login_app_name">Mook</string>
@@ -81,19 +86,19 @@
     <string name="onboarding_select_target_language">Select Target Language</string>
     <string name="onboarding_target_level_label">Target Level</string>
     <string name="onboarding_continue_button">Continue</string>
-    <string name="settings_delete_account_title">Hesabı Sil</string>
-    <string name="settings_delete_account_message">Hesabını kalıcı olarak silmek istediğinden emin misin? Profil bilgilerin, fotoğrafların ve tüm eşleşmelerin silinecek. Bu işlem geri alınamaz.</string>
-    <string name="settings_delete_account_confirm">Evet, Sil</string>
-    <string name="settings_delete_account_cancel">İptal</string>
+    <string name="settings_delete_account_title">Delete Account</string>
+    <string name="settings_delete_account_message">Are you sure you want to permanently delete your account? Your profile info, photos, and all matches will be deleted. This action cannot be undone.</string>
+    <string name="settings_delete_account_confirm">Yes, Delete</string>
+    <string name="settings_delete_account_cancel">Cancel</string>
     <string name="settings_title">Settings</string>
-    <string name="settings_language_dialog_title">Uygulama Dili / App Language</string>
-    <string name="settings_language_dialog_close">Kapat / Close</string>
+    <string name="settings_language_dialog_title">App Language</string>
+    <string name="settings_language_dialog_close">Close</string>
     <string name="settings_account_section">ACCOUNT</string>
     <string name="settings_email_label">Email</string>
     <string name="settings_appearance_section">APPEARANCE</string>
-    <string name="settings_dark_mode_title">Koyu Tema</string>
-    <string name="settings_dark_mode_subtitle">Uygulama genelinde koyu tema kullan</string>
-    <string name="settings_app_language_label">Uygulama Dili / App Language</string>
+    <string name="settings_dark_mode_title">Dark Theme</string>
+    <string name="settings_dark_mode_subtitle">Use dark theme across the app</string>
+    <string name="settings_app_language_label">App Language</string>
     <string name="settings_discovery_section">DISCOVERY</string>
     <string name="settings_show_in_discover_title">Show me in Discover</string>
     <string name="settings_show_in_discover_subtitle">Let others discover your profile</string>
@@ -101,8 +106,8 @@
     <string name="settings_legal_section">LEGAL</string>
     <string name="settings_privacy_policy_label">Privacy Policy &amp; Terms of Use</string>
     <string name="settings_view_label">View</string>
-    <string name="settings_logout_button">Çıkış Yap</string>
-    <string name="settings_delete_account_button">Hesabı Kalıcı Olarak Sil</string>
+    <string name="settings_logout_button">Log Out</string>
+    <string name="settings_delete_account_button">Permanently Delete Account</string>
     <string name="registration_date_picker_ok">OK</string>
     <string name="registration_date_picker_cancel">Cancel</string>
     <string name="registration_age_blocked_error">Sorry, you are not eligible to use Mook at this time.</string>
@@ -141,4 +146,125 @@
     <string name="registration_show_in_discover_subtitle">Let others discover your profile</string>
     <string name="registration_read_privacy_policy">Read Privacy Policy &amp; Terms of Use</string>
     <string name="registration_eula_accept_text">I have read and agree to the Mook Terms of Service and Privacy Policy. I understand that Mook has zero tolerance for objectionable content and abusive users, and any such behavior will result in a permanent ban.</string>
+
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_save">Save</string>
+    <string name="common_add">Add</string>
+    <string name="common_delete">Delete</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_discover">Discover</string>
+    <string name="nav_liked">Liked</string>
+    <string name="nav_subscription">Subscription</string>
+    <string name="nav_voices">Voices</string>
+    <string name="nav_profile">Profile</string>
+    <string name="discover_menu_cd">Menu</string>
+
+    <!-- Filters -->
+    <string name="filters_title">Discovery</string>
+    <string name="filters_subtitle">Fine-tune who you meet</string>
+    <string name="filters_age_range">Age Range</string>
+    <string name="filters_reset">Reset</string>
+    <string name="filters_apply">Apply</string>
+    <string name="filters_target_country">Target Country</string>
+    <string name="filters_any_country">Any country</string>
+    <string name="filters_selected_count">%1$d selected</string>
+    <string name="filters_search_country">Search country…</string>
+    <string name="filters_no_countries">No countries found</string>
+    <string name="filters_any">Any</string>
+
+    <!-- Liked -->
+    <string name="liked_load_error_title">Couldn\'t load your likes</string>
+    <string name="liked_empty">You haven\'t liked anyone yet</string>
+    <string name="liked_match_chip">Match</string>
+
+    <!-- Edit profile -->
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="edit_profile_photos_title">Photos</string>
+    <string name="edit_profile_photos_hint">You must upload at least 2 photos. The first one becomes your main profile photo.</string>
+    <string name="edit_profile_move_left_cd">Move left</string>
+    <string name="edit_profile_move_right_cd">Move right</string>
+    <string name="edit_profile_min_photos_error">You must have at least 2 photos.</string>
+    <string name="edit_profile_age_error">You must be at least 18 years old.</string>
+    <string name="edit_profile_basic_info_title">Basic info</string>
+    <string name="edit_profile_name_label">Name</string>
+    <string name="edit_profile_bio_label">About you</string>
+    <string name="edit_profile_birthdate_label">Birth date</string>
+    <string name="edit_profile_birthdate_placeholder">Select your birth date</string>
+    <string name="edit_profile_language_label">Native language</string>
+    <string name="edit_profile_country_label">Country</string>
+
+    <!-- Profile details -->
+    <string name="profile_edit_cd">Edit Profile</string>
+    <string name="profile_settings_cd">Settings</string>
+    <string name="profile_report_cd">Report</string>
+    <string name="profile_not_found">Profile not found or could not be loaded.</string>
+
+    <!-- Report sheet -->
+    <string name="report_title">Report User</string>
+    <string name="report_subtitle">Why are you reporting this user?</string>
+    <string name="report_submit">Submit Report</string>
+    <string name="report_reason_spam">Spam</string>
+    <string name="report_reason_harassment">Harassment</string>
+    <string name="report_reason_inappropriate_photo">Inappropriate Photo</string>
+    <string name="report_reason_underage">Underage</string>
+    <string name="report_reason_other">Other</string>
+
+    <!-- SSO -->
+    <string name="sso_title">Authorization Request</string>
+    <string name="sso_body">%1$s wants to sign in using your Mook account.</string>
+    <string name="sso_allow">Allow</string>
+    <string name="sso_deny">Deny</string>
+
+    <!-- Update dialogs -->
+    <string name="update_required_title">Update Required</string>
+    <string name="update_required_body">A new version of Mook is required to continue. Please update to the latest version to enjoy the best experience and new features.</string>
+    <string name="update_available_title">Update Available</string>
+    <string name="update_available_body">A new version of Mook is available. Update now to check out the latest features and improvements.</string>
+    <string name="update_now">Update Now</string>
+    <string name="update_later">Later</string>
+
+    <!-- Dropdowns -->
+    <string name="dropdown_select">Select…</string>
+    <string name="dropdown_expand_cd">Expand</string>
+
+    <!-- Avatar picker -->
+    <string name="avatar_pick_cd">Pick avatar</string>
+    <string name="avatar_default_cd">Default avatar</string>
+    <string name="avatar_selected_cd">Selected avatar</string>
+
+    <!-- Swipe card / carousel content descriptions -->
+    <string name="card_verified_cd">Verified</string>
+    <string name="card_options_cd">Options</string>
+    <string name="card_pass_cd">Pass</string>
+    <string name="card_like_cd">Like</string>
+    <string name="card_photo_cd">Photo %1$d</string>
+    <string name="carousel_no_photos">No photos yet</string>
+    <string name="carousel_photo_cd">Profile photo %1$d</string>
+
+    <!-- Snackbars / errors -->
+    <string name="error_generic">Something went wrong.</string>
+    <string name="error_swipe_failed">Swipe failed, please check connection.</string>
+    <string name="report_submitted">Report submitted successfully.</string>
+    <string name="report_failed">Failed to submit report.</string>
+    <string name="user_blocked">User blocked.</string>
+    <string name="block_failed">Failed to block user.</string>
+
+    <!-- Interests (canonical English values are stored; these localize the display) -->
+    <string name="interest_travel">Travel</string>
+    <string name="interest_music">Music</string>
+    <string name="interest_tech">Tech</string>
+    <string name="interest_cooking">Cooking</string>
+    <string name="interest_art">Art</string>
+    <string name="interest_fitness">Fitness</string>
+
+    <!-- Registration validation -->
+    <string name="reg_error_select_birth">Please select your birth date</string>
+    <string name="reg_error_select_country">Please select your country</string>
+    <string name="reg_error_select_gender">Please select a gender</string>
+    <string name="reg_error_confirm_password">Please confirm your password</string>
+    <string name="reg_error_passwords_mismatch">Passwords do not match</string>
+    <string name="reg_error_avatar_required">A profile photo is required.</string>
+    <string name="reg_error_discovery_photo_required">At least 1 discovery photo is required.</string>
 </resources>

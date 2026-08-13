@@ -92,7 +92,7 @@ fun DiscoverScreen(
                         }) {
                             Icon(
                                 painter = painterResource(Res.drawable.menu_svgrepo_com),
-                                contentDescription = "Menu",
+                                contentDescription = stringResource(Res.string.discover_menu_cd),
                                 tint = NeonColors.TextPrimary
                             )
                         }
@@ -100,9 +100,10 @@ fun DiscoverScreen(
                     actions = {
                         IconButton(onClick = onNavigateToRoomSwitch) {
                             Icon(
-                                painter = painterResource(Res.drawable.flag_svgrepo_com),
+                                painter = painterResource(Res.drawable.switch_flag),
                                 contentDescription = stringResource(Res.string.discover_switch_room_cd),
-                                tint = NeonColors.TextPrimary
+                                tint = NeonColors.TextPrimary,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     },
@@ -179,9 +180,16 @@ fun DiscoverScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = stringResource(Res.string.discover_no_more_profiles),
+                            text = stringResource(Res.string.discover_empty_room_message),
                             color = NeonColors.TextSecondary,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        NeonPrimaryButton(
+                            text = stringResource(Res.string.room_switch_title),
+                            onClick = onNavigateToRoomSwitch,
+                            modifier = Modifier.height(48.dp)
                         )
                     }
                 } else {

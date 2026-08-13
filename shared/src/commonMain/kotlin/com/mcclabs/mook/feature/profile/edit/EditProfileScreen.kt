@@ -49,7 +49,42 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.rememberGalleryPicker
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.edit_profile_title
+import mook.shared.generated.resources.edit_profile_photos_title
+import mook.shared.generated.resources.edit_profile_photos_hint
+import mook.shared.generated.resources.edit_profile_move_left_cd
+import mook.shared.generated.resources.edit_profile_move_right_cd
+import mook.shared.generated.resources.common_back
+import mook.shared.generated.resources.common_save
+import mook.shared.generated.resources.common_add
+import mook.shared.generated.resources.common_delete
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.mcclabs.mook.domain.model.Languages
+import com.mcclabs.mook.ui.components.CustomAuthTextField
+import com.mcclabs.mook.ui.components.LanguageDropdown
+import com.mcclabs.mook.ui.components.CountryDropdown
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import mook.shared.generated.resources.edit_profile_basic_info_title
+import mook.shared.generated.resources.edit_profile_name_label
+import mook.shared.generated.resources.edit_profile_bio_label
+import mook.shared.generated.resources.edit_profile_birthdate_label
+import mook.shared.generated.resources.edit_profile_birthdate_placeholder
+import mook.shared.generated.resources.edit_profile_language_label
+import mook.shared.generated.resources.edit_profile_country_label
+import mook.shared.generated.resources.registration_date_picker_ok
+import mook.shared.generated.resources.registration_date_picker_cancel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +98,27 @@ fun EditProfileScreen(
         viewModel.addPhoto(uri)
     })
 
+    var showDatePicker by remember { mutableStateOf(false) }
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = state.birthDateMillis)
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.onBirthDateChange(datePickerState.selectedDateMillis)
+                    showDatePicker = false
+                }) { Text(stringResource(Res.string.registration_date_picker_ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(Res.string.registration_date_picker_cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -74,12 +130,12 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profili Düzenle", color = NeonColors.TextPrimary) },
+                title = { Text(stringResource(Res.string.edit_profile_title), color = NeonColors.TextPrimary) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Geri",
+                            contentDescription = stringResource(Res.string.common_back),
                             tint = NeonColors.TextPrimary
                         )
                     }
@@ -91,7 +147,7 @@ fun EditProfileScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Primary),
                             modifier = Modifier.padding(end = 8.dp)
                         ) {
-                            Text("Kaydet", color = NeonColors.Background, fontWeight = FontWeight.Bold)
+                            Text(stringResource(Res.string.common_save), color = NeonColors.Background, fontWeight = FontWeight.Bold)
                         }
                     } else if (state.isSaving) {
                         CircularProgressIndicator(
@@ -111,58 +167,121 @@ fun EditProfileScreen(
                 CircularProgressIndicator(color = NeonColors.Primary)
             }
         } else {
-            Column(
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                Text(
-                    text = "Fotoğraflar",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = NeonColors.TextPrimary,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                // ---- Basic info form (spans the full grid width) -------------
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(
+                            text = stringResource(Res.string.edit_profile_basic_info_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = NeonColors.TextPrimary
+                        )
 
-                Text(
-                    text = "En az 2 fotoğraf yüklemelisin. İlk sıradaki fotoğraf ana profil fotoğrafın olur.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = NeonColors.TextSecondary,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                )
+                        CustomAuthTextField(
+                            value = state.displayName,
+                            onValueChange = viewModel::onNameChange,
+                            label = stringResource(Res.string.edit_profile_name_label),
+                            isError = state.displayNameError != null,
+                            errorMessage = state.displayNameError
+                        )
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    itemsIndexed(state.photos) { index, photoUrl ->
-                        PhotoEditCard(
-                            url = photoUrl,
-                            isFirst = index == 0,
-                            isLast = index == state.photos.size - 1,
-                            onMoveLeft = { viewModel.movePhoto(index, index - 1) },
-                            onMoveRight = { viewModel.movePhoto(index, index + 1) },
-                            onDelete = { viewModel.deletePhoto(index) }
+                        CustomAuthTextField(
+                            value = state.bio,
+                            onValueChange = viewModel::onBioChange,
+                            label = stringResource(Res.string.edit_profile_bio_label),
+                            singleLine = false,
+                            minLines = 3
+                        )
+
+                        // Birth date (opens the calendar picker; age is derived from it)
+                        Column {
+                            Text(
+                                text = stringResource(Res.string.edit_profile_birthdate_label),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = NeonColors.TextSecondary
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(NeonColors.InputBackground)
+                                    .clickable { showDatePicker = true }
+                                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                            ) {
+                                Text(
+                                    text = state.birthDateMillis?.let { formatBirthDate(it) }
+                                        ?: stringResource(Res.string.edit_profile_birthdate_placeholder),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (state.birthDateMillis != null) NeonColors.TextPrimary else NeonColors.TextTertiary
+                                )
+                            }
+                        }
+
+                        LanguageDropdown(
+                            label = stringResource(Res.string.edit_profile_language_label),
+                            selectedLanguage = state.selectedLanguage,
+                            onLanguageSelected = viewModel::onLanguageChange,
+                            languages = Languages.ALL
+                        )
+
+                        CountryDropdown(
+                            label = stringResource(Res.string.edit_profile_country_label),
+                            selectedCountry = state.selectedCountry,
+                            onCountrySelected = viewModel::onCountryChange,
+                            countries = state.availableCountries
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = stringResource(Res.string.edit_profile_photos_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = NeonColors.TextPrimary
+                        )
+                        Text(
+                            text = stringResource(Res.string.edit_profile_photos_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = NeonColors.TextSecondary
                         )
                     }
-                    
-                    // Add Photo button if less than max allowed (e.g., 6)
-                    if (state.photos.size < 6) {
-                        item {
-                            AddPhotoCard(onClick = { photoPicker.launch() })
-                        }
+                }
+
+                itemsIndexed(state.photos) { index, photoUrl ->
+                    PhotoEditCard(
+                        url = photoUrl,
+                        isFirst = index == 0,
+                        isLast = index == state.photos.size - 1,
+                        onMoveLeft = { viewModel.movePhoto(index, index - 1) },
+                        onMoveRight = { viewModel.movePhoto(index, index + 1) },
+                        onDelete = { viewModel.deletePhoto(index) }
+                    )
+                }
+
+                // Add Photo button if less than max allowed (e.g., 6)
+                if (state.photos.size < 6) {
+                    item {
+                        AddPhotoCard(onClick = { photoPicker.launch() })
                     }
                 }
-                
+
                 if (state.error != null) {
-                    Text(
-                        text = state.error!!,
-                        color = NeonColors.Error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Text(
+                            text = state.error!!,
+                            color = NeonColors.Error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
                 }
             }
         }
@@ -202,7 +321,7 @@ fun PhotoEditCard(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Sil",
+                contentDescription = stringResource(Res.string.common_delete),
                 tint = Color.White,
                 modifier = Modifier.size(16.dp)
             )
@@ -220,7 +339,7 @@ fun PhotoEditCard(
             if (!isFirst) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Sola Kaydır",
+                    contentDescription = stringResource(Res.string.edit_profile_move_left_cd),
                     tint = Color.White,
                     modifier = Modifier
                         .size(20.dp)
@@ -233,7 +352,7 @@ fun PhotoEditCard(
             if (!isLast) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Sağa Kaydır",
+                    contentDescription = stringResource(Res.string.edit_profile_move_right_cd),
                     tint = Color.White,
                     modifier = Modifier
                         .size(20.dp)
@@ -245,6 +364,10 @@ fun PhotoEditCard(
         }
     }
 }
+
+/** Formats a birth date (epoch millis) as an ISO date, e.g. "2000-01-15". */
+private fun formatBirthDate(millis: Long): String =
+    Instant.fromEpochMilliseconds(millis).toLocalDateTime(TimeZone.UTC).date.toString()
 
 @Composable
 fun AddPhotoCard(onClick: () -> Unit) {
@@ -259,12 +382,12 @@ fun AddPhotoCard(onClick: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Ekle",
+                contentDescription = stringResource(Res.string.common_add),
                 tint = NeonColors.Primary,
                 modifier = Modifier.size(32.dp)
             )
             Text(
-                text = "Ekle",
+                text = stringResource(Res.string.common_add),
                 color = NeonColors.Primary,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium

@@ -25,7 +25,13 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.ic_user
+import mook.shared.generated.resources.nav_liked
+import mook.shared.generated.resources.liked_load_error_title
+import mook.shared.generated.resources.liked_empty
+import mook.shared.generated.resources.liked_match_chip
+import mook.shared.generated.resources.discover_retry
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +49,7 @@ fun LikedScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Beğendiklerim",
+                        text = stringResource(Res.string.nav_liked),
                         color = NeonColors.Primary,
                         fontWeight = FontWeight.Bold
                     )
@@ -77,7 +83,7 @@ fun LikedScreen(
                     modifier = Modifier.padding(32.dp)
                 ) {
                     Text(
-                        text = "Beğendiklerin yüklenemedi",
+                        text = stringResource(Res.string.liked_load_error_title),
                         color = NeonColors.TextPrimary,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
@@ -91,14 +97,14 @@ fun LikedScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     NeonPrimaryButton(
-                        text = "Retry",
+                        text = stringResource(Res.string.discover_retry),
                         onClick = { viewModel.load() },
                         modifier = Modifier.height(48.dp)
                     )
                 }
 
                 state.liked.isEmpty() -> Text(
-                    text = "Henüz kimseyi beğenmedin",
+                    text = stringResource(Res.string.liked_empty),
                     color = NeonColors.TextSecondary,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -178,7 +184,7 @@ private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
 
         if (liked.isMatch) {
             Spacer(Modifier.width(8.dp))
-            NeonChip(text = "Eşleşme", isSelected = true)
+            NeonChip(text = stringResource(Res.string.liked_match_chip), isSelected = true)
         }
     }
 }

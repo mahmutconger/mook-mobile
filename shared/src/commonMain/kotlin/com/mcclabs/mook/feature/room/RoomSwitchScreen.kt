@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -22,9 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mcclabs.mook.ui.components.TimedInfoDialog
 import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.back_svgrepo_com
+import mook.shared.generated.resources.ic_info_circle
+import mook.shared.generated.resources.room_info_body
+import mook.shared.generated.resources.room_info_confirm
+import mook.shared.generated.resources.room_info_title
 import mook.shared.generated.resources.room_switch_back_cd
 import mook.shared.generated.resources.room_switch_title
 import org.jetbrains.compose.resources.painterResource
@@ -47,6 +53,16 @@ fun RoomSwitchScreen(
         }
     }
 
+    if (state.showInfo) {
+        TimedInfoDialog(
+            icon = Res.drawable.ic_info_circle,
+            title = stringResource(Res.string.room_info_title),
+            body = stringResource(Res.string.room_info_body),
+            confirmText = stringResource(Res.string.room_info_confirm),
+            onConfirm = { viewModel.onInfoDismissed() },
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,7 +79,8 @@ fun RoomSwitchScreen(
                 Icon(
                     painter = painterResource(Res.drawable.back_svgrepo_com),
                     contentDescription = stringResource(Res.string.room_switch_back_cd),
-                    tint = NeonColors.TextPrimary
+                    tint = NeonColors.TextPrimary,
+                    modifier = Modifier.size(24.dp)
                 )
             }
             Text(

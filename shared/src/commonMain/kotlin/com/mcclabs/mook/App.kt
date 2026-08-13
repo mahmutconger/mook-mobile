@@ -18,7 +18,9 @@ import org.koin.compose.KoinApplication
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import com.mcclabs.mook.domain.repository.SettingsRepository
+import com.mcclabs.mook.util.applyAppLocale
 import org.koin.compose.koinInject
 
 @Composable
@@ -37,14 +39,27 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
     }) {
         val settingsRepository = koinInject<SettingsRepository>()
         val isDark by settingsRepository.observeIsDarkMode().collectAsState(initial = false)
-        
+
         LaunchedEffect(isDark) {
             onDarkModeChange(isDark)
         }
 
-        MookTheme {
-            AppNavGraph()
-            com.mcclabs.mook.feature.update.GlobalUpdateWrapper()
+        // Prime the stored language so it applies on startup, not just after the user
+        // opens Settings.
+        LaunchedEffect(Unit) {
+            runCatching { settingsRepository.getAppLanguage() }
+        }
+        val appLanguage by settingsRepository.observeAppLanguage().collectAsState(initial = "en")
+
+        // Override the platform locale before the keyed subtree composes, so every
+        // stringResource resolves in the selected language. The key() forces a full
+        // recomposition whenever the language changes (Android: live; iOS: next launch).
+        applyAppLocale(appLanguage)
+        key(appLanguage) {
+            MookTheme {
+                AppNavGraph()
+                com.mcclabs.mook.feature.update.GlobalUpdateWrapper()
+            }
         }
     }
 }

@@ -200,7 +200,7 @@ fun ProfileDetailsScreen(
                     ) {
                         Icon(
                             painter = painterResource(Res.drawable.back_svgrepo_com),
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.common_back),
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )
@@ -217,7 +217,7 @@ fun ProfileDetailsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit Profile",
+                                contentDescription = stringResource(Res.string.profile_edit_cd),
                                 tint = Color.White,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -240,7 +240,7 @@ fun ProfileDetailsScreen(
                                 if (state.isOwnProfile) Res.drawable.ic_settings_minimalistic
                                 else Res.drawable.flag_svgrepo_com
                             ),
-                            contentDescription = if (state.isOwnProfile) "Settings" else "Report",
+                            contentDescription = if (state.isOwnProfile) stringResource(Res.string.profile_settings_cd) else stringResource(Res.string.profile_report_cd),
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )
@@ -370,7 +370,7 @@ private fun ProfileSheetContent(
         ) {
             // Read-only here: these are someone else's interests, not a picker.
             profile.interests.forEach { interest ->
-                NeonChip(text = interest)
+                NeonChip(text = com.mcclabs.mook.ui.components.interestLabel(interest))
             }
         }
 

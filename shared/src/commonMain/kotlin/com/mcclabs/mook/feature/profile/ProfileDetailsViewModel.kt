@@ -16,6 +16,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.profile_not_found
+import mook.shared.generated.resources.error_generic
 
 sealed class ProfileDetailsEvent {
     data class OpenDeepLink(val url: String) : ProfileDetailsEvent()
@@ -155,13 +159,13 @@ class ProfileDetailsViewModel(
                 } else {
                     _state.value = _state.value.copy(
                         profile = null,
-                        error = "Profile not found or could not be loaded.",
+                        error = getString(Res.string.profile_not_found),
                         isLoading = false
                     )
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
-                    error = "Failed to load profile: ${e.message}",
+                    error = e.message ?: getString(Res.string.error_generic),
                     isLoading = false
                 )
             }

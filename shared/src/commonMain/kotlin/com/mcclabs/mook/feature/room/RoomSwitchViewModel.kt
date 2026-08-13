@@ -21,6 +21,8 @@ data class RoomSwitchUiState(
     val isLoading: Boolean = true,
     val languages: List<Language> = emptyList(),
     val selectedCode: String? = null,
+    /** Shown once (first visit) to explain what rooms are and how to use this screen. */
+    val showInfo: Boolean = false,
 )
 
 sealed class RoomSwitchEvent {
@@ -47,9 +49,18 @@ class RoomSwitchViewModel(
         viewModelScope.launch {
             val uid = Firebase.auth.currentUser?.uid
             val ownLanguageCode = uid?.let { discoverRepository.getProfileDetails(it)?.language?.code }
-            val languages = Languages.ALL.filterNot { it.code.equals(ownLanguageCode, ignoreCase = true) }
+            val languages = listOf(languageIndependentRoom()) +
+                Languages.ALL.filterNot { it.code.equals(ownLanguageCode, ignoreCase = true) }
             val currentRoom = settingsRepository.getRoomLanguageCode()
-            _state.update { it.copy(isLoading = false, languages = languages, selectedCode = currentRoom) }
+            val showInfo = !settingsRepository.getHasSeenRoomSwitchInfo()
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    languages = languages,
+                    selectedCode = currentRoom,
+                    showInfo = showInfo,
+                )
+            }
         }
     }
 
@@ -58,5 +69,11 @@ class RoomSwitchViewModel(
             settingsRepository.setRoomLanguageCode(language.code)
             _events.emit(RoomSwitchEvent.Done)
         }
+    }
+
+    /** Dismisses the first-visit info dialog and remembers it so it never shows again. */
+    fun onInfoDismissed() {
+        _state.update { it.copy(showInfo = false) }
+        viewModelScope.launch { settingsRepository.setHasSeenRoomSwitchInfo(true) }
     }
 }

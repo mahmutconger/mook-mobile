@@ -18,11 +18,16 @@ import com.mcclabs.mook.ui.theme.BrandGradient
 import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.app_logo_transparent
+import mook.shared.generated.resources.ic_crown
 import mook.shared.generated.resources.ic_star
 import mook.shared.generated.resources.ic_user
-import mook.shared.generated.resources.mic_svgrepo_com
+import mook.shared.generated.resources.nav_discover
+import mook.shared.generated.resources.nav_liked
+import mook.shared.generated.resources.nav_subscription
+import mook.shared.generated.resources.nav_profile
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * The main bottom navigation bar.
@@ -47,7 +52,7 @@ fun BottomNavBar(
     ) {
         BottomNavItem(
             icon = Res.drawable.app_logo_transparent,
-            label = "Keşfet",
+            label = stringResource(Res.string.nav_discover),
             route = "discover",
             currentRoute = currentRoute,
             isEnabled = "discover" in enabledRoutes,
@@ -57,15 +62,15 @@ fun BottomNavBar(
         )
         BottomNavItem(
             icon = Res.drawable.ic_star,
-            label = "Beğendiklerim",
+            label = stringResource(Res.string.nav_liked),
             route = "chats",
             currentRoute = currentRoute,
             isEnabled = "chats" in enabledRoutes,
             onNavigate = onNavigate
         )
         BottomNavItem(
-            icon = Res.drawable.mic_svgrepo_com,
-            label = "Voices",
+            icon = Res.drawable.ic_crown,
+            label = stringResource(Res.string.nav_subscription),
             route = "voices",
             currentRoute = currentRoute,
             isEnabled = "voices" in enabledRoutes,
@@ -73,7 +78,7 @@ fun BottomNavBar(
         )
         BottomNavItem(
             icon = Res.drawable.ic_user,
-            label = "Profile",
+            label = stringResource(Res.string.nav_profile),
             route = "profile",
             currentRoute = currentRoute,
             isEnabled = "profile" in enabledRoutes,

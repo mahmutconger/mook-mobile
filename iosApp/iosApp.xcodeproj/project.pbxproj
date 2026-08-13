@@ -12,6 +12,7 @@
 		2E50044030115D7E00B5E66A /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50043F30115D7E00B5E66A /* FirebaseFirestore */; };
 		2E50044230115D7E00B5E66A /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50044130115D7E00B5E66A /* FirebaseRemoteConfig */; };
 		2E50044430115D7E00B5E66A /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50044330115D7E00B5E66A /* FirebaseStorage */; };
+		2E50044630115D7E00B5E66A /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50044530115D7E00B5E66A /* FirebaseFunctions */; };
 		2ED90BA83004E956002D2604 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2ED90BA73004E956002D2604 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +57,7 @@
 				2E50044030115D7E00B5E66A /* FirebaseFirestore in Frameworks */,
 				2E50044430115D7E00B5E66A /* FirebaseStorage in Frameworks */,
 				2E50044230115D7E00B5E66A /* FirebaseRemoteConfig in Frameworks */,
+				2E50044630115D7E00B5E66A /* FirebaseFunctions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +108,7 @@
 				2E50043F30115D7E00B5E66A /* FirebaseFirestore */,
 				2E50044130115D7E00B5E66A /* FirebaseRemoteConfig */,
 				2E50044330115D7E00B5E66A /* FirebaseStorage */,
+				2E50044530115D7E00B5E66A /* FirebaseFunctions */,
 			);
 			productName = iosApp;
 			productReference = 7F1888FF9F3A9E7C21762332 /* Mook.app */;
@@ -324,7 +327,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = 64CED189132FEEAF4124FD4001181C9C76A789A2;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = ZM857QH6ZN;
@@ -340,7 +343,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcclabs.mook;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Mook App Store";
@@ -362,7 +365,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
@@ -377,7 +380,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcclabs.mook;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -449,6 +452,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2E50043A30115D7E00B5E66A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		2E50044530115D7E00B5E66A /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E50043A30115D7E00B5E66A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

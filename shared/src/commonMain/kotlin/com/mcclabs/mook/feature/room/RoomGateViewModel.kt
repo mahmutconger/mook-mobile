@@ -56,7 +56,8 @@ class RoomGateViewModel(
 
             val uid = Firebase.auth.currentUser?.uid
             val ownLanguageCode = uid?.let { discoverRepository.getProfileDetails(it)?.language?.code }
-            val languages = Languages.ALL.filterNot { it.code.equals(ownLanguageCode, ignoreCase = true) }
+            val languages = listOf(languageIndependentRoom()) +
+                Languages.ALL.filterNot { it.code.equals(ownLanguageCode, ignoreCase = true) }
             _state.update { it.copy(isChecking = false, languages = languages) }
         }
     }

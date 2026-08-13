@@ -479,7 +479,7 @@ private fun ColumnScope.StepAccount(
     ) {
         state.availableInterests.forEach { interest ->
             NeonChip(
-                text = interest,
+                text = com.mcclabs.mook.ui.components.interestLabel(interest),
                 isSelected = interest in state.selectedInterests,
                 onToggle = { viewModel.toggleInterest(interest) }
             )

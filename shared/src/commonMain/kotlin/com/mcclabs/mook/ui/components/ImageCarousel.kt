@@ -21,7 +21,10 @@ import coil3.compose.AsyncImage
 import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.ic_user
+import mook.shared.generated.resources.carousel_no_photos
+import mook.shared.generated.resources.carousel_photo_cd
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
@@ -39,7 +42,7 @@ fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
         ) { page ->
             AsyncImage(
                 model = imageUrls[page],
-                contentDescription = "Profile photo ${page + 1}",
+                contentDescription = stringResource(Res.string.carousel_photo_cd, page + 1),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
@@ -97,7 +100,7 @@ private fun EmptyPhotoPlaceholder(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "No photos yet",
+                text = stringResource(Res.string.carousel_no_photos),
                 style = MaterialTheme.typography.bodyMedium,
                 color = NeonColors.TextTertiary
             )

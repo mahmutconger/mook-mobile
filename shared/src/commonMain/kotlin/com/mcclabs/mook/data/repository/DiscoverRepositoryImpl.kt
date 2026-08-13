@@ -183,10 +183,14 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             if (!hasCountry) return false
         }
         
-        if (settings.roomLanguageCode != null) {
+        // The language-independent room shows everyone; only a concrete room code filters
+        // down to speakers of that language.
+        if (settings.roomLanguageCode != null &&
+            !settings.roomLanguageCode.equals(Languages.LANGUAGE_INDEPENDENT_ROOM_CODE, ignoreCase = true)
+        ) {
             if (!language?.code.equals(settings.roomLanguageCode, ignoreCase = true)) return false
         }
-        
+
         return true
     }
 

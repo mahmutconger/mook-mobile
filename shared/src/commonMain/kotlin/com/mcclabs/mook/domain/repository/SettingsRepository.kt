@@ -40,6 +40,12 @@ interface SettingsRepository {
     /** Marks the "liked me" tutorial as seen. */
     suspend fun setHasSeenLikedMeTutorial(seen: Boolean)
 
+    /** Gets whether the user has seen the room-switch info dialog. */
+    suspend fun getHasSeenRoomSwitchInfo(): Boolean
+
+    /** Marks the room-switch info dialog as seen. */
+    suspend fun setHasSeenRoomSwitchInfo(seen: Boolean)
+
     /** Gets the language code (DeepL format) of the room the user is currently in, or `null` if none chosen yet. */
     suspend fun getRoomLanguageCode(): String?
 

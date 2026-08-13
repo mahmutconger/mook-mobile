@@ -154,7 +154,7 @@ fun SwipeableProfileCard(
                             Spacer(Modifier.width(4.dp))
                             Icon(
                                 painter = painterResource(Res.drawable.ic_check_circle),
-                                contentDescription = "Verified",
+                                contentDescription = stringResource(Res.string.card_verified_cd),
                                 tint = VerifiedBadge,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -191,7 +191,7 @@ fun SwipeableProfileCard(
                     IconButton(onClick = { expanded = true }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Options",
+                            contentDescription = stringResource(Res.string.card_options_cd),
                             tint = Color.White
                         )
                     }
@@ -240,7 +240,7 @@ fun SwipeableProfileCard(
                     ) {
                         profile.interests.forEach { 
                             InterestChip(
-                                text = it, 
+                                text = interestLabel(it),
                                 textColor = Color.White,
                                 backgroundColor = Color.White.copy(alpha = 0.2f)
                             ) 
@@ -266,7 +266,7 @@ fun SwipeableProfileCard(
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Pass", tint = Color.White, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.card_pass_cd), tint = Color.White, modifier = Modifier.size(28.dp))
                     }
                     CircleActionButton(
                         enabled = interactive,
@@ -278,7 +278,7 @@ fun SwipeableProfileCard(
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Favorite, contentDescription = "Like", tint = NeonColors.Accent, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Default.Favorite, contentDescription = stringResource(Res.string.card_like_cd), tint = NeonColors.Accent, modifier = Modifier.size(28.dp))
                     }
                 }
             }
@@ -336,7 +336,7 @@ private fun PhotoCarousel(
         } else {
             AsyncImage(
                 model = photoUrls[index.coerceIn(0, count - 1)],
-                contentDescription = "Photo ${index + 1}",
+                contentDescription = stringResource(Res.string.card_photo_cd, index + 1),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()

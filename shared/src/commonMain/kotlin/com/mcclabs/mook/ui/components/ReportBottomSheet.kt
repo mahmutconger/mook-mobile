@@ -23,8 +23,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.theme.NeonColors
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.report_title
+import mook.shared.generated.resources.report_subtitle
+import mook.shared.generated.resources.report_submit
+import mook.shared.generated.resources.report_reason_spam
+import mook.shared.generated.resources.report_reason_harassment
+import mook.shared.generated.resources.report_reason_inappropriate_photo
+import mook.shared.generated.resources.report_reason_underage
+import mook.shared.generated.resources.report_reason_other
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
-/** The predefined report reasons, in display order. "Underage" is kept for CSAE reports. */
+/**
+ * The predefined report reasons, in display order. These canonical English values are
+ * stored in Firestore (so moderation stays consistent regardless of the reporter's UI
+ * language); [reasonLabel] maps each to a localized label for display only.
+ * "Underage" is kept for CSAE reports.
+ */
 val ReportReasons: List<String> = listOf(
     "Spam",
     "Harassment",
@@ -32,6 +48,15 @@ val ReportReasons: List<String> = listOf(
     "Underage",
     "Other",
 )
+
+/** Maps a canonical [ReportReasons] value to its localized display label. */
+private fun reasonLabel(reason: String): StringResource = when (reason) {
+    "Spam" -> Res.string.report_reason_spam
+    "Harassment" -> Res.string.report_reason_harassment
+    "Inappropriate Photo" -> Res.string.report_reason_inappropriate_photo
+    "Underage" -> Res.string.report_reason_underage
+    else -> Res.string.report_reason_other
+}
 
 /**
  * A modal bottom sheet for reporting a user, with the predefined [ReportReasons].
@@ -67,14 +92,14 @@ fun ReportBottomSheet(
                 .padding(bottom = 16.dp)
         ) {
             Text(
-                text = "Report User",
+                text = stringResource(Res.string.report_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = NeonColors.TextPrimary,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Why are you reporting this user?",
+                text = stringResource(Res.string.report_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = NeonColors.TextSecondary,
             )
@@ -94,13 +119,13 @@ fun ReportBottomSheet(
                         colors = RadioButtonDefaults.colors(selectedColor = NeonColors.Primary),
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(reason, color = NeonColors.TextPrimary)
+                    Text(stringResource(reasonLabel(reason)), color = NeonColors.TextPrimary)
                 }
             }
 
             Spacer(Modifier.height(16.dp))
             NeonPrimaryButton(
-                text = "Submit Report",
+                text = stringResource(Res.string.report_submit),
                 onClick = onSubmit,
                 enabled = selectedReason != null,
             )

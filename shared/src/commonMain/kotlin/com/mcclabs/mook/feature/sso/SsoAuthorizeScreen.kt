@@ -29,6 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.theme.NeonColors
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.sso_title
+import mook.shared.generated.resources.sso_body
+import mook.shared.generated.resources.sso_allow
+import mook.shared.generated.resources.sso_deny
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.delay
 
@@ -74,7 +80,7 @@ fun SsoAuthorizeScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Authorization Request",
+                text = stringResource(Res.string.sso_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = NeonColors.TextPrimary,
                 fontWeight = FontWeight.Bold
@@ -83,7 +89,7 @@ fun SsoAuthorizeScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "${state.clientName} wants to sign in using your Mook account.",
+                text = stringResource(Res.string.sso_body, state.clientName),
                 style = MaterialTheme.typography.bodyLarge,
                 color = NeonColors.TextSecondary,
                 textAlign = TextAlign.Center
@@ -123,7 +129,7 @@ fun SsoAuthorizeScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Allow", color = NeonColors.Background, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.sso_allow), color = NeonColors.Background, fontWeight = FontWeight.Bold)
                 }
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -134,7 +140,7 @@ fun SsoAuthorizeScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Deny", color = NeonColors.TextSecondary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.sso_deny), color = NeonColors.TextSecondary, fontWeight = FontWeight.Bold)
                 }
             }
         }

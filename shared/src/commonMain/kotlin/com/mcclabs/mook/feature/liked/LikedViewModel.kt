@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.error_generic
 
 class LikedViewModel(
     private val repository: DiscoverRepository
@@ -30,7 +33,7 @@ class LikedViewModel(
             } catch (e: Exception) {
                 Log.e("Beğendiklerim yüklenemedi", e)
                 _state.update {
-                    it.copy(error = e.message ?: "Something went wrong.", isLoading = false)
+                    it.copy(error = e.message ?: getString(Res.string.error_generic), isLoading = false)
                 }
             }
         }

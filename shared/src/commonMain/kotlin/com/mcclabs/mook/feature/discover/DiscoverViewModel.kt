@@ -19,6 +19,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.mcclabs.mook.util.Log
+import org.jetbrains.compose.resources.getString
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.error_generic
+import mook.shared.generated.resources.error_swipe_failed
+import mook.shared.generated.resources.report_submitted
+import mook.shared.generated.resources.report_failed
+import mook.shared.generated.resources.user_blocked
+import mook.shared.generated.resources.block_failed
 
 sealed class DiscoverEvent {
     data class NavigateToProfile(val profileId: String) : DiscoverEvent()
@@ -70,7 +78,7 @@ class DiscoverViewModel(
             )
         } catch (e: Exception) {
             _state.value = _state.value.copy(
-                error = e.message ?: "Something went wrong.",
+                error = e.message ?: getString(Res.string.error_generic),
                 isLoading = false
             )
         }
@@ -97,7 +105,7 @@ class DiscoverViewModel(
             val result = interactionRepository.swipeUser(profileId, isLike = true)
             if (result is MatchResult.Error) {
                 insertProfile(profile)
-                _events.emit(DiscoverEvent.ShowSnackbar("Swipe failed, please check connection."))
+                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
             } else if (result is MatchResult.MutualMatch) {
                 _events.emit(DiscoverEvent.NavigateToMatch(profileId))
             }
@@ -111,7 +119,7 @@ class DiscoverViewModel(
             val result = interactionRepository.swipeUser(profileId, isLike = false)
             if (result is MatchResult.Error) {
                 insertProfile(profile)
-                _events.emit(DiscoverEvent.ShowSnackbar("Swipe failed, please check connection."))
+                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
             }
         }
     }
@@ -177,11 +185,11 @@ class DiscoverViewModel(
                     selectedReportReason = null,
                     selectedProfileToReportOrBlock = null
                 )
-                _events.emit(DiscoverEvent.ShowSnackbar("Report submitted successfully."))
+                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.report_submitted)))
                 // Optionally remove the profile from feed immediately
                 removeProfile(profileId)
             } catch (e: Exception) {
-                _events.emit(DiscoverEvent.ShowSnackbar("Failed to submit report."))
+                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.report_failed)))
             }
         }
     }
@@ -216,11 +224,11 @@ class DiscoverViewModel(
                     showBlockConfirmDialog = false,
                     selectedProfileToReportOrBlock = null
                 )
-                _events.emit(DiscoverEvent.ShowSnackbar("User blocked."))
+                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.user_blocked)))
                 // Remove from feed
                 removeProfile(profileId)
             } catch (e: Exception) {
-                _events.emit(DiscoverEvent.ShowSnackbar("Failed to block user."))
+                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.block_failed)))
             }
         }
     }

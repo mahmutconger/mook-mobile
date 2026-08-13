@@ -28,6 +28,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.model.Language
 import com.mcclabs.mook.ui.theme.NeonColors
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.dropdown_select
+import mook.shared.generated.resources.dropdown_expand_cd
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A dropdown selector for choosing a [Language].
@@ -86,7 +90,7 @@ fun LanguageDropdown(
                 )
             } else {
                 Text(
-                    text = "Select…",
+                    text = stringResource(Res.string.dropdown_select),
                     style = MaterialTheme.typography.bodyMedium,
                     color = NeonColors.TextTertiary,
                     modifier = Modifier.weight(1f),
@@ -95,7 +99,7 @@ fun LanguageDropdown(
 
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = "Expand",
+                contentDescription = stringResource(Res.string.dropdown_expand_cd),
                 tint = NeonColors.TextSecondary,
             )
         }

@@ -29,7 +29,18 @@ import mook.shared.generated.resources.calendar_svgrepo_com
 import mook.shared.generated.resources.flag_svgrepo_com
 import mook.shared.generated.resources.ic_settings_minimalistic
 import mook.shared.generated.resources.search_normal_1_svgrepo_com
+import mook.shared.generated.resources.filters_title
+import mook.shared.generated.resources.filters_subtitle
+import mook.shared.generated.resources.filters_age_range
+import mook.shared.generated.resources.filters_reset
+import mook.shared.generated.resources.filters_apply
+import mook.shared.generated.resources.filters_target_country
+import mook.shared.generated.resources.filters_any_country
+import mook.shared.generated.resources.filters_selected_count
+import mook.shared.generated.resources.filters_search_country
+import mook.shared.generated.resources.filters_no_countries
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
@@ -73,13 +84,13 @@ fun FiltersScreen(
             Spacer(modifier = Modifier.width(14.dp))
             Column {
                 Text(
-                    text = "Discovery",
+                    text = stringResource(Res.string.filters_title),
                     color = NeonColors.TextPrimary,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Fine-tune who you meet",
+                    text = stringResource(Res.string.filters_subtitle),
                     color = NeonColors.TextSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -110,7 +121,7 @@ fun FiltersScreen(
 
                 FilterSection(
                     icon = Res.drawable.calendar_svgrepo_com,
-                    title = "Age Range",
+                    title = stringResource(Res.string.filters_age_range),
                     trailing = {
                         Box(
                             modifier = Modifier
@@ -156,11 +167,11 @@ fun FiltersScreen(
                     border = BorderStroke(1.dp, NeonColors.CardBorder),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonColors.TextPrimary)
                 ) {
-                    Text("Reset", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(Res.string.filters_reset), fontWeight = FontWeight.SemiBold)
                 }
 
                 NeonPrimaryButton(
-                    text = "Apply",
+                    text = stringResource(Res.string.filters_apply),
                     onClick = { viewModel.onApply(onNavigateBack) },
                     modifier = Modifier.weight(1f)
                 )
@@ -194,8 +205,9 @@ private fun CountrySection(
 
     FilterSection(
         icon = Res.drawable.flag_svgrepo_com,
-        title = "Target Country",
-        subtitle = if (selected.isEmpty()) "Any country" else "${selected.size} selected"
+        title = stringResource(Res.string.filters_target_country),
+        subtitle = if (selected.isEmpty()) stringResource(Res.string.filters_any_country)
+        else stringResource(Res.string.filters_selected_count, selected.size)
     ) {
         if (selected.isNotEmpty()) {
             FlowRow(
@@ -212,13 +224,13 @@ private fun CountrySection(
         SearchField(
             value = query,
             onValueChange = { query = it },
-            placeholder = "Search country…"
+            placeholder = stringResource(Res.string.filters_search_country)
         )
 
         if (query.isNotBlank()) {
             if (results.isEmpty()) {
                 Text(
-                    text = "No countries found",
+                    text = stringResource(Res.string.filters_no_countries),
                     color = NeonColors.TextTertiary,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(vertical = 4.dp)

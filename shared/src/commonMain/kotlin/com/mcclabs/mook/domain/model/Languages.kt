@@ -9,6 +9,13 @@ package com.mcclabs.mook.domain.model
  */
 object Languages {
 
+    /**
+     * Sentinel room code for the "language-independent" room, where everyone is shown
+     * regardless of native language. Not a real ISO code, so [fromCode] returns null and
+     * the Discover query skips the language filter for it.
+     */
+    const val LANGUAGE_INDEPENDENT_ROOM_CODE: String = "ALL"
+
     val ALL: List<Language> = listOf(
         Language(code = "BG", name = "Български", flagEmoji = "🇧🇬"),
         Language(code = "CS", name = "Čeština", flagEmoji = "🇨🇿"),

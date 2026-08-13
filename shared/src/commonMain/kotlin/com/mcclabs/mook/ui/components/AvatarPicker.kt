@@ -19,7 +19,11 @@ import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.add_photo_svgrepo_com
 import mook.shared.generated.resources.ic_user
+import mook.shared.generated.resources.avatar_pick_cd
+import mook.shared.generated.resources.avatar_default_cd
+import mook.shared.generated.resources.avatar_selected_cd
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Circular avatar picker with a placeholder icon and an "add" overlay button.
@@ -55,14 +59,14 @@ fun AvatarPicker(
                 // Default person placeholder
                 Icon(
                     painter = painterResource(Res.drawable.ic_user),
-                    contentDescription = "Default avatar",
+                    contentDescription = stringResource(Res.string.avatar_default_cd),
                     tint = NeonColors.TextTertiary,
                     modifier = Modifier.size(48.dp),
                 )
             } else {
                 AsyncImage(
                     model = avatarUri,
-                    contentDescription = "Selected avatar",
+                    contentDescription = stringResource(Res.string.avatar_selected_cd),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -82,7 +86,7 @@ fun AvatarPicker(
         ) {
             Icon(
                 painter = painterResource(Res.drawable.add_photo_svgrepo_com),
-                contentDescription = "Pick avatar",
+                contentDescription = stringResource(Res.string.avatar_pick_cd),
                 tint = NeonColors.Background,
                 modifier = Modifier.size(16.dp),
             )

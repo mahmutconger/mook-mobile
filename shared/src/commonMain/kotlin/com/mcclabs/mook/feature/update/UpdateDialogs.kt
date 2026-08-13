@@ -28,6 +28,14 @@ import com.mcclabs.mook.domain.model.UpdateState
 import com.mcclabs.mook.platform.getStoreUrl
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.theme.NeonColors
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.update_required_title
+import mook.shared.generated.resources.update_required_body
+import mook.shared.generated.resources.update_available_title
+import mook.shared.generated.resources.update_available_body
+import mook.shared.generated.resources.update_now
+import mook.shared.generated.resources.update_later
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.ui.platform.LocalUriHandler
 
@@ -65,8 +73,8 @@ fun ForceUpdateDialog() {
         )
     ) {
         UpdateDialogContent(
-            title = "Update Required",
-            description = "A new version of Mook is required to continue. Please update to the latest version to enjoy the best experience and new features.",
+            title = stringResource(Res.string.update_required_title),
+            description = stringResource(Res.string.update_required_body),
             onUpdateClick = { uriHandler.openUri(getStoreUrl()) },
             onDismissClick = null
         )
@@ -85,8 +93,8 @@ fun OptionalUpdateDialog(onDismiss: () -> Unit) {
         )
     ) {
         UpdateDialogContent(
-            title = "Update Available",
-            description = "A new version of Mook is available. Update now to check out the latest features and improvements.",
+            title = stringResource(Res.string.update_available_title),
+            description = stringResource(Res.string.update_available_body),
             onUpdateClick = { 
                 uriHandler.openUri(getStoreUrl()) 
                 onDismiss()
@@ -131,7 +139,7 @@ private fun UpdateDialogContent(
         Spacer(modifier = Modifier.height(32.dp))
         
         NeonPrimaryButton(
-            text = "Update Now",
+            text = stringResource(Res.string.update_now),
             onClick = onUpdateClick,
             modifier = Modifier.fillMaxWidth()
         )
@@ -143,7 +151,7 @@ private fun UpdateDialogContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Later",
+                    text = stringResource(Res.string.update_later),
                     style = MaterialTheme.typography.bodyLarge,
                     color = NeonColors.TextTertiary
                 )

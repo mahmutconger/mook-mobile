@@ -19,6 +19,17 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.reg_error_select_birth
+import mook.shared.generated.resources.reg_error_select_country
+import mook.shared.generated.resources.reg_error_select_gender
+import mook.shared.generated.resources.reg_error_confirm_password
+import mook.shared.generated.resources.reg_error_passwords_mismatch
+import mook.shared.generated.resources.reg_error_avatar_required
+import mook.shared.generated.resources.reg_error_discovery_photo_required
+import mook.shared.generated.resources.legal_terms_error
+import mook.shared.generated.resources.legal_eula_error
 
 class RegistrationViewModel(
     private val authRepository: AuthRepository
@@ -127,7 +138,10 @@ class RegistrationViewModel(
     private fun validateStep1(): Boolean {
         val millis = _uiState.value.birthDateMillis
         if (millis == null) {
-            _uiState.update { it.copy(birthDateError = "Please select your birth date") }
+            viewModelScope.launch {
+                val msg = getString(Res.string.reg_error_select_birth)
+                _uiState.update { it.copy(birthDateError = msg) }
+            }
             return false
         }
 
@@ -142,7 +156,10 @@ class RegistrationViewModel(
     /** Step 2 — language (always defaulted) and country. */
     private fun validateStep2(): Boolean {
         if (_uiState.value.selectedCountry == null) {
-            _uiState.update { it.copy(countryError = "Please select your country") }
+            viewModelScope.launch {
+                val msg = getString(Res.string.reg_error_select_country)
+                _uiState.update { it.copy(countryError = msg) }
+            }
             return false
         }
         return true
@@ -152,14 +169,17 @@ class RegistrationViewModel(
     private fun validateStep3(): Boolean {
         val state = _uiState.value
         val nameValidation = InputValidator.validateDisplayName(state.displayName)
-        val genderError = if (state.gender == null) "Please select a gender" else null
+        val genderMissing = state.gender == null
 
-        if (!nameValidation.isValid || genderError != null) {
-            _uiState.update {
-                it.copy(
-                    displayNameError = nameValidation.errorMessage,
-                    genderError = genderError
-                )
+        if (!nameValidation.isValid || genderMissing) {
+            viewModelScope.launch {
+                val genderMsg = if (genderMissing) getString(Res.string.reg_error_select_gender) else null
+                _uiState.update {
+                    it.copy(
+                        displayNameError = nameValidation.errorMessage,
+                        genderError = genderMsg
+                    )
+                }
             }
             return false
         }
@@ -219,49 +239,60 @@ class RegistrationViewModel(
         val bioValidation = InputValidator.validateBio(currentState.bio)
 
         // Confirm password must match.
-        val confirmPasswordError = when {
-            currentState.confirmPassword.isEmpty() -> "Please confirm your password"
-            currentState.confirmPassword != currentState.password -> "Passwords do not match"
-            else -> null
-        }
+        val confirmPasswordEmpty = currentState.confirmPassword.isEmpty()
+        val confirmPasswordMismatch = currentState.confirmPassword != currentState.password
         // Gender is required.
-        val genderError = if (currentState.gender == null) "Please select a gender" else null
+        val genderMissing = currentState.gender == null
         // Terms of Use acceptance is required.
-        val termsError = if (!currentState.termsAccepted) {
-            "You must accept the Terms of Use to continue"
-        } else null
+        val termsMissing = !currentState.termsAccepted
 
         if (!emailValidation.isValid ||
             !passwordValidation.isValid ||
             !nameValidation.isValid ||
             !bioValidation.isValid ||
-            confirmPasswordError != null ||
-            genderError != null ||
-            termsError != null ||
+            confirmPasswordEmpty || confirmPasswordMismatch ||
+            genderMissing ||
+            termsMissing ||
             !currentState.acceptedEula
         ) {
-            _uiState.update {
-                it.copy(
-                    emailError = emailValidation.errorMessage,
-                    passwordError = passwordValidation.errorMessage,
-                    confirmPasswordError = confirmPasswordError,
-                    displayNameError = nameValidation.errorMessage,
-                    bioError = bioValidation.errorMessage,
-                    genderError = genderError,
-                    termsError = termsError,
-                    generalError = if (!currentState.acceptedEula) "EULA not accepted" else null
-                )
+            viewModelScope.launch {
+                val confirmMsg = when {
+                    confirmPasswordEmpty -> getString(Res.string.reg_error_confirm_password)
+                    confirmPasswordMismatch -> getString(Res.string.reg_error_passwords_mismatch)
+                    else -> null
+                }
+                val genderMsg = if (genderMissing) getString(Res.string.reg_error_select_gender) else null
+                val termsMsg = if (termsMissing) getString(Res.string.legal_terms_error) else null
+                val generalMsg = if (!currentState.acceptedEula) getString(Res.string.legal_eula_error) else null
+                _uiState.update {
+                    it.copy(
+                        emailError = emailValidation.errorMessage,
+                        passwordError = passwordValidation.errorMessage,
+                        confirmPasswordError = confirmMsg,
+                        displayNameError = nameValidation.errorMessage,
+                        bioError = bioValidation.errorMessage,
+                        genderError = genderMsg,
+                        termsError = termsMsg,
+                        generalError = generalMsg
+                    )
+                }
             }
             return
         }
 
         if (currentState.avatarUri == null) {
-            _uiState.update { it.copy(generalError = "Profil fotoğrafı eklemek zorunludur.") }
+            viewModelScope.launch {
+                val msg = getString(Res.string.reg_error_avatar_required)
+                _uiState.update { it.copy(generalError = msg) }
+            }
             return
         }
 
         if (currentState.discoveryPhotos.isEmpty()) {
-            _uiState.update { it.copy(generalError = "En az 1 adet keşfette görünen fotoğraf eklemek zorunludur.") }
+            viewModelScope.launch {
+                val msg = getString(Res.string.reg_error_discovery_photo_required)
+                _uiState.update { it.copy(generalError = msg) }
+            }
             return
         }
 

@@ -28,6 +28,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.model.Country
 import com.mcclabs.mook.ui.theme.NeonColors
+import mook.shared.generated.resources.Res
+import mook.shared.generated.resources.dropdown_select
+import mook.shared.generated.resources.dropdown_expand_cd
+import mook.shared.generated.resources.filters_search_country
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A searchable dropdown selector for choosing a [Country].
@@ -77,14 +82,14 @@ fun CountryDropdown(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = selectedCountry?.name ?: "Select…",
+                text = selectedCountry?.name ?: stringResource(Res.string.dropdown_select),
                 style = MaterialTheme.typography.bodyLarge,
                 color = if (selectedCountry != null) NeonColors.TextPrimary else NeonColors.TextTertiary,
                 modifier = Modifier.weight(1f),
             )
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = "Expand",
+                contentDescription = stringResource(Res.string.dropdown_expand_cd),
                 tint = NeonColors.TextSecondary,
             )
         }
@@ -104,7 +109,7 @@ fun CountryDropdown(
                 value = query,
                 onValueChange = { query = it },
                 label = "",
-                placeholder = "Search country…",
+                placeholder = stringResource(Res.string.filters_search_country),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 4.dp),

@@ -59,14 +59,14 @@
     <string name="settings_delete_account_confirm">Evet, Sil</string>
     <string name="settings_delete_account_cancel">İptal</string>
     <string name="settings_title">Ayarlar</string>
-    <string name="settings_language_dialog_title">Uygulama Dili / App Language</string>
-    <string name="settings_language_dialog_close">Kapat / Close</string>
+    <string name="settings_language_dialog_title">Uygulama Dili</string>
+    <string name="settings_language_dialog_close">Kapat</string>
     <string name="settings_account_section">HESAP</string>
     <string name="settings_email_label">E-posta</string>
     <string name="settings_appearance_section">GÖRÜNÜM</string>
     <string name="settings_dark_mode_title">Koyu Tema</string>
     <string name="settings_dark_mode_subtitle">Uygulama genelinde koyu tema kullan</string>
-    <string name="settings_app_language_label">Uygulama Dili / App Language</string>
+    <string name="settings_app_language_label">Uygulama Dili</string>
     <string name="settings_discovery_section">KEŞİF</string>
     <string name="settings_show_in_discover_title">Beni Keşfet\'te Göster</string>
     <string name="settings_show_in_discover_subtitle">Başkalarının profilinizi keşfetmesine izin verin</string>
@@ -139,5 +139,131 @@
     <string name="room_gate_subtitle">Pratik yapmak istediğin dili seç. Bu dili ana dili olarak konuşan kişilerle eşleştirileceksin.</string>
     <string name="room_switch_title">Oda değiştir</string>
     <string name="room_switch_back_cd">Geri</string>
+    <string name="room_info_title">Odalar nasıl çalışır</string>
+    <string name="room_info_body">Oda, pratik yapmak istediğin dildir. Bir dil seç; o dili konuşan kişileri keşfeder ve onlarla eşleşirsin — buradaki her şey o dil üzerine kuruludur. İstediğin zaman bu ekrandan odanı değiştirebilirsin.</string>
+    <string name="room_info_confirm">Anladım</string>
     <string name="discover_switch_room_cd">Oda değiştir</string>
+    <string name="discover_empty_room_message">Üzgünüz, burada henüz birini bulamadık. Dilersen başka odalara bakabilirsin.</string>
+    <string name="room_language_independent">Dilden bağımsız</string>
+
+    <!-- Common -->
+    <string name="common_back">Geri</string>
+    <string name="common_save">Kaydet</string>
+    <string name="common_add">Ekle</string>
+    <string name="common_delete">Sil</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_discover">Keşfet</string>
+    <string name="nav_liked">Beğendiklerim</string>
+    <string name="nav_subscription">Abonelik</string>
+    <string name="nav_voices">Sesler</string>
+    <string name="nav_profile">Profil</string>
+    <string name="discover_menu_cd">Menü</string>
+
+    <!-- Filters -->
+    <string name="filters_title">Keşif</string>
+    <string name="filters_subtitle">Kiminle tanışacağını ayarla</string>
+    <string name="filters_age_range">Yaş Aralığı</string>
+    <string name="filters_reset">Sıfırla</string>
+    <string name="filters_apply">Uygula</string>
+    <string name="filters_target_country">Hedef Ülke</string>
+    <string name="filters_any_country">Tüm ülkeler</string>
+    <string name="filters_selected_count">%1$d seçili</string>
+    <string name="filters_search_country">Ülke ara…</string>
+    <string name="filters_no_countries">Ülke bulunamadı</string>
+    <string name="filters_any">Tümü</string>
+
+    <!-- Liked -->
+    <string name="liked_load_error_title">Beğendiklerin yüklenemedi</string>
+    <string name="liked_empty">Henüz kimseyi beğenmedin</string>
+    <string name="liked_match_chip">Eşleşme</string>
+
+    <!-- Edit profile -->
+    <string name="edit_profile_title">Profili Düzenle</string>
+    <string name="edit_profile_photos_title">Fotoğraflar</string>
+    <string name="edit_profile_photos_hint">En az 2 fotoğraf yüklemelisin. İlk sıradaki fotoğraf ana profil fotoğrafın olur.</string>
+    <string name="edit_profile_move_left_cd">Sola kaydır</string>
+    <string name="edit_profile_move_right_cd">Sağa kaydır</string>
+    <string name="edit_profile_min_photos_error">En az 2 fotoğrafın olmak zorundadır.</string>
+    <string name="edit_profile_age_error">En az 18 yaşında olmalısın.</string>
+    <string name="edit_profile_basic_info_title">Temel bilgiler</string>
+    <string name="edit_profile_name_label">İsim</string>
+    <string name="edit_profile_bio_label">Hakkında</string>
+    <string name="edit_profile_birthdate_label">Doğum tarihi</string>
+    <string name="edit_profile_birthdate_placeholder">Doğum tarihini seç</string>
+    <string name="edit_profile_language_label">Ana dil</string>
+    <string name="edit_profile_country_label">Ülke</string>
+
+    <!-- Profile details -->
+    <string name="profile_edit_cd">Profili Düzenle</string>
+    <string name="profile_settings_cd">Ayarlar</string>
+    <string name="profile_report_cd">Şikayet Et</string>
+    <string name="profile_not_found">Profil bulunamadı veya yüklenemedi.</string>
+
+    <!-- Report sheet -->
+    <string name="report_title">Kullanıcıyı Şikayet Et</string>
+    <string name="report_subtitle">Bu kullanıcıyı neden şikayet ediyorsun?</string>
+    <string name="report_submit">Şikayeti Gönder</string>
+    <string name="report_reason_spam">Spam</string>
+    <string name="report_reason_harassment">Taciz</string>
+    <string name="report_reason_inappropriate_photo">Uygunsuz Fotoğraf</string>
+    <string name="report_reason_underage">Reşit Değil</string>
+    <string name="report_reason_other">Diğer</string>
+
+    <!-- SSO -->
+    <string name="sso_title">Yetkilendirme İsteği</string>
+    <string name="sso_body">%1$s, Mook hesabınla giriş yapmak istiyor.</string>
+    <string name="sso_allow">İzin Ver</string>
+    <string name="sso_deny">Reddet</string>
+
+    <!-- Update dialogs -->
+    <string name="update_required_title">Güncelleme Gerekli</string>
+    <string name="update_required_body">Devam etmek için Mook\'un yeni bir sürümü gerekli. En iyi deneyim ve yeni özellikler için lütfen en son sürüme güncelle.</string>
+    <string name="update_available_title">Güncelleme Mevcut</string>
+    <string name="update_available_body">Mook\'un yeni bir sürümü mevcut. En son özellikleri ve iyileştirmeleri görmek için şimdi güncelle.</string>
+    <string name="update_now">Şimdi Güncelle</string>
+    <string name="update_later">Sonra</string>
+
+    <!-- Dropdowns -->
+    <string name="dropdown_select">Seç…</string>
+    <string name="dropdown_expand_cd">Genişlet</string>
+
+    <!-- Avatar picker -->
+    <string name="avatar_pick_cd">Avatar seç</string>
+    <string name="avatar_default_cd">Varsayılan avatar</string>
+    <string name="avatar_selected_cd">Seçili avatar</string>
+
+    <!-- Swipe card / carousel content descriptions -->
+    <string name="card_verified_cd">Onaylı</string>
+    <string name="card_options_cd">Seçenekler</string>
+    <string name="card_pass_cd">Geç</string>
+    <string name="card_like_cd">Beğen</string>
+    <string name="card_photo_cd">Fotoğraf %1$d</string>
+    <string name="carousel_no_photos">Henüz fotoğraf yok</string>
+    <string name="carousel_photo_cd">Profil fotoğrafı %1$d</string>
+
+    <!-- Snackbars / errors -->
+    <string name="error_generic">Bir şeyler ters gitti.</string>
+    <string name="error_swipe_failed">Kaydırma başarısız, bağlantını kontrol et.</string>
+    <string name="report_submitted">Şikayet başarıyla gönderildi.</string>
+    <string name="report_failed">Şikayet gönderilemedi.</string>
+    <string name="user_blocked">Kullanıcı engellendi.</string>
+    <string name="block_failed">Kullanıcı engellenemedi.</string>
+
+    <!-- Interests (canonical English values are stored; these localize the display) -->
+    <string name="interest_travel">Seyahat</string>
+    <string name="interest_music">Müzik</string>
+    <string name="interest_tech">Teknoloji</string>
+    <string name="interest_cooking">Yemek</string>
+    <string name="interest_art">Sanat</string>
+    <string name="interest_fitness">Fitness</string>
+
+    <!-- Registration validation -->
+    <string name="reg_error_select_birth">Lütfen doğum tarihinizi seçin</string>
+    <string name="reg_error_select_country">Lütfen ülkenizi seçin</string>
+    <string name="reg_error_select_gender">Lütfen bir cinsiyet seçin</string>
+    <string name="reg_error_confirm_password">Lütfen şifrenizi onaylayın</string>
+    <string name="reg_error_passwords_mismatch">Şifreler eşleşmiyor</string>
+    <string name="reg_error_avatar_required">Profil fotoğrafı eklemek zorunludur.</string>
+    <string name="reg_error_discovery_photo_required">En az 1 adet keşfette görünen fotoğraf eklemek zorunludur.</string>
 </resources>

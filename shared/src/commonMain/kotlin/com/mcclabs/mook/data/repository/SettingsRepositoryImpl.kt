@@ -171,6 +171,24 @@ class SettingsRepositoryImpl : SettingsRepository {
         )
     }
 
+    override suspend fun getHasSeenRoomSwitchInfo(): Boolean {
+        val userId = Firebase.auth.currentUser?.uid ?: return false
+        return try {
+            val document = appFirestore.collection("users").document(userId).get()
+            runCatching { document.get<Boolean>("hasSeenRoomSwitchInfo") }.getOrNull() ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun setHasSeenRoomSwitchInfo(seen: Boolean) {
+        val userId = Firebase.auth.currentUser?.uid ?: return
+        appFirestore.collection("users").document(userId).set(
+            mapOf("hasSeenRoomSwitchInfo" to seen),
+            merge = true
+        )
+    }
+
     override suspend fun getRoomLanguageCode(): String? {
         return getSettings().roomLanguageCode
     }
