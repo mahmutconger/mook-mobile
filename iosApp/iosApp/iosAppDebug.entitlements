@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		Debug builds talk to the APNs sandbox, so the token this app registers is a
+		sandbox token. The Release counterpart (iosAppRelease.entitlements) must say
+		"production" instead: an App Store build carrying "development" registers a
+		sandbox token that the production APNs gateway rejects, and every push
+		silently disappears.
+	-->
+	<key>aps-environment</key>
+	<string>development</string>
+</dict>
+</plist>

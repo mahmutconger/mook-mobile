@@ -5,3 +5,10 @@ PRODUCT_BUNDLE_IDENTIFIER=com.mcclabs.mook
 
 CURRENT_PROJECT_VERSION=1
 MARKETING_VERSION=1.0
+
+// Xcode 16/26'nın "Explicitly Built Modules" özelliği, Firebase Firestore'un
+// (FirebaseFirestoreInternal) modül haritasıyla çakışıp "module 'Foundation' is
+// needed but has not been provided" hatasına yol açıyor. Kapatınca Clang implicit
+// modüllere döner ve Firebase yeniden derlenir. Proje seviyesi olduğundan SPM
+// bağımlılıklarına da uygulanır.
+SWIFT_ENABLE_EXPLICIT_MODULES = NO

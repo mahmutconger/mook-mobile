@@ -1,21 +1,36 @@
 package com.mcclabs.mook
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
+
+    /**
+     * Android 13+ drops every notification silently until the user grants this, while
+     * the FCM token registers either way — so a missing grant looks like a broken
+     * server rather than a missing permission. The result is ignored: declining only
+     * costs new-message banners, which must not block using the app.
+     */
+    private val requestNotificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Apply the initial theme immediately (before first frame) to avoid a flash.
         applySystemBarStyle(isDark = false)
+        askForNotificationPermission()
 
         setContent {
             App(
@@ -23,6 +38,18 @@ class MainActivity : ComponentActivity() {
                     applySystemBarStyle(isDark)
                 }
             )
+        }
+    }
+
+    /** No-op below API 33, where notifications need no runtime grant. */
+    private fun askForNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val granted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 

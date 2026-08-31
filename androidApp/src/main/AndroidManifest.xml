@@ -15,6 +15,14 @@
         android:maxSdkVersion="32" />
 
     <!--
+        New-message push notifications (Android 13+). Without this the system drops
+        every notification silently; the token still registers, so the failure looks
+        like a server problem rather than a missing permission.
+        MainActivity must still request it at runtime.
+    -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!--
         Package visibility (Android 11+): allows checking whether the companion
         WalkTalk app is installed so "Send Message" can open it, or fall back to
         Google Play when it is not.

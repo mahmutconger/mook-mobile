@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		"production" because this configuration is signed with the "Mook App Store"
+		distribution profile and ships to TestFlight and the App Store, which use the
+		production APNs gateway.
+
+		It previously said "development": with manual signing Xcode does not rewrite
+		this at export time the way it does under automatic signing, so a released
+		build would have registered sandbox tokens that production APNs rejects — no
+		error anywhere, just no notifications. The sandbox value lives in
+		iosAppDebug.entitlements, which the Debug configuration uses.
+	-->
+	<key>aps-environment</key>
+	<string>production</string>
+</dict>
+</plist>
