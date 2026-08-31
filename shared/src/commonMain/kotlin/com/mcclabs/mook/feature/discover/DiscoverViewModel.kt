@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
+import com.mcclabs.mook.domain.billing.PremiumRepository
+import com.mcclabs.mook.domain.model.DiscoverProfile
+import com.mcclabs.mook.domain.model.Languages
 import com.mcclabs.mook.domain.model.MatchResult
 import com.mcclabs.mook.domain.model.MatchSettings
 import dev.gitlive.firebase.Firebase
@@ -17,8 +20,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.mcclabs.mook.util.Log
 import org.jetbrains.compose.resources.getString
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.error_generic
@@ -33,12 +36,23 @@ sealed class DiscoverEvent {
     /** Emitted on a mutual match; carries the id of the user who was matched with. */
     data class NavigateToMatch(val matchedUserId: String) : DiscoverEvent()
     data class ShowSnackbar(val message: String) : DiscoverEvent()
+    /** Free user hit the daily like limit and chose to upgrade. */
+    data object NavigateToPaywall : DiscoverEvent()
 }
 
+/**
+ * Backs the Discovery grid.
+ *
+ * The screen is a paged browse surface rather than a card deck: profiles accumulate as the
+ * user scrolls, and acting on someone (liking here, or liking/passing from their profile)
+ * takes them out of the feed. Filters live in [SettingsRepository], so a change there
+ * restarts paging from the top without the user leaving the screen.
+ */
 class DiscoverViewModel(
     private val repository: DiscoverRepository,
     private val interactionRepository: InteractionRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val premiumRepository: PremiumRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DiscoverUiState())
@@ -47,13 +61,26 @@ class DiscoverViewModel(
     private val _events = MutableSharedFlow<DiscoverEvent>()
     val events: SharedFlow<DiscoverEvent> = _events.asSharedFlow()
 
+    /** The filters the visible page was loaded with; used by refresh and paging. */
+    private var currentSettings: MatchSettings = MatchSettings()
+
     init {
+        observePremium()
         observeSettingsAndReload()
     }
 
+    /** Keeps the UI's premium flag in sync so gates lift the instant a purchase completes. */
+    private fun observePremium() {
+        viewModelScope.launch {
+            premiumRepository.isPremium.collect { premium ->
+                _state.update { it.copy(isPremium = premium) }
+            }
+        }
+    }
+
     /**
-     * Reloads the stack whenever the filters change, so applying a filter takes effect
-     * without the user having to leave and re-enter Discover.
+     * Reloads the grid whenever the filters change, so applying a filter takes effect
+     * without the user having to leave and re-enter Discovery.
      */
     private fun observeSettingsAndReload() {
         viewModelScope.launch {
@@ -61,79 +88,212 @@ class DiscoverViewModel(
             runCatching { settingsRepository.getSettings() }
 
             settingsRepository.observeSettings().collectLatest { settings ->
-                loadProfiles(settings)
+                currentSettings = settings
+                applyFilterChips(settings)
+                loadFirstPage(settings)
             }
         }
     }
 
-    private suspend fun loadProfiles(settings: MatchSettings) {
-        _state.value = _state.value.copy(isLoading = true, error = null)
-        try {
-            val profiles = repository.getDiscoverProfiles(settings)
-            val hasSeenTutorial = settingsRepository.getHasSeenLikedMeTutorial()
-            _state.value = _state.value.copy(
-                profiles = profiles, 
-                isLoading = false,
-                hasSeenLikedMeTutorial = hasSeenTutorial
-            )
-        } catch (e: Exception) {
-            _state.value = _state.value.copy(
-                error = e.message ?: getString(Res.string.error_generic),
-                isLoading = false
+    /** Mirrors the stored filters into the chip row above the grid. */
+    private fun applyFilterChips(settings: MatchSettings) {
+        val code = settings.roomLanguageCode
+        _state.update {
+            it.copy(
+                roomLanguage = Languages.fromCode(code),
+                isLanguageIndependentRoom =
+                    code != null && code.equals(Languages.LANGUAGE_INDEPENDENT_ROOM_CODE, ignoreCase = true),
+                ageRangeStart = settings.ageRangeStart,
+                ageRangeEnd = settings.ageRangeEnd,
             )
         }
+    }
+
+    /**
+     * Loads page one. Paging state lives in the repository, so it is reset explicitly here
+     * rather than relying on the filters having changed — the settings flow re-emits on every
+     * save, including saves that leave the values untouched.
+     */
+    private suspend fun loadFirstPage(settings: MatchSettings) {
+        val refreshing = _state.value.isRefreshing
+        _state.update { it.copy(isLoading = !refreshing, error = null) }
+        try {
+            repository.resetDiscoverPaging()
+            val profiles = repository.getDiscoverProfiles(settings)
+            val hasSeenTutorial = settingsRepository.getHasSeenLikedMeTutorial()
+            val swipesUsedToday = repository.getSwipesUsedToday()
+            _state.update {
+                it.copy(
+                    profiles = profiles,
+                    isLoading = false,
+                    isRefreshing = false,
+                    isLoadingMore = false,
+                    endReached = !repository.hasMoreProfiles(),
+                    hasSeenLikedMeTutorial = hasSeenTutorial,
+                    likedMeTutorialProfileId = profiles.firstOrNull { p -> p.hasLikedMe }?.id,
+                    swipesUsedToday = swipesUsedToday,
+                )
+            }
+        } catch (e: Exception) {
+            _state.update {
+                it.copy(
+                    error = e.message ?: getString(Res.string.error_generic),
+                    isLoading = false,
+                    isRefreshing = false,
+                    isLoadingMore = false,
+                )
+            }
+        }
+    }
+
+    /**
+     * Appends the next page. Called when the grid scrolls near its end; a no-op while another
+     * load is in flight or once the room is exhausted, so scrolling cannot stack requests.
+     */
+    fun loadMore() {
+        val s = _state.value
+        if (s.isLoading || s.isLoadingMore || s.isRefreshing || s.endReached) return
+
+        _state.update { it.copy(isLoadingMore = true) }
+        viewModelScope.launch {
+            try {
+                val next = repository.getDiscoverProfiles(currentSettings)
+                _state.update { current ->
+                    // Guard against duplicates: a profile can surface twice if documents shift
+                    // between pages (someone's lastActiveTimestamp updates mid-scroll).
+                    val existing = current.profiles.mapTo(mutableSetOf()) { p -> p.id }
+                    current.copy(
+                        profiles = current.profiles + next.filter { p -> existing.add(p.id) },
+                        isLoadingMore = false,
+                        endReached = next.isEmpty() || !repository.hasMoreProfiles(),
+                    )
+                }
+            } catch (e: Exception) {
+                // A failed page must not clear what is already on screen; the user can scroll
+                // again to retry.
+                _state.update { it.copy(isLoadingMore = false) }
+                _events.emit(DiscoverEvent.ShowSnackbar(e.message ?: getString(Res.string.error_generic)))
+            }
+        }
+    }
+
+    /** Pull-to-refresh: rebuilds the feed from the top with the current filters. */
+    fun refresh() {
+        if (_state.value.isRefreshing) return
+        _state.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch { loadFirstPage(currentSettings) }
     }
 
     /** Re-runs the query after a failure; the settings flow does not re-emit on its own. */
     fun retry() {
         viewModelScope.launch {
-            loadProfiles(settingsRepository.getSettings())
+            loadFirstPage(settingsRepository.getSettings())
+        }
+    }
+
+    /**
+     * Drops cards for people acted on elsewhere — typically a like or pass made on the profile
+     * screen the user has just come back from. Called when Discovery resumes, so the feed is
+     * consistent without re-querying or losing the scroll position.
+     */
+    fun pruneActedOnProfiles() {
+        val acted = repository.actedOnProfileIds()
+        if (acted.isEmpty()) return
+        _state.update { current ->
+            val remaining = current.profiles.filterNot { it.id in acted }
+            if (remaining.size == current.profiles.size) current
+            else current.copy(
+                profiles = remaining,
+                likedMeTutorialProfileId = remaining.firstOrNull { it.hasLikedMe }?.id,
+            )
+        }
+        // Acting elsewhere also spends the daily allowance; re-read it so the limit sheet
+        // fires at the right moment.
+        viewModelScope.launch {
+            val used = repository.getSwipesUsedToday()
+            _state.update { it.copy(swipesUsedToday = used) }
         }
     }
 
     fun dismissLikedMeTutorial() {
         viewModelScope.launch {
             settingsRepository.setHasSeenLikedMeTutorial(true)
-            _state.value = _state.value.copy(hasSeenLikedMeTutorial = true)
+            _state.update { it.copy(hasSeenLikedMeTutorial = true) }
         }
     }
 
-    fun swipeRight(profileId: String) {
+    // ── Liking ──────────────────────────────────────────────────────────────
+
+    /**
+     * Likes someone straight from the grid. The card leaves the feed immediately and is put
+     * back if the write fails, so a dropped connection never silently loses a like.
+     */
+    fun likeProfile(profileId: String) {
+        if (!consumeSwipeOrBlock()) return
         val profile = _state.value.profiles.find { it.id == profileId } ?: return
+        val index = _state.value.profiles.indexOfFirst { it.id == profileId }
         removeProfile(profileId)
+        repository.markActedOn(profileId)
         viewModelScope.launch {
-            val result = interactionRepository.swipeUser(profileId, isLike = true)
-            if (result is MatchResult.Error) {
-                insertProfile(profile)
-                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
-            } else if (result is MatchResult.MutualMatch) {
-                _events.emit(DiscoverEvent.NavigateToMatch(profileId))
+            when (interactionRepository.swipeUser(profileId, isLike = true)) {
+                is MatchResult.Error -> {
+                    insertProfile(profile, index)
+                    revertSwipeCount()
+                    _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
+                }
+                is MatchResult.MutualMatch -> _events.emit(DiscoverEvent.NavigateToMatch(profileId))
+                else -> Unit
             }
         }
     }
 
-    fun swipeLeft(profileId: String) {
-        val profile = _state.value.profiles.find { it.id == profileId } ?: return
-        removeProfile(profileId)
-        viewModelScope.launch {
-            val result = interactionRepository.swipeUser(profileId, isLike = false)
-            if (result is MatchResult.Error) {
-                insertProfile(profile)
-                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
-            }
+    /**
+     * Enforces the free daily limit. Returns true (and optimistically counts the like) when
+     * allowed; otherwise raises the upgrade sheet and returns false. Premium bypasses it.
+     */
+    private fun consumeSwipeOrBlock(): Boolean {
+        if (!_state.value.canSwipe) {
+            _state.update { it.copy(showLimitSheet = true) }
+            return false
         }
+        _state.update { it.copy(swipesUsedToday = it.swipesUsedToday + 1) }
+        return true
+    }
+
+    /** Rolls the optimistic count back when the write fails. */
+    private fun revertSwipeCount() {
+        _state.update { it.copy(swipesUsedToday = (it.swipesUsedToday - 1).coerceAtLeast(0)) }
+    }
+
+    fun onUpgradeClicked() {
+        _state.update { it.copy(showLimitSheet = false) }
+        viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall) }
+    }
+
+    fun onLimitSheetDismissed() {
+        _state.update { it.copy(showLimitSheet = false) }
     }
 
     private fun removeProfile(profileId: String) {
-        val currentProfiles = _state.value.profiles.toMutableList()
-        currentProfiles.removeAll { it.id == profileId }
-        _state.value = _state.value.copy(profiles = currentProfiles)
+        _state.update { current ->
+            val remaining = current.profiles.filterNot { it.id == profileId }
+            current.copy(
+                profiles = remaining,
+                likedMeTutorialProfileId = remaining.firstOrNull { it.hasLikedMe }?.id,
+            )
+        }
     }
 
-    private fun insertProfile(profile: com.mcclabs.mook.domain.model.DiscoverProfile) {
-        val currentProfiles = _state.value.profiles.toMutableList()
-        currentProfiles.add(0, profile)
-        _state.value = _state.value.copy(profiles = currentProfiles)
+    /** Puts a profile back where it was after a failed write. */
+    private fun insertProfile(profile: DiscoverProfile, index: Int) {
+        _state.update { current ->
+            val restored = current.profiles.toMutableList()
+            restored.add(index.coerceIn(0, restored.size), profile)
+            current.copy(
+                profiles = restored,
+                likedMeTutorialProfileId = restored.firstOrNull { it.hasLikedMe }?.id,
+            )
+        }
     }
 
     fun onProfileClicked(profileId: String) {
@@ -142,25 +302,64 @@ class DiscoverViewModel(
         }
     }
 
+    // ── Filter chips ────────────────────────────────────────────────────────
+
+    fun onAgeChipClicked() {
+        _state.update { it.copy(showAgeSheet = true) }
+    }
+
+    fun onAgeSheetDismissed() {
+        // Reverts the sliders to what is actually stored, so closing without applying
+        // does not leave the chip showing a range the feed is not using.
+        _state.update {
+            it.copy(
+                showAgeSheet = false,
+                ageRangeStart = currentSettings.ageRangeStart,
+                ageRangeEnd = currentSettings.ageRangeEnd,
+            )
+        }
+    }
+
+    /** Live slider movement — chip text follows, nothing is queried until Apply. */
+    fun onAgeRangeChanged(start: Int, end: Int) {
+        _state.update { it.copy(ageRangeStart = start, ageRangeEnd = end) }
+    }
+
+    /** Persists the age range; the settings flow then reloads the grid. */
+    fun onAgeRangeApplied() {
+        val s = _state.value
+        _state.update { it.copy(showAgeSheet = false) }
+        viewModelScope.launch {
+            runCatching {
+                settingsRepository.saveSettings(
+                    currentSettings.copy(ageRangeStart = s.ageRangeStart, ageRangeEnd = s.ageRangeEnd)
+                )
+            }.onFailure {
+                _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_generic)))
+            }
+        }
+    }
+
     // ── UGC Safety: Reporting & Blocking ────────────────────────────────────
 
     fun onReportClick(profileId: String) {
-        _state.value = _state.value.copy(
-            showReportDialog = true,
-            selectedProfileToReportOrBlock = profileId
-        )
+        _state.update {
+            it.copy(showReportDialog = true, selectedProfileToReportOrBlock = profileId)
+        }
     }
 
     fun onReportDismiss() {
-        _state.value = _state.value.copy(
-            showReportDialog = false,
-            selectedReportReason = null,
-            selectedProfileToReportOrBlock = null
-        )
+        _state.update {
+            it.copy(
+                showReportDialog = false,
+                selectedReportReason = null,
+                selectedProfileToReportOrBlock = null
+            )
+        }
     }
 
     fun onReportReasonSelected(reason: String) {
-        _state.value = _state.value.copy(selectedReportReason = reason)
+        _state.update { it.copy(selectedReportReason = reason) }
     }
 
     fun submitReport() {
@@ -180,13 +379,16 @@ class DiscoverViewModel(
                     .collection("reports")
                     .document
                     .set(report)
-                _state.value = _state.value.copy(
-                    showReportDialog = false,
-                    selectedReportReason = null,
-                    selectedProfileToReportOrBlock = null
-                )
+                _state.update {
+                    it.copy(
+                        showReportDialog = false,
+                        selectedReportReason = null,
+                        selectedProfileToReportOrBlock = null
+                    )
+                }
                 _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.report_submitted)))
-                // Optionally remove the profile from feed immediately
+                // Take the reported profile out of the feed immediately.
+                repository.markActedOn(profileId)
                 removeProfile(profileId)
             } catch (e: Exception) {
                 _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.report_failed)))
@@ -195,17 +397,15 @@ class DiscoverViewModel(
     }
 
     fun onBlockClick(profileId: String) {
-        _state.value = _state.value.copy(
-            showBlockConfirmDialog = true,
-            selectedProfileToReportOrBlock = profileId
-        )
+        _state.update {
+            it.copy(showBlockConfirmDialog = true, selectedProfileToReportOrBlock = profileId)
+        }
     }
 
     fun onBlockDismiss() {
-        _state.value = _state.value.copy(
-            showBlockConfirmDialog = false,
-            selectedProfileToReportOrBlock = null
-        )
+        _state.update {
+            it.copy(showBlockConfirmDialog = false, selectedProfileToReportOrBlock = null)
+        }
     }
 
     fun confirmBlock() {
@@ -220,12 +420,11 @@ class DiscoverViewModel(
                         mapOf("blockedUsers" to dev.gitlive.firebase.firestore.FieldValue.arrayUnion(profileId)),
                         merge = true
                     )
-                _state.value = _state.value.copy(
-                    showBlockConfirmDialog = false,
-                    selectedProfileToReportOrBlock = null
-                )
+                _state.update {
+                    it.copy(showBlockConfirmDialog = false, selectedProfileToReportOrBlock = null)
+                }
                 _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.user_blocked)))
-                // Remove from feed
+                repository.markActedOn(profileId)
                 removeProfile(profileId)
             } catch (e: Exception) {
                 _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.block_failed)))

@@ -13,6 +13,17 @@ import dev.gitlive.firebase.auth.auth
 import com.mcclabs.mook.data.appFirestore
 import dev.gitlive.firebase.firestore.where
 import com.mcclabs.mook.util.Log
+import com.mcclabs.mook.util.getCurrentTimeMillis
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
+
+/** How many matching profiles one [DiscoverRepositoryImpl.getDiscoverProfiles] call aims to return. */
+private const val PAGE_SIZE = 10
+
+/** How many `users` documents each underlying Firestore query reads before filtering. */
+private const val QUERY_BATCH_SIZE = 20
 
 class DiscoverRepositoryImpl : DiscoverRepository {
 
@@ -45,6 +56,12 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         val interests = runCatching { document.get<List<String>>("interests") }.getOrNull() ?: emptyList()
         val verified = runCatching { document.get<Boolean>("verified") }.getOrNull() ?: false
 
+        // Written as epoch millis (see UserProfile.lastActiveTimestamp). Absent on documents
+        // created before the field existed, which simply read as "not online".
+        val lastActiveMillis = runCatching { document.get<Long>("lastActiveTimestamp") }
+            .getOrNull()
+            ?.takeIf { it > 0L }
+
         return DiscoverProfile(
             id = id,
             name = name,
@@ -54,7 +71,8 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             photoUrls = photoUrls,
             bio = bio,
             interests = interests,
-            verified = verified
+            verified = verified,
+            lastActiveMillis = lastActiveMillis
         )
     }
 
@@ -62,6 +80,31 @@ class DiscoverRepositoryImpl : DiscoverRepository {
     private var swipedUserIds = mutableSetOf<String>()
     private var isInteractionsFetched = false
     private var lastSettings: MatchSettings? = null
+
+    /**
+     * Set once a `users` page comes back short, meaning the collection is exhausted for the
+     * current filters. Cleared whenever paging restarts (new filters, or [resetDiscoverPaging]).
+     */
+    private var reachedEnd = false
+
+    override fun hasMoreProfiles(): Boolean = !reachedEnd
+
+    override fun markActedOn(profileId: String) {
+        swipedUserIds.add(profileId)
+    }
+
+    override fun actedOnProfileIds(): Set<String> = swipedUserIds.toSet()
+
+    override fun resetDiscoverPaging() {
+        lastVisibleDocument = null
+        lastSettings = null
+        reachedEnd = false
+        // Rebuild the exclusion set too: likes and blocks made elsewhere (another device, the
+        // profile screen) must be reflected, otherwise refreshing resurfaces people already
+        // acted on.
+        isInteractionsFetched = false
+        swipedUserIds = mutableSetOf()
+    }
 
     override suspend fun getDiscoverProfiles(settings: MatchSettings): List<DiscoverProfile> {
         val currentUser = Firebase.auth.currentUser
@@ -87,7 +130,12 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         if (effectiveSettings != lastSettings) {
             lastVisibleDocument = null
             lastSettings = effectiveSettings
+            reachedEnd = false
         }
+
+        // Nothing left for these filters — don't spend a read proving it again on every
+        // scroll to the bottom.
+        if (reachedEnd) return emptyList()
 
         Log.d("Discover sorgusu başlıyor (uid=$currentUid, yaş=${settings.ageRangeStart}-${settings.ageRangeEnd})")
 
@@ -117,11 +165,11 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         val profiles = mutableListOf<DiscoverProfile>()
 
         // Recursive or loop fetching to ensure we get a batch of valid (unswiped) users
-        while (profiles.size < 5) {
+        while (profiles.size < PAGE_SIZE && !reachedEnd) {
             var query = db.collection("users")
                 .where { "isMookActive" equalTo true }
                 .orderBy("lastActiveTimestamp", dev.gitlive.firebase.firestore.Direction.DESCENDING)
-                .limit(10)
+                .limit(QUERY_BATCH_SIZE)
 
             lastVisibleDocument?.let {
                 query = query.startAfter(it)
@@ -131,9 +179,16 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             val documents = querySnapshot.documents
 
             Log.d("users sorgusu döndü: ${documents.size} doküman (isMookActive==true)")
-            if (documents.isEmpty()) break // No more users
+            if (documents.isEmpty()) {
+                reachedEnd = true
+                break
+            }
 
             lastVisibleDocument = documents.last()
+
+            // A short page means this was the last one; remember it so the grid can stop
+            // paging after these results are consumed.
+            if (documents.size < QUERY_BATCH_SIZE) reachedEnd = true
 
             for (document in documents) {
                 if (document.id == currentUid || swipedUserIds.contains(document.id)) continue
@@ -192,6 +247,29 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         }
 
         return true
+    }
+
+    override suspend fun getSwipesUsedToday(): Int {
+        val currentUid = Firebase.auth.currentUser?.uid ?: return 0
+        return try {
+            // Local midnight → epoch millis, matching how swipe timestamps are written.
+            val tz = TimeZone.currentSystemDefault()
+            val startOfDayMillis = Instant.fromEpochMilliseconds(getCurrentTimeMillis())
+                .toLocalDateTime(tz).date
+                .atStartOfDayIn(tz)
+                .toEpochMilliseconds()
+
+            // Composite query (fromUserId ==, timestamp >=) → needs a Firestore composite index.
+            val snapshot = appFirestore.collection("interactions")
+                .where {
+                    ("fromUserId" equalTo currentUid) and ("timestamp" greaterThanOrEqualTo startOfDayMillis)
+                }
+                .get()
+            snapshot.documents.size
+        } catch (e: Exception) {
+            Log.e("Günlük kaydırma sayısı okunamadı", e)
+            0
+        }
     }
 
     override suspend fun getProfileDetails(profileId: String): DiscoverProfile? {
