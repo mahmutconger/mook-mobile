@@ -20,6 +20,9 @@ import com.mcclabs.mook.feature.room.RoomGateScreen
 import com.mcclabs.mook.feature.room.RoomSwitchScreen
 import com.mcclabs.mook.feature.settings.SettingsScreen
 import com.mcclabs.mook.feature.sso.SsoAuthorizeScreen
+import com.mcclabs.mook.feature.walktalkdemo.WalkTalkDemoScreen
+import com.mcclabs.mook.feature.chat.ChatScreen
+import com.mcclabs.mook.feature.chatlist.ChatListScreen
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 
@@ -102,8 +105,37 @@ fun AppNavGraph() {
                 onNavigateToLiked = {
                     navController.navigate(NavRoutes.Liked.route) { launchSingleTop = true }
                 },
+                onNavigateToChats = {
+                    navController.navigate(NavRoutes.ChatList.route) { launchSingleTop = true }
+                },
                 onNavigateToRoomSwitch = {
                     navController.navigate(NavRoutes.RoomSwitch.route)
+                },
+                onNavigateToPaywall = {
+                    navController.navigate(NavRoutes.Paywall.route)
+                }
+            )
+        }
+
+        composable(NavRoutes.Paywall.route) {
+            com.mcclabs.mook.feature.paywall.PaywallScreen(
+                onClose = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.ChatList.route) {
+            ChatListScreen(
+                onNavigateToChat = { chatId, peerUid ->
+                    navController.navigate(NavRoutes.Chat.createRoute(chatId, peerUid))
+                },
+                onNavigateToDiscover = {
+                    navController.popBackStack(NavRoutes.Discover.route, inclusive = false)
+                },
+                onNavigateToLiked = {
+                    navController.navigate(NavRoutes.Liked.route) { launchSingleTop = true }
+                },
+                onNavigateToProfile = { profileId ->
+                    navController.navigate(NavRoutes.ProfileDetails.createRoute(profileId))
                 }
             )
         }
@@ -116,7 +148,23 @@ fun AppNavGraph() {
                 onNavigateToDiscover = {
                     // Return to the existing Discover rather than stacking a new one.
                     navController.popBackStack(NavRoutes.Discover.route, inclusive = false)
+                },
+                onNavigateToChats = {
+                    navController.navigate(NavRoutes.ChatList.route) { launchSingleTop = true }
+                },
+                onNavigateToWalkTalkDemo = {
+                    navController.navigate(NavRoutes.WalkTalkDemo.route) { launchSingleTop = true }
                 }
+            )
+        }
+
+        composable(
+            route = NavRoutes.WalkTalkDemo.route,
+            // Lets a push, an email or WalkTalk itself drop the user straight into the demo.
+            deepLinks = listOf(navDeepLink { uriPattern = "mook://walktalk-demo" })
+        ) {
+            WalkTalkDemoScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -131,6 +179,19 @@ fun AppNavGraph() {
                 },
                 onNavigateToEditProfile = {
                     navController.navigate(NavRoutes.EditProfile.route)
+                },
+                onNavigateToMatch = { matchedUserId ->
+                    // Drop the profile on the way to the celebration: dismissing the match
+                    // should land back on the feed, not on the person just matched with.
+                    navController.navigate(NavRoutes.Match.createRoute(matchedUserId)) {
+                        popUpTo(NavRoutes.ProfileDetails.route) { inclusive = true }
+                    }
+                },
+                onNavigateToPaywall = {
+                    navController.navigate(NavRoutes.Paywall.route)
+                },
+                onNavigateToChat = { chatId, peerUid ->
+                    navController.navigate(NavRoutes.Chat.createRoute(chatId, peerUid)) { launchSingleTop = true }
                 }
             )
         }
@@ -164,6 +225,14 @@ fun AppNavGraph() {
                     .orEmpty(),
                 onKeepSwiping = {
                     navController.popBackStack()
+                },
+                onNavigateToChat = { chatId, peerUid ->
+                    // Drop the celebration on the way into the conversation: backing out
+                    // of a chat should land on the feed, not replay the match animation.
+                    navController.navigate(NavRoutes.Chat.createRoute(chatId, peerUid)) {
+                        popUpTo(NavRoutes.Match.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -179,6 +248,14 @@ fun AppNavGraph() {
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+        
+        composable(NavRoutes.Chat.route) { backStackEntry ->
+            ChatScreen(
+                chatId = backStackEntry.arguments?.read { getStringOrNull(NavRoutes.Chat.ARG_CHAT_ID) }.orEmpty(),
+                peerUid = backStackEntry.arguments?.read { getStringOrNull(NavRoutes.Chat.ARG_PEER_UID) }.orEmpty(),
+                onNavigateBack = { navController.popBackStack() },
             )
         }
     }

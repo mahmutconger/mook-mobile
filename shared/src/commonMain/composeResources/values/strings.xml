@@ -31,6 +31,18 @@
     <string name="room_info_confirm">Got it</string>
     <string name="discover_switch_room_cd">Switch room</string>
     <string name="discover_empty_room_message">Sorry, we couldn\'t find anyone here yet. You can check out other rooms if you\'d like.</string>
+    <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
+    <string name="discover_swipe_limit_body">You\'ve used your %1$d free swipes for today. They refresh tomorrow — or go Premium to swipe without limits.</string>
+    <string name="discover_upgrade_cta">Upgrade to Premium</string>
+
+    <!-- Paywall -->
+    <string name="paywall_title">Mook Premium</string>
+    <string name="paywall_subtitle">Unlock the full Mook experience</string>
+    <string name="paywall_benefit_unlimited">Unlimited swipes every day</string>
+    <string name="paywall_benefit_likes">See everyone who liked you</string>
+    <string name="paywall_benefit_filters">Advanced filters &amp; every language room</string>
+    <string name="paywall_not_ready">Plans and purchasing will appear here once billing is set up.</string>
+    <string name="paywall_close">Close</string>
     <string name="room_language_independent">Language-independent</string>
     <string name="discover_error_couldnt_load_profiles">Couldn\'t load profiles</string>
     <string name="discover_retry">Retry</string>
@@ -156,6 +168,7 @@
     <!-- Bottom navigation -->
     <string name="nav_discover">Discover</string>
     <string name="nav_liked">Liked</string>
+    <string name="nav_chats">Chats</string>
     <string name="nav_subscription">Subscription</string>
     <string name="nav_voices">Voices</string>
     <string name="nav_profile">Profile</string>
@@ -267,4 +280,72 @@
     <string name="reg_error_passwords_mismatch">Passwords do not match</string>
     <string name="reg_error_avatar_required">A profile photo is required.</string>
     <string name="reg_error_discovery_photo_required">At least 1 discovery photo is required.</string>
+
+    <!-- Discovery grid -->
+    <string name="discover_title">Discovery</string>
+    <string name="discover_filters_cd">Filters</string>
+    <string name="discover_chip_age">Age</string>
+    <string name="discover_age_chip_value">%1$d–%2$d</string>
+    <string name="discover_online">Online</string>
+    <string name="discover_card_like_cd">Like</string>
+    <string name="discover_card_more_cd">More options</string>
+    <string name="discover_report_profile">Report profile</string>
+
+    <!-- Profile like / pass -->
+    <string name="profile_like">Like</string>
+    <string name="profile_pass">Pass</string>
+    <string name="profile_liked_toast">Liked</string>
+    <string name="profile_passed_toast">Passed</string>
+
+    <!-- WalkTalk live-translation demo -->
+    <string name="wtdemo_title">Live translated chat</string>
+    <string name="wtdemo_pitch">No language barrier with WalkTalk — everyone writes in their own language.</string>
+    <string name="wtdemo_back_cd">Back</string>
+    <string name="wtdemo_side_left">You</string>
+    <string name="wtdemo_side_right">The other person</string>
+    <string name="wtdemo_writer_cd">Write as %1$s</string>
+    <string name="wtdemo_language_menu_cd">Change %1$s\'s language</string>
+    <string name="wtdemo_swap_cd">Swap the two languages</string>
+    <string name="wtdemo_composer_hint">Write in %1$s…</string>
+    <string name="wtdemo_send_cd">Send message</string>
+    <string name="wtdemo_translating">translating…</string>
+    <string name="wtdemo_typing">translating into %1$s…</string>
+    <string name="wtdemo_preview_label">They will read this in %1$s</string>
+    <string name="wtdemo_retry">Try again</string>
+    <string name="wtdemo_bubble_cd">Translation: %1$s. Original: %2$s</string>
+    <string name="wtdemo_error_network">No connection. Check your internet and try again.</string>
+    <string name="wtdemo_error_timeout">The translation took too long. Try again.</string>
+    <string name="wtdemo_error_rate_limited">That was quick — wait a few seconds and try again.</string>
+    <string name="wtdemo_error_invalid_input">This message is too long to translate (max %1$d characters).</string>
+    <string name="wtdemo_error_unauthenticated">We couldn\'t verify your session. Sign in again and retry.</string>
+    <string name="wtdemo_error_server">Translation is unavailable right now. Try again.</string>
+    <string name="wtdemo_cta">Try WalkTalk</string>
+    <string name="wtdemo_cta_caption">Sign in with your Mook account in seconds — no new sign-up.</string>
+    <string name="wtdemo_promo_title">Chat without the language barrier</string>
+    <string name="wtdemo_promo_body">Try WalkTalk\'s live translation right here.</string>
+    <string name="wtdemo_promo_cd">Open the WalkTalk live translation demo</string>
+    <string name="chat_list_title">Chats</string>
+    <string name="chat_list_empty">You have no chats yet.</string>
+    <string name="chat_list_start">Start the conversation</string>
+    <string name="chat_list_own_message_prefix">You: </string>
+    <string name="chat_unknown_peer">Unknown</string>
+    <string name="chat_title_fallback">Chat</string>
+    <string name="chat_empty">No messages yet — say hello! 💬</string>
+    <string name="chat_composer_placeholder">Write your message…</string>
+    <string name="chat_send_cd">Send</string>
+    <string name="chat_error_not_matched">You can only message people you have matched with.</string>
+    <string name="chat_error_rate_limited">You are sending messages too quickly. Please wait a moment.</string>
+    <string name="chat_error_send_failed">Message could not be sent. Please try again.</string>
+    <string name="chat_list_yesterday">Yesterday</string>
+    <string name="chat_message_deleted">This message was deleted</string>
+    <string name="chat_action_delete">Delete message</string>
+    <string name="chat_action_report">Report message</string>
+    <string name="chat_action_retry">Try again</string>
+    <string name="chat_action_discard">Discard</string>
+    <string name="chat_action_cancel">Cancel</string>
+    <string name="chat_status_sending">Sending…</string>
+    <string name="chat_status_failed">Not sent</string>
+    <string name="chat_report_title">Report message</string>
+    <string name="chat_report_subtitle">Why are you reporting this message?</string>
+    <string name="chat_error_delete_failed">Message could not be deleted. Please try again.</string>
 </resources>

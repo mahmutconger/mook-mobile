@@ -144,6 +144,18 @@
     <string name="room_info_confirm">Anladım</string>
     <string name="discover_switch_room_cd">Oda değiştir</string>
     <string name="discover_empty_room_message">Üzgünüz, burada henüz birini bulamadık. Dilersen başka odalara bakabilirsin.</string>
+    <string name="discover_swipe_limit_title">Günlük hakkın doldu</string>
+    <string name="discover_swipe_limit_body">Bugünlük %1$d ücretsiz kaydırma hakkını kullandın. Yarın yenilenecek — ya da Premium ile sınırsız kaydır.</string>
+    <string name="discover_upgrade_cta">Premium\'a Yükselt</string>
+
+    <!-- Paywall -->
+    <string name="paywall_title">Mook Premium</string>
+    <string name="paywall_subtitle">Mook\'un tamamını aç</string>
+    <string name="paywall_benefit_unlimited">Her gün sınırsız kaydırma</string>
+    <string name="paywall_benefit_likes">Seni beğenen herkesi gör</string>
+    <string name="paywall_benefit_filters">Gelişmiş filtreler ve tüm dil odaları</string>
+    <string name="paywall_not_ready">Paketler ve satın alma, faturalandırma kurulunca burada görünecek.</string>
+    <string name="paywall_close">Kapat</string>
     <string name="room_language_independent">Dilden bağımsız</string>
 
     <!-- Common -->
@@ -154,7 +166,8 @@
 
     <!-- Bottom navigation -->
     <string name="nav_discover">Keşfet</string>
-    <string name="nav_liked">Beğendiklerim</string>
+    <string name="nav_liked">Beğenenler</string>
+    <string name="nav_chats">Sohbetler</string>
     <string name="nav_subscription">Abonelik</string>
     <string name="nav_voices">Sesler</string>
     <string name="nav_profile">Profil</string>
@@ -266,4 +279,72 @@
     <string name="reg_error_passwords_mismatch">Şifreler eşleşmiyor</string>
     <string name="reg_error_avatar_required">Profil fotoğrafı eklemek zorunludur.</string>
     <string name="reg_error_discovery_photo_required">En az 1 adet keşfette görünen fotoğraf eklemek zorunludur.</string>
+
+    <!-- Keşfet ızgarası -->
+    <string name="discover_title">Keşfet</string>
+    <string name="discover_filters_cd">Filtreler</string>
+    <string name="discover_chip_age">Yaş</string>
+    <string name="discover_age_chip_value">%1$d–%2$d</string>
+    <string name="discover_online">Çevrimiçi</string>
+    <string name="discover_card_like_cd">Beğen</string>
+    <string name="discover_card_more_cd">Diğer seçenekler</string>
+    <string name="discover_report_profile">Profili şikayet et</string>
+
+    <!-- Profil beğenme / geçme -->
+    <string name="profile_like">Beğen</string>
+    <string name="profile_pass">Geç</string>
+    <string name="profile_liked_toast">Beğenildi</string>
+    <string name="profile_passed_toast">Geçildi</string>
+
+    <!-- WalkTalk canlı çeviri demosu -->
+    <string name="wtdemo_title">Canlı çevirili sohbet</string>
+    <string name="wtdemo_pitch">WalkTalk ile dil engeli yok — herkes kendi dilinde yazar.</string>
+    <string name="wtdemo_back_cd">Geri</string>
+    <string name="wtdemo_side_left">Sen</string>
+    <string name="wtdemo_side_right">Karşı taraf</string>
+    <string name="wtdemo_writer_cd">%1$s olarak yaz</string>
+    <string name="wtdemo_language_menu_cd">%1$s için dili değiştir</string>
+    <string name="wtdemo_swap_cd">İki dili yer değiştir</string>
+    <string name="wtdemo_composer_hint">%1$s dilinde yaz…</string>
+    <string name="wtdemo_send_cd">Mesajı gönder</string>
+    <string name="wtdemo_translating">çevriliyor…</string>
+    <string name="wtdemo_typing">%1$s diline çevriliyor…</string>
+    <string name="wtdemo_preview_label">Karşı taraf bunu %1$s dilinde okuyacak</string>
+    <string name="wtdemo_retry">Tekrar dene</string>
+    <string name="wtdemo_bubble_cd">Çeviri: %1$s. Özgün metin: %2$s</string>
+    <string name="wtdemo_error_network">Bağlantı yok. İnternetini kontrol edip tekrar dene.</string>
+    <string name="wtdemo_error_timeout">Çeviri çok uzun sürdü. Tekrar dene.</string>
+    <string name="wtdemo_error_rate_limited">Biraz hızlı gittik — birkaç saniye sonra tekrar dene.</string>
+    <string name="wtdemo_error_invalid_input">Bu mesaj çeviri için çok uzun (en fazla %1$d karakter).</string>
+    <string name="wtdemo_error_unauthenticated">Oturumun doğrulanamadı. Tekrar giriş yapıp dene.</string>
+    <string name="wtdemo_error_server">Çeviri şu an kullanılamıyor. Tekrar dene.</string>
+    <string name="wtdemo_cta">WalkTalk\'ı Dene</string>
+    <string name="wtdemo_cta_caption">Mook hesabınla saniyeler içinde gir — yeni kayıt yok.</string>
+    <string name="wtdemo_promo_title">Dil engeli olmadan sohbet et</string>
+    <string name="wtdemo_promo_body">WalkTalk\'ın canlı çevirisini hemen burada dene.</string>
+    <string name="wtdemo_promo_cd">WalkTalk canlı çeviri demosunu aç</string>
+    <string name="chat_list_title">Sohbetler</string>
+    <string name="chat_list_empty">Henüz sohbetin yok.</string>
+    <string name="chat_list_start">Sohbete başla</string>
+    <string name="chat_list_own_message_prefix">Sen: </string>
+    <string name="chat_unknown_peer">Bilinmeyen</string>
+    <string name="chat_title_fallback">Sohbet</string>
+    <string name="chat_empty">Henüz mesaj yok — sohbete başla! 💬</string>
+    <string name="chat_composer_placeholder">Mesajınızı yazın…</string>
+    <string name="chat_send_cd">Gönder</string>
+    <string name="chat_error_not_matched">Yalnızca eşleştiğin kişilere mesaj gönderebilirsin.</string>
+    <string name="chat_error_rate_limited">Çok hızlı mesaj gönderiyorsun. Lütfen biraz bekle.</string>
+    <string name="chat_error_send_failed">Mesaj gönderilemedi. Lütfen tekrar dene.</string>
+    <string name="chat_list_yesterday">Dün</string>
+    <string name="chat_message_deleted">Bu mesaj silindi</string>
+    <string name="chat_action_delete">Mesajı sil</string>
+    <string name="chat_action_report">Mesajı bildir</string>
+    <string name="chat_action_retry">Tekrar dene</string>
+    <string name="chat_action_discard">Vazgeç</string>
+    <string name="chat_action_cancel">İptal</string>
+    <string name="chat_status_sending">Gönderiliyor…</string>
+    <string name="chat_status_failed">Gönderilemedi</string>
+    <string name="chat_report_title">Mesajı bildir</string>
+    <string name="chat_report_subtitle">Bu mesajı neden bildiriyorsun?</string>
+    <string name="chat_error_delete_failed">Mesaj silinemedi. Lütfen tekrar dene.</string>
 </resources>

@@ -37,4 +37,19 @@ sealed class NavRoutes(val route: String) {
     }
 
     data object EditProfile : NavRoutes("edit_profile")
+
+    data object Paywall : NavRoutes("paywall")
+
+    /** Interactive live-translation showcase for the companion WalkTalk app. */
+    data object WalkTalkDemo : NavRoutes("walktalk_demo")
+
+    /** 1-on-1 real-time chat with a matched user. */
+    data object Chat : NavRoutes("chat/{chatId}/{peerUid}") {
+        const val ARG_CHAT_ID = "chatId"
+        const val ARG_PEER_UID = "peerUid"
+        fun createRoute(chatId: String, peerUid: String) = "chat/$chatId/$peerUid"
+    }
+
+    /** Chat list (inbox) showing active conversations. */
+    data object ChatList : NavRoutes("chatlist")
 }

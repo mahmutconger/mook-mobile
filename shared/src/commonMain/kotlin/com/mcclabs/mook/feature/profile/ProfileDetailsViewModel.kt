@@ -2,12 +2,15 @@ package com.mcclabs.mook.feature.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mcclabs.mook.domain.billing.PremiumRepository
+import com.mcclabs.mook.domain.model.MatchResult
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FieldValue
 import com.mcclabs.mook.data.appFirestore
+import com.mcclabs.mook.domain.repository.ChatRepository
 import com.mcclabs.mook.util.buildWalkTalkChatUrl
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,16 +23,29 @@ import org.jetbrains.compose.resources.getString
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.profile_not_found
 import mook.shared.generated.resources.error_generic
+import mook.shared.generated.resources.error_swipe_failed
 
 sealed class ProfileDetailsEvent {
     data class OpenDeepLink(val url: String) : ProfileDetailsEvent()
     object ReportSubmitted : ProfileDetailsEvent()
     object BlockConfirmed : ProfileDetailsEvent()
+
+    /** The like was mutual — hand off to the match celebration. */
+    data class NavigateToMatch(val matchedUserId: String) : ProfileDetailsEvent()
+    /** Navigate to the real-time chat screen with a matched user. */
+    data class NavigateToChat(val chatId: String, val peerUid: String) : ProfileDetailsEvent()
+    /** The like or pass landed; the screen returns to the feed. */
+    object ActionCompleted : ProfileDetailsEvent()
+    /** Free user hit the daily limit and chose to upgrade. */
+    object NavigateToPaywall : ProfileDetailsEvent()
+    data class ShowMessage(val message: String) : ProfileDetailsEvent()
 }
 
 class ProfileDetailsViewModel(
     private val repository: DiscoverRepository,
     private val interactionRepository: InteractionRepository,
+    private val premiumRepository: PremiumRepository,
+    private val chatRepository: ChatRepository,
     private val profileId: String
 ) : ViewModel() {
 
@@ -45,19 +61,83 @@ class ProfileDetailsViewModel(
 
     init {
         loadProfile()
+        observePremium()
+    }
+
+    /** Keeps the premium flag current so the daily-limit gate lifts right after a purchase. */
+    private fun observePremium() {
+        viewModelScope.launch {
+            premiumRepository.isPremium.collect { premium ->
+                _state.value = _state.value.copy(isPremium = premium)
+            }
+        }
+    }
+
+    // ── Like / pass ─────────────────────────────────────────────────────────
+
+    /**
+     * Likes this person. A mutual like hands off to the match screen; otherwise the profile
+     * closes and the feed drops the card. This is the deliberate path — the Discovery grid's
+     * heart is the quick one — so a failure here surfaces rather than passing silently.
+     */
+    fun onLikeClicked() = act(isLike = true)
+
+    /** Passes on this person: they leave the feed and will not be shown again. */
+    fun onPassClicked() = act(isLike = false)
+
+    private fun act(isLike: Boolean) {
+        val current = _state.value
+        if (current.isActionInFlight || current.isActedOn || current.isOwnProfile) return
+        if (!current.canSwipe) {
+            _state.value = current.copy(showLimitDialog = true)
+            return
+        }
+
+        _state.value = current.copy(
+            isActionInFlight = true,
+            swipesUsedToday = current.swipesUsedToday + 1
+        )
+        viewModelScope.launch {
+            when (interactionRepository.swipeUser(profileId, isLike = isLike)) {
+                is MatchResult.Error -> {
+                    _state.value = _state.value.copy(
+                        isActionInFlight = false,
+                        swipesUsedToday = (_state.value.swipesUsedToday - 1).coerceAtLeast(0)
+                    )
+                    _events.emit(ProfileDetailsEvent.ShowMessage(getString(Res.string.error_swipe_failed)))
+                }
+                is MatchResult.MutualMatch -> {
+                    // Tell Discovery to drop the card before the match screen takes over, so
+                    // coming back from it does not show someone already matched with.
+                    repository.markActedOn(profileId)
+                    _state.value = _state.value.copy(isActionInFlight = false, isActedOn = true)
+                    _events.emit(ProfileDetailsEvent.NavigateToMatch(profileId))
+                }
+                else -> {
+                    repository.markActedOn(profileId)
+                    _state.value = _state.value.copy(isActionInFlight = false, isActedOn = true)
+                    // The card disappearing from the feed is the confirmation; a toast the
+                    // user navigates away from before reading is not.
+                    _events.emit(ProfileDetailsEvent.ActionCompleted)
+                }
+            }
+        }
+    }
+
+    fun onUpgradeClicked() {
+        _state.value = _state.value.copy(showLimitDialog = false)
+        viewModelScope.launch { _events.emit(ProfileDetailsEvent.NavigateToPaywall) }
+    }
+
+    fun onLimitDialogDismissed() {
+        _state.value = _state.value.copy(showLimitDialog = false)
     }
 
     fun onSendMessageClicked() {
         viewModelScope.launch {
-            // Chat lives in the companion WalkTalk app, opened via deep link — same as MatchScreen.
-            // The viewed [profileId] is the peer's Firebase uid (shared Firebase project).
-            val current = Firebase.auth.currentUser
-            val url = buildWalkTalkChatUrl(
-                peerId = profileId,
-                currentUid = current?.uid.orEmpty(),
-                currentEmail = current?.email.orEmpty(),
-            )
-            _events.emit(ProfileDetailsEvent.OpenDeepLink(url))
+            val currentUid = Firebase.auth.currentUser?.uid ?: return@launch
+            val chatId = chatRepository.buildChatId(currentUid, profileId)
+            _events.emit(ProfileDetailsEvent.NavigateToChat(chatId = chatId, peerUid = profileId))
         }
     }
 
@@ -150,11 +230,18 @@ class ProfileDetailsViewModel(
                     interactionRepository.checkMutualMatch(profileId)
                 } else false
 
+                // The exclusion set the feed uses is the same source of truth for "already
+                // acted on", so reopening a profile never offers a second like.
+                val alreadyActedOn = !isOwnProfile && profileId in repository.actedOnProfileIds()
+                val swipesUsedToday = if (isOwnProfile) 0 else repository.getSwipesUsedToday()
+
                 if (profile != null) {
                     _state.value = _state.value.copy(
-                        profile = profile, 
+                        profile = profile,
                         isLoading = false,
-                        isMatched = isMatched
+                        isMatched = isMatched,
+                        isActedOn = alreadyActedOn,
+                        swipesUsedToday = swipesUsedToday
                     )
                 } else {
                     _state.value = _state.value.copy(

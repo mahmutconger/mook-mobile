@@ -20,6 +20,7 @@ import com.mcclabs.mook.domain.model.LikedProfile
 import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.components.NeonChip
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
+import com.mcclabs.mook.ui.components.WalkTalkDemoPromoCard
 import com.mcclabs.mook.ui.theme.NeonColors
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
@@ -39,6 +40,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LikedScreen(
     onNavigateToProfile: (String) -> Unit,
     onNavigateToDiscover: () -> Unit,
+    onNavigateToChats: () -> Unit,
+    onNavigateToWalkTalkDemo: () -> Unit,
     viewModel: LikedViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -59,11 +62,12 @@ fun LikedScreen(
         },
         bottomBar = {
             BottomNavBar(
-                currentRoute = "chats",
-                enabledRoutes = setOf("discover", "chats", "profile"),
+                currentRoute = "liked",
+                enabledRoutes = setOf("discover", "liked", "chats", "profile"),
                 onNavigate = { route ->
                     when (route) {
                         "discover" -> onNavigateToDiscover()
+                        "chats" -> onNavigateToChats()
                         "profile" -> if (currentUserId.isNotEmpty()) onNavigateToProfile(currentUserId)
                     }
                 }
@@ -114,6 +118,11 @@ fun LikedScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // The Chats tab is where messaging is on the user's mind, so the
+                    // WalkTalk translation demo is offered here rather than buried in Settings.
+                    item(key = "walktalk_demo_promo") {
+                        WalkTalkDemoPromoCard(onClick = onNavigateToWalkTalkDemo)
+                    }
                     items(state.liked, key = { it.profile.id }) { liked ->
                         LikedRow(liked = liked, onClick = { onNavigateToProfile(liked.profile.id) })
                     }

@@ -19,7 +19,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import com.mcclabs.mook.domain.repository.PushTokenRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
+import kotlinx.coroutines.flow.map
 import com.mcclabs.mook.util.applyAppLocale
 import org.koin.compose.koinInject
 
@@ -48,6 +52,20 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
         // opens Settings.
         LaunchedEffect(Unit) {
             runCatching { settingsRepository.getAppLanguage() }
+        }
+
+        // Record this device's push token. Keyed on the signed-in uid rather than Unit:
+        // on a fresh install App composes before anyone has logged in, and a
+        // fire-once effect would register nothing and never retry. Tokens also rotate
+        // (reinstall, restore, cache clear), so re-running per session is correct —
+        // the write is an arrayUnion, so re-registering the same token costs nothing.
+        // Without this the server has no address to push a new-message notification to.
+        val pushTokenRepository = koinInject<PushTokenRepository>()
+        val signedInUid by Firebase.auth.authStateChanged
+            .map { it?.uid }
+            .collectAsState(initial = null)
+        LaunchedEffect(signedInUid) {
+            if (signedInUid != null) pushTokenRepository.registerCurrentDevice()
         }
         val appLanguage by settingsRepository.observeAppLanguage().collectAsState(initial = "en")
 

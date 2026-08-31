@@ -27,6 +27,7 @@ import org.koin.core.parameter.parametersOf
 fun MatchScreen(
     matchedUserId: String,
     onKeepSwiping: () -> Unit,
+    onNavigateToChat: (chatId: String, peerUid: String) -> Unit = { _, _ -> },
     viewModel: MatchViewModel = koinViewModel<MatchViewModel>(
         parameters = { parametersOf(matchedUserId) }
     )
@@ -40,6 +41,7 @@ fun MatchScreen(
             when (event) {
                 // Don't redirect immediately — show a branded explainer first.
                 is MatchEvent.OpenDeepLink -> pendingChatUrl = event.url
+                is MatchEvent.NavigateToChat -> onNavigateToChat(event.chatId, event.peerUid)
             }
         }
     }

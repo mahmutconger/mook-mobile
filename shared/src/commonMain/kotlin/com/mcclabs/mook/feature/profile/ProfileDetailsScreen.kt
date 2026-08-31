@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -49,6 +50,9 @@ fun ProfileDetailsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToSettings: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
+    onNavigateToMatch: (String) -> Unit = {},
+    onNavigateToPaywall: () -> Unit = {},
+    onNavigateToChat: (chatId: String, peerUid: String) -> Unit = { _, _ -> },
     viewModel: ProfileDetailsViewModel = koinViewModel<ProfileDetailsViewModel>(
         parameters = { parametersOf(profileId) }
     )
@@ -57,6 +61,7 @@ fun ProfileDetailsScreen(
     val openWalkTalkChat = rememberWalkTalkChatOpener()
     val scope = rememberCoroutineScope()
     var pendingChatUrl by remember { mutableStateOf<String?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -65,8 +70,48 @@ fun ProfileDetailsScreen(
                 is ProfileDetailsEvent.OpenDeepLink -> pendingChatUrl = event.url
                 is ProfileDetailsEvent.ReportSubmitted -> onNavigateBack()
                 is ProfileDetailsEvent.BlockConfirmed -> onNavigateBack()
+                is ProfileDetailsEvent.NavigateToMatch -> onNavigateToMatch(event.matchedUserId)
+                is ProfileDetailsEvent.NavigateToChat -> onNavigateToChat(event.chatId, event.peerUid)
+                // The feed is what the user was doing; a like or pass returns them to it.
+                ProfileDetailsEvent.ActionCompleted -> onNavigateBack()
+                is ProfileDetailsEvent.NavigateToPaywall -> onNavigateToPaywall()
+                is ProfileDetailsEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
             }
         }
+    }
+
+    // ── Daily like limit ────────────────────────────────────────────────────
+    if (state.showLimitDialog) {
+        AlertDialog(
+            onDismissRequest = viewModel::onLimitDialogDismissed,
+            containerColor = NeonColors.Card,
+            title = {
+                Text(
+                    text = stringResource(Res.string.discover_swipe_limit_title),
+                    color = NeonColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(
+                        Res.string.discover_swipe_limit_body,
+                        com.mcclabs.mook.domain.billing.BillingConfig.FREE_DAILY_SWIPE_LIMIT
+                    ),
+                    color = NeonColors.TextSecondary
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = viewModel::onUpgradeClicked) {
+                    Text(stringResource(Res.string.discover_upgrade_cta), color = NeonColors.Primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::onLimitDialogDismissed) {
+                    Text(stringResource(Res.string.profile_block_cancel), color = NeonColors.TextSecondary)
+                }
+            }
+        )
     }
 
     // ── Report Profile bottom sheet ───────────────────────────────────────
@@ -150,6 +195,7 @@ fun ProfileDetailsScreen(
 
             BottomSheetScaffold(
                 scaffoldState = scaffoldState,
+                snackbarHost = { SnackbarHost(snackbarHostState) },
                 sheetPeekHeight = 148.dp,
                 sheetContainerColor = NeonColors.Background,
                 sheetContentColor = NeonColors.TextPrimary,
@@ -160,6 +206,10 @@ fun ProfileDetailsScreen(
                         profile = profile,
                         isOwnProfile = state.isOwnProfile,
                         isMatched = state.isMatched,
+                        canAct = state.canAct,
+                        isActionInFlight = state.isActionInFlight,
+                        onLike = { viewModel.onLikeClicked() },
+                        onPass = { viewModel.onPassClicked() },
                         onSendMessage = { viewModel.onSendMessageClicked() },
                         onBlock = { viewModel.onBlockClick() }
                     )
@@ -274,6 +324,10 @@ private fun ProfileSheetContent(
     profile: DiscoverProfile,
     isOwnProfile: Boolean,
     isMatched: Boolean,
+    canAct: Boolean,
+    isActionInFlight: Boolean,
+    onLike: () -> Unit,
+    onPass: () -> Unit,
     onSendMessage: () -> Unit,
     onBlock: () -> Unit = {},
 ) {
@@ -372,6 +426,17 @@ private fun ProfileSheetContent(
             profile.interests.forEach { interest ->
                 NeonChip(text = com.mcclabs.mook.ui.components.interestLabel(interest))
             }
+        }
+
+        // The considered decision, after reading the whole profile. The Discovery grid's
+        // heart is the shortcut; this is the version with a pass alongside it.
+        if (canAct) {
+            Spacer(modifier = Modifier.height(24.dp))
+            LikePassRow(
+                enabled = !isActionInFlight,
+                onPass = onPass,
+                onLike = onLike
+            )
         }
 
         // Only other people's profiles get a message CTA; you don't message yourself.
@@ -478,6 +543,64 @@ fun InfoCard(
                 color = NeonColors.Primary,
                 fontWeight = FontWeight.SemiBold
             )
+        }
+    }
+}
+
+/**
+ * Pass on the left, like on the right — the same left/right sense the swipe deck used, so
+ * the muscle memory carries over now that the gesture is gone.
+ */
+@Composable
+private fun LikePassRow(
+    enabled: Boolean,
+    onPass: () -> Unit,
+    onLike: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        OutlinedButton(
+            onClick = onPass,
+            enabled = enabled,
+            modifier = Modifier.weight(1f).height(56.dp),
+            shape = RoundedCornerShape(28.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, NeonColors.CardBorder),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonColors.TextSecondary)
+        ) {
+            Text(
+                text = stringResource(Res.string.profile_pass),
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
+
+        Button(
+            onClick = onLike,
+            enabled = enabled,
+            modifier = Modifier.weight(1f).height(56.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            ),
+            contentPadding = PaddingValues()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(brush = BrandGradient, shape = RoundedCornerShape(28.dp))
+                    .alpha(if (enabled) 1f else 0.5f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(Res.string.profile_like),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
         }
     }
 }

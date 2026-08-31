@@ -2,6 +2,7 @@ package com.mcclabs.mook.feature.match
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mcclabs.mook.domain.repository.ChatRepository
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
@@ -18,10 +19,12 @@ import com.mcclabs.mook.util.buildWalkTalkChatUrl
 
 sealed class MatchEvent {
     data class OpenDeepLink(val url: String) : MatchEvent()
+    data class NavigateToChat(val chatId: String, val peerUid: String) : MatchEvent()
 }
 
 class MatchViewModel(
     private val discoverRepository: DiscoverRepository,
+    private val chatRepository: ChatRepository,
     private val matchedUserId: String
 ) : ViewModel() {
 
@@ -67,19 +70,9 @@ class MatchViewModel(
 
     fun onChatClicked() {
         viewModelScope.launch {
-            // Mook and WalkTalk share one Firebase project, so [matchedUserId] (the
-            // matched person's Firebase uid) is the same id WalkTalk stores under
-            // users/{uid}. The current user's uid + email travel along so WalkTalk
-            // can verify the link opener against its own auth session.
-            val current = Firebase.auth.currentUser
-            val url = buildWalkTalkChatUrl(
-                peerId = matchedUserId,
-                currentUid = current?.uid.orEmpty(),
-                currentEmail = current?.email.orEmpty(),
-            )
-
-            Log.d("WalkTalk sohbeti açılıyor (peerId=$matchedUserId)")
-            _events.emit(MatchEvent.OpenDeepLink(url))
+            val currentUid = Firebase.auth.currentUser?.uid ?: return@launch
+            val chatId = chatRepository.buildChatId(currentUid, matchedUserId)
+            _events.emit(MatchEvent.NavigateToChat(chatId, matchedUserId))
         }
     }
 }

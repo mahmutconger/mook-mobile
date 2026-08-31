@@ -23,6 +23,8 @@ import mook.shared.generated.resources.ic_star
 import mook.shared.generated.resources.ic_user
 import mook.shared.generated.resources.nav_discover
 import mook.shared.generated.resources.nav_liked
+import mook.shared.generated.resources.nav_chats
+import mook.shared.generated.resources.chat_round_line_svgrepo_com
 import mook.shared.generated.resources.nav_subscription
 import mook.shared.generated.resources.nav_profile
 import org.jetbrains.compose.resources.DrawableResource
@@ -39,7 +41,7 @@ import org.jetbrains.compose.resources.stringResource
 fun BottomNavBar(
     currentRoute: String,
     onNavigate: (String) -> Unit,
-    enabledRoutes: Set<String> = setOf("discover", "chats", "voices", "profile")
+    enabledRoutes: Set<String> = setOf("discover", "liked", "chats", "voices", "profile")
 ) {
     Row(
         modifier = Modifier
@@ -63,6 +65,14 @@ fun BottomNavBar(
         BottomNavItem(
             icon = Res.drawable.ic_star,
             label = stringResource(Res.string.nav_liked),
+            route = "liked",
+            currentRoute = currentRoute,
+            isEnabled = "liked" in enabledRoutes,
+            onNavigate = onNavigate
+        )
+        BottomNavItem(
+            icon = Res.drawable.chat_round_line_svgrepo_com,
+            label = stringResource(Res.string.nav_chats),
             route = "chats",
             currentRoute = currentRoute,
             isEnabled = "chats" in enabledRoutes,
