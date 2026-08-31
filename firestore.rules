@@ -115,19 +115,25 @@ service cloud.firestore {
       // sorun çıkardığı için kaldırıldı.
       allow read: if signedIn() && request.auth.uid in resource.data.users;
 
-      // CREATE: Yeni sohbet — kullanıcı kendi uid'ini eklemiş olmalı.
-      allow create: if signedIn()
-        && request.resource.data.users is list
-        && request.auth.uid in request.resource.data.users;
+      // CREATE / UPDATE: Sohbet dokümanını yalnızca `sendMessage` callable'ı
+      // (Admin SDK) yazar; Admin SDK kuralları atladığı için buraya izin
+      // vermeye gerek yok. Eski kural "yeni veriye kendi uid'ini koyan herkes"e
+      // yazma hakkı veriyordu: A, kendini `users` dizisine ekleyerek B ile C
+      // arasındaki sohbeti ezebiliyordu. Tek istisna okundu bilgisi — kullanıcı
+      // yalnızca kendi sayacını sıfırlayabilir.
+      allow create: if false;
 
-      // UPDATE: Mesaj gönderirken chat dokümanı güncelleniyor (merge:true).
-      // İki senaryo izin verilir:
-      //   a) Mevcut üye güncelleme yapıyor
-      //   b) İlk mesajda create/update karışımı — yeni veri de uid içeriyor
-      allow update: if signedIn() && (
-        request.auth.uid in resource.data.users ||
-        (request.resource.data.users is list && request.auth.uid in request.resource.data.users)
-      );
+      // İlk mesajdan önce `unreadCounts` alanı yoktur; get(...) varsayılanı
+      // olmadan diff() hata fırlatıp yazmayı reddederdi.
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.users
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(["unreadCounts"])
+        && request.resource.data.unreadCounts[request.auth.uid] == 0
+        // Karşı tarafın sayacına dokunulamaz.
+        && request.resource.data.unreadCounts
+             .diff(resource.data.get("unreadCounts", {})).affectedKeys()
+             .hasOnly([request.auth.uid]);
 
       allow delete: if false;
 
@@ -145,12 +151,10 @@ service cloud.firestore {
         // Chat varsa kullanıcı üye olmalı.
         allow read: if signedIn() && (userInChat() || !chatExists());
 
-        // Yazma: artık chat dokümanı önce yazılıyor (FirestoreMessagesRepository),
-        // bu noktada chat her zaman mevcut olacak.
-        allow create: if signedIn()
-          && userInChat()
-          && request.resource.data.senderUid == request.auth.uid;
-        allow update, delete: if false;
+        // Mesajlar yalnızca `sendMessage` callable'ı üzerinden yazılır. İstemciye
+        // doğrudan yazma hakkı verilirse eşleşme kontrolü, hız sınırı, çeviri ve
+        // bildirim — dördü birden — atlanır.
+        allow create, update, delete: if false;
       }
     }
 
