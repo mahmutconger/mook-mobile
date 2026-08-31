@@ -22,6 +22,11 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+            // Without this the compiler cannot derive a bundle ID from the exported
+            // packages and falls back to the bundle *name* ("Shared") with a warning
+            // on every build. Naming it explicitly also keeps the framework's
+            // CFBundleIdentifier distinct from the app's own.
+            binaryOption("bundleId", "com.mcclabs.mook.shared")
         }
     }
     
@@ -47,6 +52,10 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.1.2"))
+            // Android reads its own FCM token (see PushToken.android.kt). iOS cannot —
+            // FirebaseMessaging is linked into the Xcode target there, and the token is
+            // handed in from Swift instead.
+            implementation("com.google.firebase:firebase-messaging")
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -57,7 +66,11 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
-            implementation(libs.compose.uiToolingPreview)
+            // `org.jetbrains.compose.ui:ui-tooling-preview` resolves to the *androidx*
+            // artifact on the Android target, which has no org.jetbrains.compose
+            // `@Preview`. The components variant is the multiplatform one, so a
+            // @Preview in commonMain compiles for both targets.
+            implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.koin.core)
@@ -77,6 +90,8 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            // Virtual time for the WalkTalk demo's debounce / stale-response tests.
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

@@ -17,3 +17,9 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# Compiled Cloud Functions output — rebuilt by the predeploy hook.
+functions/lib/
+firestore-debug.log
+ui-debug.log
+firebase-debug.log

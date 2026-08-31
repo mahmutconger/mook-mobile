@@ -13,6 +13,7 @@
 		2E50044230115D7E00B5E66A /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50044130115D7E00B5E66A /* FirebaseRemoteConfig */; };
 		2E50044430115D7E00B5E66A /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50044330115D7E00B5E66A /* FirebaseStorage */; };
 		2E50044630115D7E00B5E66A /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50044530115D7E00B5E66A /* FirebaseFunctions */; };
+		2E50044830115D7E00B5E66A /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 2E50044730115D7E00B5E66A /* FirebaseMessaging */; };
 		2ED90BA83004E956002D2604 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2ED90BA73004E956002D2604 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +59,7 @@
 				2E50044430115D7E00B5E66A /* FirebaseStorage in Frameworks */,
 				2E50044230115D7E00B5E66A /* FirebaseRemoteConfig in Frameworks */,
 				2E50044630115D7E00B5E66A /* FirebaseFunctions in Frameworks */,
+				2E50044830115D7E00B5E66A /* FirebaseMessaging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +111,7 @@
 				2E50044130115D7E00B5E66A /* FirebaseRemoteConfig */,
 				2E50044330115D7E00B5E66A /* FirebaseStorage */,
 				2E50044530115D7E00B5E66A /* FirebaseFunctions */,
+				2E50044730115D7E00B5E66A /* FirebaseMessaging */,
 			);
 			productName = iosApp;
 			productReference = 7F1888FF9F3A9E7C21762332 /* Mook.app */;
@@ -205,6 +208,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_EXPLICIT_MODULES = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -256,6 +260,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -270,6 +275,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_EXPLICIT_MODULES = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -314,6 +320,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -324,6 +331,7 @@
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosAppRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = 64CED189132FEEAF4124FD4001181C9C76A789A2;
 				CODE_SIGN_STYLE = Manual;
@@ -363,11 +371,12 @@
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosAppDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ZM857QH6ZN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
@@ -382,7 +391,6 @@
 				);
 				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcclabs.mook;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -457,6 +465,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2E50043A30115D7E00B5E66A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFunctions;
+		};
+		2E50044730115D7E00B5E66A /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E50043A30115D7E00B5E66A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
