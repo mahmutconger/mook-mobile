@@ -19,6 +19,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,18 +34,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalUriHandler
+import com.mcclabs.mook.domain.billing.Tier
 import com.mcclabs.mook.ui.components.NeonToggle
 import com.mcclabs.mook.ui.theme.NeonColors
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/** Google Play abonelik yönetimi derin bağlantısı (Play Store uygulamasında açılır). */
+private const val PLAY_STORE_SUBSCRIPTIONS_URL = "https://play.google.com/store/account/subscriptions"
 
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToFilters: () -> Unit = {},
+    onNavigateToPaywall: () -> Unit = {},
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -59,10 +69,12 @@ fun SettingsScreen(
 
     val uriHandler = LocalUriHandler.current
 
-    // ── Delete-account confirmation dialog ───────────────────────────────────
+    // ── Hesap silme onay iletişim kutusu ─────────────────────────────────────
     if (state.showDeleteConfirmDialog) {
+        val isDeleting = state.deleteAccount is DeleteAccountUiState.Loading
         AlertDialog(
-            onDismissRequest = viewModel::onDeleteDismiss,
+            // Silme sürerken kapatmaya izin verilmez ki işlem yarıda kalmasın.
+            onDismissRequest = { if (!isDeleting) viewModel.onDeleteDismiss() },
             containerColor = NeonColors.Card,
             title = {
                 Text(
@@ -73,23 +85,76 @@ fun SettingsScreen(
                 )
             },
             text = {
-                Text(
-                    text = stringResource(Res.string.settings_delete_account_message),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.TextSecondary
-                )
+                Column {
+                    Text(
+                        text = stringResource(Res.string.settings_delete_account_message),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = NeonColors.TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    // Play Store zorunluluğu: silmenin abonelikleri iptal ETMEDİĞİ uyarısı.
+                    Text(
+                        text = stringResource(Res.string.settings_delete_account_subscription_warning),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = NeonColors.Error,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    // Kullanıcıyı Google Play abonelik yönetimi sayfasına derin bağlantıyla götürür.
+                    TextButton(onClick = { uriHandler.openUri(PLAY_STORE_SUBSCRIPTIONS_URL) }) {
+                        Text(
+                            text = stringResource(Res.string.settings_delete_account_manage_subs),
+                            color = NeonColors.Primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    val deleteState = state.deleteAccount
+                    when (deleteState) {
+                        is DeleteAccountUiState.Loading -> {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(Res.string.settings_delete_account_progress),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = NeonColors.TextSecondary
+                            )
+                        }
+                        is DeleteAccountUiState.Error -> {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = deleteState.message,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = NeonColors.Error
+                            )
+                        }
+                        else -> Unit
+                    }
+                }
             },
             confirmButton = {
                 Button(
                     onClick = viewModel::onDeleteConfirm,
+                    enabled = !isDeleting,
                     colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Error)
                 ) {
-                    Text(stringResource(Res.string.settings_delete_account_confirm), color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                    if (isDeleting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            color = androidx.compose.ui.graphics.Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(Res.string.settings_delete_account_confirm),
+                            color = androidx.compose.ui.graphics.Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             },
             dismissButton = {
                 Button(
                     onClick = viewModel::onDeleteDismiss,
+                    enabled = !isDeleting,
                     colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder)
                 ) {
                     Text(stringResource(Res.string.settings_delete_account_cancel), color = NeonColors.TextPrimary)
@@ -189,6 +254,57 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
         SectionLabel(stringResource(Res.string.settings_account_section))
         SettingsRow(title = stringResource(Res.string.settings_email_label), value = state.email.ifEmpty { "—" })
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Keep subscriptions reachable before a user hits a quota. Besides being
+        // necessary for license testing, this is the expected entry point for a
+        // voluntary upgrade rather than making the limit dialog the only route.
+        SectionLabel(stringResource(Res.string.settings_membership_section))
+        val tierLabel = state.subscription.tier.displayName()
+        val membershipStatus = if (state.subscription.inTrial) {
+            stringResource(Res.string.settings_membership_trial)
+        } else {
+            stringResource(Res.string.settings_membership_active)
+        }
+        SettingsRow(
+            title = stringResource(Res.string.settings_membership_current_plan),
+            value = "$tierLabel · $membershipStatus",
+            onClick = onNavigateToPaywall,
+        )
+        state.subscription.expiresAtMillis?.let { expiresAt ->
+            SettingsRow(
+                title = stringResource(
+                    if (state.subscription.willRenew) Res.string.settings_membership_renews
+                    else Res.string.settings_membership_ends,
+                ),
+                value = expiresAt.formatSubscriptionDate(),
+            )
+        }
+        if (state.subscription.tier != Tier.FREE) {
+            SettingsRow(
+                title = stringResource(Res.string.settings_membership_manage),
+                value = stringResource(Res.string.settings_view_label),
+                onClick = { uriHandler.openUri(PLAY_STORE_SUBSCRIPTIONS_URL) },
+            )
+        }
+        SettingsRow(
+            title = stringResource(Res.string.settings_membership_restore),
+            value = if (state.isRestoringPurchases) {
+                stringResource(Res.string.settings_membership_restoring)
+            } else {
+                stringResource(Res.string.settings_membership_action)
+            },
+            onClick = viewModel::restorePurchases,
+        )
+        state.restorePurchasesMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = NeonColors.TextSecondary,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -309,11 +425,14 @@ fun SettingsScreen(
             )
         }
 
-        // Error message if deletion failed
-        if (state.deleteError != null) {
+        // Error message if deletion failed. The state is modelled as a sealed type,
+        // rather than as a separate nullable string, so loading and error UI cannot
+        // accidentally disagree.
+        val deleteError = (state.deleteAccount as? DeleteAccountUiState.Error)?.message
+        if (deleteError != null) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = state.deleteError!!,
+                text = deleteError,
                 style = MaterialTheme.typography.bodySmall,
                 color = NeonColors.Error,
                 modifier = Modifier
@@ -335,6 +454,19 @@ private fun SectionLabel(text: String) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
     )
+}
+
+@Composable
+private fun Tier.displayName(): String = when (this) {
+    Tier.FREE -> stringResource(Res.string.settings_membership_free)
+    Tier.ECONOMY -> stringResource(Res.string.settings_membership_economy)
+    Tier.STANDARD -> stringResource(Res.string.settings_membership_standard)
+    Tier.PREMIUM -> stringResource(Res.string.settings_membership_premium)
+}
+
+private fun Long.formatSubscriptionDate(): String {
+    val date = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return "${date.dayOfMonth.toString().padStart(2, '0')}.${date.monthNumber.toString().padStart(2, '0')}.${date.year}"
 }
 
 @Composable

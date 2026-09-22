@@ -4,11 +4,13 @@ import com.mcclabs.mook.domain.model.MatchSettings
 import com.mcclabs.mook.domain.repository.SettingsRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.functions.functions
 import com.mcclabs.mook.data.appFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.mcclabs.mook.util.Log
+import kotlinx.serialization.Serializable
 
 /**
  * Stores the user's Discover filters on their own `users` document, so they survive
@@ -20,13 +22,15 @@ import com.mcclabs.mook.util.Log
 class SettingsRepositoryImpl : SettingsRepository {
 
     private val state = MutableStateFlow(MatchSettings())
-    private var isLoaded = false
+    // Repositories are Koin singletons and outlive a logout/login navigation cycle.
+    // Cache ownership must therefore be tied to a Firebase uid, never just a boolean.
+    private var settingsLoadedForUid: String? = null
 
     override fun observeSettings(): Flow<MatchSettings> = state.asStateFlow()
 
     override suspend fun getSettings(): MatchSettings {
-        val userId = Firebase.auth.currentUser?.uid ?: return state.value
-        if (isLoaded) return state.value
+        val userId = Firebase.auth.currentUser?.uid ?: return MatchSettings()
+        if (settingsLoadedForUid == userId) return state.value
 
         val settings = try {
             val document = appFirestore.collection("users").document(userId).get()
@@ -47,7 +51,7 @@ class SettingsRepositoryImpl : SettingsRepository {
         }
 
         state.value = settings
-        isLoaded = true
+        settingsLoadedForUid = userId
         return settings
     }
 
@@ -59,14 +63,12 @@ class SettingsRepositoryImpl : SettingsRepository {
             "ageRangeEnd" to settings.ageRangeEnd,
             "targetCountries" to settings.targetCountries
         )
-        settings.roomLanguageCode?.let { updateMap["roomLanguageCode"] = it }
-
         appFirestore.collection("users").document(userId).set(
             updateMap,
             merge = true
         )
         state.value = settings
-        isLoaded = true
+        settingsLoadedForUid = userId
     }
 
     override suspend fun getDiscoverVisible(): Boolean {
@@ -90,13 +92,13 @@ class SettingsRepositoryImpl : SettingsRepository {
     }
 
     private val isDarkModeFlow = MutableStateFlow(false)
-    private var isDarkModeLoaded = false
+    private var darkModeLoadedForUid: String? = null
 
     override fun observeIsDarkMode(): Flow<Boolean> = isDarkModeFlow.asStateFlow()
 
     override suspend fun getIsDarkMode(): Boolean {
-        val userId = Firebase.auth.currentUser?.uid ?: return isDarkModeFlow.value
-        if (isDarkModeLoaded) return isDarkModeFlow.value
+        val userId = Firebase.auth.currentUser?.uid ?: return false
+        if (darkModeLoadedForUid == userId) return isDarkModeFlow.value
 
         val isDark = try {
             val document = appFirestore.collection("users").document(userId).get()
@@ -107,7 +109,7 @@ class SettingsRepositoryImpl : SettingsRepository {
         }
 
         isDarkModeFlow.value = isDark
-        isDarkModeLoaded = true
+        darkModeLoadedForUid = userId
         return isDark
     }
 
@@ -118,17 +120,17 @@ class SettingsRepositoryImpl : SettingsRepository {
             merge = true
         )
         isDarkModeFlow.value = isDark
-        isDarkModeLoaded = true
+        darkModeLoadedForUid = userId
     }
 
     private val appLanguageFlow = MutableStateFlow("en")
-    private var appLanguageLoaded = false
+    private var appLanguageLoadedForUid: String? = null
 
     override fun observeAppLanguage(): Flow<String> = appLanguageFlow.asStateFlow()
 
     override suspend fun getAppLanguage(): String {
-        val userId = Firebase.auth.currentUser?.uid ?: return appLanguageFlow.value
-        if (appLanguageLoaded) return appLanguageFlow.value
+        val userId = Firebase.auth.currentUser?.uid ?: return "en"
+        if (appLanguageLoadedForUid == userId) return appLanguageFlow.value
 
         val language = try {
             val document = appFirestore.collection("users").document(userId).get()
@@ -139,7 +141,7 @@ class SettingsRepositoryImpl : SettingsRepository {
         }
 
         appLanguageFlow.value = language
-        appLanguageLoaded = true
+        appLanguageLoadedForUid = userId
         return language
     }
 
@@ -150,7 +152,7 @@ class SettingsRepositoryImpl : SettingsRepository {
             merge = true
         )
         appLanguageFlow.value = language
-        appLanguageLoaded = true
+        appLanguageLoadedForUid = userId
     }
 
     override suspend fun getHasSeenLikedMeTutorial(): Boolean {
@@ -194,6 +196,14 @@ class SettingsRepositoryImpl : SettingsRepository {
     }
 
     override suspend fun setRoomLanguageCode(code: String) {
-        saveSettings(getSettings().copy(roomLanguageCode = code))
+        // Membership and daily room-switch quotas are enforced by Cloud Functions.
+        // Do not write this protected field directly: a modified client could otherwise
+        // join every room without spending its tier allowance.
+        Firebase.functions.httpsCallable("switchRoom")
+            .invoke(SwitchRoomRequest(code))
+        state.value = getSettings().copy(roomLanguageCode = code)
     }
 }
+
+@Serializable
+private data class SwitchRoomRequest(val languageCode: String)

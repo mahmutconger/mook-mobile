@@ -2,10 +2,12 @@ package com.mcclabs.mook.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mcclabs.mook.domain.account.DeleteAccountUseCase
+import com.mcclabs.mook.domain.billing.PurchaseOutcome
+import com.mcclabs.mook.domain.billing.SubscriptionRepository
+import com.mcclabs.mook.domain.model.AuthResult
 import com.mcclabs.mook.domain.repository.AuthRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,7 +24,9 @@ sealed class SettingsEvent {
 
 class SettingsViewModel(
     private val authRepository: AuthRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
+    private val subscriptions: SubscriptionRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsUiState())
@@ -33,6 +37,12 @@ class SettingsViewModel(
 
     init {
         load()
+        viewModelScope.launch {
+            subscriptions.state.collect { entitlement ->
+                _state.update { it.copy(subscription = entitlement) }
+            }
+        }
+        viewModelScope.launch { subscriptions.refresh() }
     }
 
     private fun load() {
@@ -43,7 +53,7 @@ class SettingsViewModel(
             val lang = settingsRepository.getAppLanguage()
             _state.update {
                 it.copy(
-                    email = Firebase.auth.currentUser?.email.orEmpty(),
+                    email = authRepository.currentUserEmail().orEmpty(),
                     discoverVisible = visible,
                     isDarkMode = isDark,
                     appLanguage = lang,
@@ -93,6 +103,18 @@ class SettingsViewModel(
         }
     }
 
+    fun restorePurchases() = viewModelScope.launch {
+        if (_state.value.isRestoringPurchases) return@launch
+        _state.update { it.copy(isRestoringPurchases = true, restorePurchasesMessage = null) }
+        val message = when (val outcome = subscriptions.restore()) {
+            PurchaseOutcome.Success -> "Purchases restored."
+            PurchaseOutcome.Cancelled -> null
+            PurchaseOutcome.Pending -> "Your restoration is pending."
+            is PurchaseOutcome.Error -> outcome.message
+        }
+        _state.update { it.copy(isRestoringPurchases = false, restorePurchasesMessage = message) }
+    }
+
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
@@ -100,32 +122,40 @@ class SettingsViewModel(
         }
     }
 
-    /** Shows the confirmation dialog before permanently deleting the account. */
+    /** Kalıcı silmeden önce onay iletişim kutusunu gösterir. */
     fun onDeleteAccountClick() {
         _state.update { it.copy(showDeleteConfirmDialog = true) }
     }
 
-    /** User dismissed the delete confirmation dialog without confirming. */
+    /** Kullanıcı onaylamadan iletişim kutusunu kapattı; hata durumu da sıfırlanır. */
     fun onDeleteDismiss() {
-        _state.update { it.copy(showDeleteConfirmDialog = false) }
+        _state.update {
+            it.copy(showDeleteConfirmDialog = false, deleteAccount = DeleteAccountUiState.Idle)
+        }
     }
 
     /**
-     * Permanently deletes the account after the user confirms.
+     * Kullanıcı onayladıktan sonra hesabı kalıcı olarak siler.
      *
-     * On success emits [SettingsEvent.AccountDeleted] so the UI navigates to
-     * Login and clears the back stack.
+     * Durum akışı: Loading → (Success | Error). Başarıda [SettingsEvent.AccountDeleted]
+     * yayınlanır ki UI Login'e gitsin ve geri yığınını temizlesin.
      */
     fun onDeleteConfirm() {
-        _state.update { it.copy(showDeleteConfirmDialog = false, isLoading = true) }
+        // Silme zaten sürüyorsa çift tetiklemeyi yok say.
+        if (_state.value.deleteAccount is DeleteAccountUiState.Loading) return
+
+        // İletişim kutusu açık kalır ki ilerleme (spinner) ve olası hata orada gösterilebilsin.
+        _state.update { it.copy(deleteAccount = DeleteAccountUiState.Loading) }
         viewModelScope.launch {
-            val result = authRepository.deleteAccount()
-            when (result) {
-                is com.mcclabs.mook.domain.model.AuthResult.Success -> {
+            when (val result = deleteAccountUseCase()) {
+                is AuthResult.Success -> {
+                    _state.update { it.copy(deleteAccount = DeleteAccountUiState.Success) }
                     _events.emit(SettingsEvent.AccountDeleted)
                 }
-                is com.mcclabs.mook.domain.model.AuthResult.Error -> {
-                    _state.update { it.copy(isLoading = false, deleteError = result.message) }
+                is AuthResult.Error -> {
+                    _state.update {
+                        it.copy(deleteAccount = DeleteAccountUiState.Error(result.message))
+                    }
                 }
             }
         }
