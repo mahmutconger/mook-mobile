@@ -8,6 +8,7 @@ import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.storage.storage
+import dev.gitlive.firebase.functions.functions
 import com.mcclabs.mook.data.appFirestore
 import com.mcclabs.mook.util.Log
 
@@ -224,25 +225,29 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 
+    override fun currentUserEmail(): String? = Firebase.auth.currentUser?.email
+
     override suspend fun deleteAccount(): AuthResult<Unit> {
+        // Oturum yoksa çağrıya hiç çıkmayız.
+        Firebase.auth.currentUser
+            ?: return AuthResult.Error("Oturum açmış bir kullanıcı bulunamadı.")
+
         return try {
-            val user = Firebase.auth.currentUser
-                ?: return AuthResult.Error("No authenticated user found")
-            val uid = user.uid
+            // Ağır silme işlemini sunucu yapar: güvenlik kuralları istemci tarafında
+            // toplu silmeyi engellediğinden, Storage + Firestore + RevenueCat + Auth
+            // temizliği `deleteAccount` Cloud Function içinde Admin SDK ile yürütülür.
+            Firebase.functions.httpsCallable("deleteAccount").invoke()
 
-            // 1. Delete Firestore user document (profile data, preferences, etc.).
-            appFirestore.collection("users").document(uid).delete()
+            // Sunucu Auth kaydını sildi; yerel oturumu da temizleyelim ki uygulama
+            // Login'e dönebilsin ve önbellekteki kullanıcı kalmasın.
+            runCatching { Firebase.auth.signOut() }
 
-            // 2. Delete Firebase Auth account.
-            //    This must be done last — once the auth account is gone,
-            //    security rules block any further Firestore/Storage writes.
-            user.delete()
-
-            Log.d("Account deleted: $uid")
+            Log.d("Hesap silindi (Cloud Function)")
             AuthResult.Success(Unit)
         } catch (e: Exception) {
-            Log.e("Account deletion failed", e)
-            AuthResult.Error(e.message ?: "Account deletion failed. Please try again.")
+            // Sunucu ayrıntılarını kullanıcıya sızdırmadan logla, genel mesaj döndür.
+            Log.e("Hesap silme başarısız", e)
+            AuthResult.Error("Hesap silinemedi. Lütfen tekrar deneyin.")
         }
     }
 }

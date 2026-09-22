@@ -88,16 +88,27 @@ interface AuthRepository {
     suspend fun logout()
 
     /**
-     * Permanently deletes the current user's account and all associated data.
+     * Giriş yapmış kullanıcının e-posta adresini döndürür (yoksa `null`).
      *
-     * This includes the Firebase Auth account, the Firestore `users` document,
-     * and any files in Firebase Storage under `users/{uid}/`.
+     * Yerel oturumdan okunan senkron bir değerdir; ViewModel'ın doğrudan Firebase'e
+     * bağımlı olmaması ve birim testlerde kolayca sahtelenebilmesi için bu arayüzde
+     * soyutlanmıştır.
+     */
+    fun currentUserEmail(): String?
+
+    /**
+     * Kullanıcının hesabını ve tüm ilişkili verisini kalıcı olarak siler.
      *
-     * Google Play requires every app that supports account creation to also
-     * provide an in-app account-deletion path (policy effective 2024).
+     * Silme işlemi güvenli bir sunucu ortamında (`deleteAccount` Cloud Function) yapılır:
+     * Storage dosyaları, Firestore dokümanları (interactions/matches/usage/users),
+     * RevenueCat aboneci kaydı ve son olarak Firebase Auth hesabı temizlenir. İstemci
+     * bu ağır silmeyi doğrudan yapamaz çünkü güvenlik kuralları buna izin vermez.
      *
-     * @return [AuthResult.Success] with `Unit` on success, or [AuthResult.Error]
-     *         with a message if the deletion could not be completed.
+     * Hesap oluşturmaya izin veren her uygulamanın uygulama içi hesap silme yolu
+     * sunması Google Play tarafından zorunludur (2024).
+     *
+     * @return Başarıda [AuthResult.Success] (`Unit`), aksi halde açıklayıcı bir
+     *         mesajla [AuthResult.Error].
      */
     suspend fun deleteAccount(): AuthResult<Unit>
 }
