@@ -6,6 +6,17 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "functions": {
+      "port": 5001
+    }
+  },
   "functions": [
     {
       "source": "functions",
@@ -19,7 +30,29 @@
         ".git",
         "firebase-debug.log",
         "firebase-debug.*.log",
-        "src"
+        "src",
+        "test"
+      ]
+    }
+  ],
+  "hosting": [
+    {
+      "target": "mook-sso",
+      "public": "hosting/mook-sso",
+      "ignore": [
+        "firebase.json",
+        "**/node_modules/**"
+      ],
+      "headers": [
+        {
+          "source": "/.well-known/assetlinks.json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
       ]
     }
   ]

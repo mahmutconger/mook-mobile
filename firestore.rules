@@ -11,10 +11,28 @@ service cloud.firestore {
     }
 
     match /users/{uid} {
-      allow read: if signedIn();
+      // Private account document: e-mail, date of birth, FCM tokens and billing-adjacent
+      // state must never be enumerable by Discover. Public discovery data lives in the
+      // server-maintained public_profiles projection below.
+      allow get: if isMe(uid);
+      allow list: if false;
       allow create: if isMe(uid);
-      allow update: if isMe(uid);
+      allow update: if isMe(uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          "roomLanguageCode", "roomLanguageCodes", "roomSlots", "boostUntil",
+          "incognito", "verified", "timeZone", "timeZoneChangedAt", "visibleTo"
+        ]);
       allow delete: if false;
+    }
+
+    // This collection is written only by the syncPublicProfile Cloud Function. It is the
+    // sole cross-account profile surface and intentionally excludes private user fields.
+    match /public_profiles/{uid} {
+      // Incognito users can be fetched only by members they already liked. Discover's
+      // normal query includes incognito == false, which lets the rules prove its scope.
+      allow get, list: if signedIn()
+        && (resource.data.incognito != true || request.auth.uid in resource.data.get("visibleTo", []));
+      allow write: if false;
     }
 
     // ---------------------------------------------------------------------
@@ -46,16 +64,9 @@ service cloud.firestore {
       // filtrelenmek zorunda; aksi halde Firestore statik analizi reddeder.
       allow list: if signedIn() && resource.data.fromUserId == request.auth.uid;
 
-      allow create: if signedIn() && validInteraction(request.resource.data);
-
-      // set() mevcut dokümanın üzerine yazabilir (aynı kişiyi tekrar kaydırmak).
-      // Kaydın sahibi ve hedefi değiştirilemez.
-      allow update: if signedIn()
-        && resource.data.fromUserId == request.auth.uid
-        && validInteraction(request.resource.data)
-        && request.resource.data.toUserId == resource.data.toUserId;
-
-      allow delete: if false;
+      // swipe callable validates blocks, idempotency and quota transactionally. Any direct
+      // client write would bypass those monetization controls.
+      allow create, update, delete: if false;
     }
 
     // ---------------------------------------------------------------------
@@ -95,15 +106,35 @@ service cloud.firestore {
       // sorgu whereArrayContains("users", uid) ile filtrelenmelidir.
       allow read: if signedIn() && request.auth.uid in resource.data.users;
 
-      allow create: if signedIn() && validMatch(request.resource.data);
+      allow create, update, delete: if false;
+    }
 
-      // İki kişi aynı anda kaydırırsa set() üzerine yazabilir.
-      allow update: if signedIn()
-        && request.auth.uid in resource.data.users
-        && request.resource.data.users == resource.data.users
-        && validMatch(request.resource.data);
+    match /usage/{uid} {
+      allow read: if isMe(uid);
+      allow write: if false;
+    }
 
-      allow delete: if false;
+    match /customers/{uid} {
+      allow read: if isMe(uid);
+      allow write: if false;
+    }
+
+    match /config/plans {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /profileViews/{viewId} {
+      allow read, write: if false;
+    }
+
+    match /ssv_transactions/{transactionId} {
+      allow read, write: if false;
+    }
+
+    match /liked_me_unlocks/{unlockId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
     }
 
     match /chats/{chatId} {
@@ -203,13 +234,21 @@ service cloud.firestore {
     }
 
     match /posts/{postId} {
-      allow read: if signedIn() && (resource.data.isPublic == true || resource.data.authorUid == request.auth.uid);
-      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
+      // WalkTalk's established Android client writes the author as `uid`; Mook's
+      // newer surface uses `authorUid`.  Keep both schemas readable and writable
+      // by their owner while the clients share this collection.
+      function isPostOwner(data) {
+        return (data.uid is string && data.uid == request.auth.uid)
+          || (data.authorUid is string && data.authorUid == request.auth.uid);
+      }
+
+      allow read: if signedIn() && (resource.data.isPublic == true || isPostOwner(resource.data));
+      allow create: if signedIn() && isPostOwner(request.resource.data);
       allow update: if signedIn() && (
-        resource.data.authorUid == request.auth.uid ||
+        isPostOwner(resource.data) ||
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(["likedBy", "likeCount"])
       );
-      allow delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+      allow delete: if signedIn() && isPostOwner(resource.data);
     }
 
     match /stories/{storyId} {

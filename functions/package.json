@@ -10,7 +10,10 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test:emulator": "node --test test/monetization.emulator.test.js",
+    "test": "npm run build && firebase --config ../firebase.json emulators:exec --only auth,firestore,functions --project walktalk-1123f \"npm run test:emulator\"",
+    "migrate:public-profiles": "node scripts/migrate-public-profiles.js"
   },
   "engines": {
     "node": "20"

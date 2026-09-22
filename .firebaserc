@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "walktalk-1123f"
+  },
+  "targets": {
+    "walktalk-1123f": {
+      "hosting": {
+        "mook-sso": [
+          "mook-sso"
+        ]
+      }
+    }
   }
 }

@@ -1,9 +1,30 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
+import { enforceMessageQuota, resolveTierFor } from "./monetization";
 
-admin.initializeApp();
+if (admin.apps.length === 0) admin.initializeApp();
 const db = admin.firestore();
+
+// Hesap silme akışı (Google Play uyumu) ayrı modülde tutulur; buradan yeniden
+// dışa aktarılır. Modül, admin.* çağrılarını yalnızca handler içinde yaptığı için
+// import sırası initializeApp'ten etkilenmez.
+export { deleteAccount } from "./deleteAccount";
+export { revenueCatWebhook } from "./revenuecatWebhook";
+export {
+    activateBoost,
+    bootstrapMonetization,
+    getUsage,
+    rewind,
+    recordProfileVisit,
+    setIncognito,
+    swipe,
+    switchRoom,
+    syncPublicProfile,
+    unlockLikedMe,
+    updateTimeZone,
+} from "./monetization";
 
 // ---------------------------------------------------------------------------
 // Existing DeepL Demo Logic
@@ -157,8 +178,6 @@ function assertValidMessageId(messageId: unknown): string {
     return messageId;
 }
 
-const SEND_MESSAGE_RATE_LIMIT_WINDOW = 60 * 1000;
-const SEND_MESSAGE_MAX_COUNT = 30;
 
 /** The deterministic chat id for a pair of uids — must match ChatRepository.buildChatId. */
 function buildChatId(uid1: string, uid2: string): string {
@@ -211,26 +230,26 @@ export const sendMessage = onCall(
             throw new HttpsError("failed-precondition", "not-matched");
         }
 
-        const now = Date.now();
-        const rateLimitRef = db.collection("rate_limits").doc(uid);
+        const chatRef = db.collection("chats").doc(data.chatId);
+        const messageRef = chatRef.collection("messages").doc(messageId);
 
-        // 1. Distributed Rate Limiting via Firestore
-        await db.runTransaction(async (transaction) => {
-            const doc = await transaction.get(rateLimitRef);
-            if (!doc.exists) {
-                transaction.set(rateLimitRef, { windowStart: now, messageCount: 1 });
-                return;
+        // A retry after an ambiguous network failure must not consume a second daily
+        // message/new-chat allowance. The client owns messageId, so an existing document
+        // is a definitive idempotency record rather than a best-effort cache.
+        const existingMessage = await messageRef.get();
+        if (existingMessage.exists) {
+            if (existingMessage.data()?.senderUid !== uid) {
+                throw new HttpsError("already-exists", "messageId is already in use.");
             }
-            const rateData = doc.data()!;
-            if (now - rateData.windowStart > SEND_MESSAGE_RATE_LIMIT_WINDOW) {
-                transaction.update(rateLimitRef, { windowStart: now, messageCount: 1 });
-            } else {
-                if (rateData.messageCount >= SEND_MESSAGE_MAX_COUNT) {
-                    throw new HttpsError("resource-exhausted", "rate-limit-exceeded");
-                }
-                transaction.update(rateLimitRef, { messageCount: admin.firestore.FieldValue.increment(1) });
-            }
-        });
+            return { success: true, messageId, translatedText: existingMessage.data()?.translatedText ?? null };
+        }
+
+        // This transaction combines the original 30/minute guard with tier-specific
+        // daily messages and new-conversation quotas. It runs before DeepL so rejected
+        // requests never spend translation budget.
+        const chatExists = (await chatRef.get()).exists;
+        await enforceMessageQuota(uid, await resolveTierFor(uid, request), !chatExists);
+        const now = Date.now();
 
         // 2. Read the recipient's profile once — it carries both the language to
         //    translate into and the tokens to notify at the end.
@@ -240,7 +259,6 @@ export const sendMessage = onCall(
         //    would keep receiving the old one forever. One document read is negligible
         //    beside the DeepL call below. "EN-US" is only the last resort — a wrong
         //    guess here silently mistranslates every message in the conversation.
-        const chatRef = db.collection("chats").doc(data.chatId);
         const peerData = (await db.collection("users").doc(data.peerUid).get()).data();
         let targetLanguage: string = readUserLanguage(peerData) ?? "EN-US";
 
@@ -300,7 +318,7 @@ export const sendMessage = onCall(
             lastMessageTimestamp: now,
             lastSenderUid: uid,
             unreadCounts: {
-                [data.peerUid]: admin.firestore.FieldValue.increment(1),
+                [data.peerUid]: FieldValue.increment(1),
             },
             // The previous last message may have been retracted; this one is not.
             lastMessageDeleted: false,
@@ -310,7 +328,6 @@ export const sendMessage = onCall(
         // sender render the bubble optimistically and reconcile it by id when the
         // snapshot arrives, and make a retry idempotent: resending after a timeout
         // overwrites the same document instead of posting a duplicate.
-        const messageRef = chatRef.collection("messages").doc(messageId);
         batch.set(messageRef, {
             senderUid: uid,
             text: data.text,
@@ -362,7 +379,7 @@ export const sendMessage = onCall(
                     });
                     if (invalidTokens.length > 0) {
                         await db.collection("users").doc(data.peerUid).update({
-                            fcmTokens: admin.firestore.FieldValue.arrayRemove(...invalidTokens)
+                            fcmTokens: FieldValue.arrayRemove(...invalidTokens)
                         });
                     }
                 }

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mcclabs.mook",
+      "sha256_cert_fingerprints": [
+        "62:BB:DD:32:62:84:08:10:A6:27:1B:56:FA:97:56:6C:10:9D:71:44:68:4F:49:80:84:4C:04:F6:CF:A4:5B:CF"
+      ]
+    }
+  }
+]
