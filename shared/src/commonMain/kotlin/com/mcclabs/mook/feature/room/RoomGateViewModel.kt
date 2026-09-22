@@ -22,6 +22,7 @@ data class RoomGateUiState(
     val isChecking: Boolean = true,
     val languages: List<Language> = emptyList(),
     val isSubmitting: Boolean = false,
+    val error: RoomSelectionError? = null,
 )
 
 sealed class RoomGateEvent {
@@ -65,9 +66,13 @@ class RoomGateViewModel(
     fun onRoomSelected(language: Language) {
         if (_state.value.isSubmitting) return
         viewModelScope.launch {
-            _state.update { it.copy(isSubmitting = true) }
-            settingsRepository.setRoomLanguageCode(language.code)
-            _events.emit(RoomGateEvent.Proceed)
+            _state.update { it.copy(isSubmitting = true, error = null) }
+            try {
+                settingsRepository.setRoomLanguageCode(language.code)
+                _events.emit(RoomGateEvent.Proceed)
+            } catch (error: Exception) {
+                _state.update { it.copy(isSubmitting = false, error = error.toRoomSelectionError()) }
+            }
         }
     }
 }

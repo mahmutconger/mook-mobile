@@ -49,6 +49,14 @@ class WalkTalkDeepLinkTest {
     }
 
     @Test
+    fun ctaUrlCarriesStateWhenMookStartsTheFlow() {
+        assertEquals(
+            "https://walktalkk.com/chat?source=mook_translate_demo&flow=sso&mook_state=abc_DEF-123",
+            buildWalkTalkSsoEntryUrl(mookState = "abc_DEF-123"),
+        )
+    }
+
+    @Test
     fun chatDeepLinkStillBuildsTheMatchFlowUrl() {
         // The CTA additions must not disturb the existing match -> WalkTalk hand-off.
         assertEquals(

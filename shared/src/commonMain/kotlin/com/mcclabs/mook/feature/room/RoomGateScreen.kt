@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,8 @@ import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.room_gate_subtitle
 import mook.shared.generated.resources.room_gate_title
+import mook.shared.generated.resources.room_error_slot_limit
+import mook.shared.generated.resources.room_error_unavailable
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -82,7 +85,18 @@ fun RoomGateScreen(
             languages = state.languages,
             selectedCode = null,
             onSelect = { viewModel.onRoomSelected(it) },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.weight(1f)
         )
+        state.error?.let { error ->
+            Text(
+                text = stringResource(
+                    if (error == RoomSelectionError.SLOT_LIMIT) Res.string.room_error_slot_limit
+                    else Res.string.room_error_unavailable,
+                ),
+                color = NeonColors.Error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            )
+        }
     }
 }

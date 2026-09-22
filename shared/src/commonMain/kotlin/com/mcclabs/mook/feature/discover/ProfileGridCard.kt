@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -47,6 +48,7 @@ import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.discover_block_user
 import mook.shared.generated.resources.discover_card_like_cd
 import mook.shared.generated.resources.discover_card_more_cd
+import mook.shared.generated.resources.discover_card_pass_cd
 import mook.shared.generated.resources.discover_online
 import mook.shared.generated.resources.discover_report_profile
 import org.jetbrains.compose.resources.stringResource
@@ -68,6 +70,7 @@ fun ProfileGridCard(
     nowMillis: Long,
     onClick: () -> Unit,
     onLike: () -> Unit,
+    onPass: () -> Unit,
     onReport: () -> Unit,
     onBlock: () -> Unit,
     modifier: Modifier = Modifier,
@@ -168,7 +171,7 @@ fun ProfileGridCard(
             }
         }
 
-        // ── Caption + like ─────────────────────────────────────────────────
+        // ── Caption + Pass / like ──────────────────────────────────────────
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -204,20 +207,37 @@ fun ProfileGridCard(
 
             Spacer(modifier = Modifier.width(6.dp))
 
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(CircleShape)
-                    .background(BrandGradient)
-                    .clickable(onClick = onLike),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = stringResource(Res.string.discover_card_like_cd),
-                    tint = Color.White,
-                    modifier = Modifier.size(19.dp)
-                )
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(IconScrim)
+                        .clickable(onClick = onPass),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(Res.string.discover_card_pass_cd),
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(BrandGradient)
+                        .clickable(onClick = onLike),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = stringResource(Res.string.discover_card_like_cd),
+                        tint = Color.White,
+                        modifier = Modifier.size(19.dp)
+                    )
+                }
             }
         }
     }

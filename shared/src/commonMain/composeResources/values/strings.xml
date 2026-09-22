@@ -32,8 +32,8 @@
     <string name="discover_switch_room_cd">Switch room</string>
     <string name="discover_empty_room_message">Sorry, we couldn\'t find anyone here yet. You can check out other rooms if you\'d like.</string>
     <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
-    <string name="discover_swipe_limit_body">You\'ve used your %1$d free swipes for today. They refresh tomorrow — or go Premium to swipe without limits.</string>
-    <string name="discover_upgrade_cta">Upgrade to Premium</string>
+    <string name="discover_swipe_limit_body">You\'ve used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>
+    <string name="discover_upgrade_cta">View plans</string>
 
     <!-- Paywall -->
     <string name="paywall_title">Mook Premium</string>
@@ -102,10 +102,30 @@
     <string name="settings_delete_account_message">Are you sure you want to permanently delete your account? Your profile info, photos, and all matches will be deleted. This action cannot be undone.</string>
     <string name="settings_delete_account_confirm">Yes, Delete</string>
     <string name="settings_delete_account_cancel">Cancel</string>
+    <string name="settings_delete_account_subscription_warning">Important: Deleting your account does NOT automatically cancel your active subscriptions. You must cancel them separately from Google Play.</string>
+    <string name="settings_delete_account_manage_subs">Manage subscriptions</string>
+    <string name="settings_delete_account_progress">Deleting your account…</string>
     <string name="settings_title">Settings</string>
     <string name="settings_language_dialog_title">App Language</string>
     <string name="settings_language_dialog_close">Close</string>
     <string name="settings_account_section">ACCOUNT</string>
+    <string name="room_error_slot_limit">Your current plan has no remaining room slots. Upgrade or change an existing room.</string>
+    <string name="room_error_unavailable">We couldn\'t change your room. Please try again.</string>
+    <string name="settings_membership_section">MEMBERSHIP</string>
+    <string name="settings_membership_label">Mook membership</string>
+    <string name="settings_membership_action">View plans</string>
+    <string name="settings_membership_current_plan">Current plan</string>
+    <string name="settings_membership_free">Free</string>
+    <string name="settings_membership_economy">Economy</string>
+    <string name="settings_membership_standard">Standard</string>
+    <string name="settings_membership_premium">Premium</string>
+    <string name="settings_membership_active">Active</string>
+    <string name="settings_membership_trial">Trial</string>
+    <string name="settings_membership_renews">Renews on</string>
+    <string name="settings_membership_ends">Ends on</string>
+    <string name="settings_membership_manage">Manage subscription</string>
+    <string name="settings_membership_restore">Restore purchases</string>
+    <string name="settings_membership_restoring">Restoring…</string>
     <string name="settings_email_label">Email</string>
     <string name="settings_appearance_section">APPEARANCE</string>
     <string name="settings_dark_mode_title">Dark Theme</string>
@@ -229,6 +249,16 @@
     <string name="sso_body">%1$s wants to sign in using your Mook account.</string>
     <string name="sso_allow">Allow</string>
     <string name="sso_deny">Deny</string>
+    <string name="sso_verifying">Verifying request…</string>
+    <string name="sso_retry">Try again</string>
+    <string name="sso_close">Close</string>
+    <string name="sso_error_network">No connection. Check your internet and try again.</string>
+    <string name="sso_error_server">Sign-in couldn\'t be completed right now. Please try again.</string>
+    <string name="sso_error_client_unavailable">%1$s couldn\'t be opened. Make sure the latest version is installed.</string>
+    <string name="sso_blocked_title">Request couldn\'t be verified</string>
+    <string name="sso_blocked_body">For your security, this sign-in request was stopped. If you started it, open the app and try again.</string>
+    <string name="sso_expired_title">Request expired</string>
+    <string name="sso_expired_body">This sign-in request is too old. Start again from the app.</string>
 
     <!-- Update dialogs -->
     <string name="update_required_title">Update Required</string>
@@ -288,6 +318,13 @@
     <string name="discover_age_chip_value">%1$d–%2$d</string>
     <string name="discover_online">Online</string>
     <string name="discover_card_like_cd">Like</string>
+    <string name="discover_card_pass_cd">Pass</string>
+    <string name="discover_rewind">Rewind pass</string>
+    <string name="discover_rewind_upgrade">Rewind · Upgrade</string>
+    <string name="discover_rewind_success">Your last pass was restored.</string>
+    <string name="discover_boost">Boost</string>
+    <string name="discover_boost_active">Boost active</string>
+    <string name="discover_boost_started">Your profile is boosted for 30 minutes.</string>
     <string name="discover_card_more_cd">More options</string>
     <string name="discover_report_profile">Report profile</string>
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
-import com.mcclabs.mook.domain.billing.PremiumRepository
+import com.mcclabs.mook.domain.billing.SubscriptionRepository
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.domain.model.Languages
 import com.mcclabs.mook.domain.model.MatchResult
@@ -30,6 +30,8 @@ import mook.shared.generated.resources.report_submitted
 import mook.shared.generated.resources.report_failed
 import mook.shared.generated.resources.user_blocked
 import mook.shared.generated.resources.block_failed
+import mook.shared.generated.resources.discover_boost_started
+import mook.shared.generated.resources.discover_rewind_success
 
 sealed class DiscoverEvent {
     data class NavigateToProfile(val profileId: String) : DiscoverEvent()
@@ -52,7 +54,7 @@ class DiscoverViewModel(
     private val repository: DiscoverRepository,
     private val interactionRepository: InteractionRepository,
     private val settingsRepository: SettingsRepository,
-    private val premiumRepository: PremiumRepository
+    private val subscriptions: SubscriptionRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DiscoverUiState())
@@ -65,17 +67,18 @@ class DiscoverViewModel(
     private var currentSettings: MatchSettings = MatchSettings()
 
     init {
-        observePremium()
+        observeEntitlement()
         observeSettingsAndReload()
     }
 
-    /** Keeps the UI's premium flag in sync so gates lift the instant a purchase completes. */
-    private fun observePremium() {
+    /** Keeps every tier's client-side gate in sync with RevenueCat, not just Premium. */
+    private fun observeEntitlement() {
         viewModelScope.launch {
-            premiumRepository.isPremium.collect { premium ->
-                _state.update { it.copy(isPremium = premium) }
+            subscriptions.state.collect { entitlement ->
+                _state.update { it.copy(entitlement = entitlement) }
             }
         }
+        viewModelScope.launch { subscriptions.refresh() }
     }
 
     /**
@@ -229,9 +232,11 @@ class DiscoverViewModel(
      * back if the write fails, so a dropped connection never silently loses a like.
      */
     fun likeProfile(profileId: String) {
-        if (!consumeSwipeOrBlock()) return
+        if (_state.value.isSwipeInFlight) return
         val profile = _state.value.profiles.find { it.id == profileId } ?: return
+        if (!consumeSwipeOrBlock()) return
         val index = _state.value.profiles.indexOfFirst { it.id == profileId }
+        _state.update { it.copy(isSwipeInFlight = true) }
         removeProfile(profileId)
         repository.markActedOn(profileId)
         viewModelScope.launch {
@@ -239,11 +244,87 @@ class DiscoverViewModel(
                 is MatchResult.Error -> {
                     insertProfile(profile, index)
                     revertSwipeCount()
+                    _state.update { it.copy(isSwipeInFlight = false) }
                     _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
                 }
-                is MatchResult.MutualMatch -> _events.emit(DiscoverEvent.NavigateToMatch(profileId))
-                else -> Unit
+                is MatchResult.MutualMatch -> {
+                    _state.update { it.copy(isSwipeInFlight = false) }
+                    _events.emit(DiscoverEvent.NavigateToMatch(profileId))
+                }
+                else -> _state.update { it.copy(isSwipeInFlight = false) }
             }
+        }
+    }
+
+    /** Passes a tile without leaving Discovery; its immediate undo is the Rewind control. */
+    fun passProfile(profileId: String) {
+        if (_state.value.isSwipeInFlight) return
+        val profile = _state.value.profiles.find { it.id == profileId } ?: return
+        val index = _state.value.profiles.indexOfFirst { it.id == profileId }
+        _state.update { it.copy(isSwipeInFlight = true) }
+        removeProfile(profileId)
+        repository.markActedOn(profileId)
+        viewModelScope.launch {
+            when (interactionRepository.swipeUser(profileId, isLike = false)) {
+                is MatchResult.Error -> {
+                    insertProfile(profile, index)
+                    repository.unmarkActedOn(profileId)
+                    _state.update { it.copy(isSwipeInFlight = false) }
+                    _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
+                }
+                else -> {
+                    lastPassedProfile = PassedProfile(profile, index)
+                    _state.update { it.copy(hasRewindablePass = true, isSwipeInFlight = false) }
+                }
+            }
+        }
+    }
+
+    /** Restores only the latest pass, exactly matching the server's rewind contract. */
+    fun rewindLastPass() {
+        val passed = lastPassedProfile ?: return
+        if (_state.value.entitlement.limits.rewindsPerDay == 0) {
+            viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall) }
+            return
+        }
+        if (_state.value.isRewinding) return
+        _state.update { it.copy(isRewinding = true) }
+        viewModelScope.launch {
+            interactionRepository.rewindLastPass()
+                .onSuccess { profileUid ->
+                    if (profileUid == passed.profile.id) {
+                        repository.unmarkActedOn(profileUid)
+                        insertProfile(passed.profile, passed.index)
+                    }
+                    lastPassedProfile = null
+                    _state.update { it.copy(hasRewindablePass = false, isRewinding = false) }
+                    _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.discover_rewind_success)))
+                }
+                .onFailure {
+                    _state.update { it.copy(isRewinding = false) }
+                    _events.emit(DiscoverEvent.ShowSnackbar(it.message ?: getString(Res.string.error_generic)))
+                }
+        }
+    }
+
+    /** Activates the current tier's Boost; the server owns monthly allowance and expiry. */
+    fun activateBoost() {
+        if (_state.value.entitlement.limits.boostsPerMonth == 0) {
+            viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall) }
+            return
+        }
+        if (_state.value.isBoosting) return
+        _state.update { it.copy(isBoosting = true) }
+        viewModelScope.launch {
+            interactionRepository.activateBoost()
+                .onSuccess { boostUntil ->
+                    _state.update { it.copy(isBoosting = false, boostUntilMillis = boostUntil) }
+                    _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.discover_boost_started)))
+                }
+                .onFailure {
+                    _state.update { it.copy(isBoosting = false) }
+                    _events.emit(DiscoverEvent.ShowSnackbar(it.message ?: getString(Res.string.error_generic)))
+                }
         }
     }
 
@@ -295,6 +376,9 @@ class DiscoverViewModel(
             )
         }
     }
+
+    private data class PassedProfile(val profile: DiscoverProfile, val index: Int)
+    private var lastPassedProfile: PassedProfile? = null
 
     fun onProfileClicked(profileId: String) {
         viewModelScope.launch {

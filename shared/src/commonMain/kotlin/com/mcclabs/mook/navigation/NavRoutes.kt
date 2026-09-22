@@ -31,9 +31,14 @@ sealed class NavRoutes(val route: String) {
         fun createRoute(matchedUserId: String) = "match/$matchedUserId"
     }
 
-    data object SsoAuthorize : NavRoutes("sso_authorize?client={client}&callback={callback}") {
-        const val ARG_CLIENT = "client"
-        const val ARG_CALLBACK = "callback"
+    /** Parametre adları OAuth 2.0 ile aynıdır ve App Link sorgusundan birebir okunur. */
+    data object SsoAuthorize : NavRoutes(
+        "sso_authorize?client_id={client_id}&redirect_uri={redirect_uri}&state={state}&mook_state={mook_state}",
+    ) {
+        const val ARG_CLIENT_ID = "client_id"
+        const val ARG_REDIRECT_URI = "redirect_uri"
+        const val ARG_STATE = "state"
+        const val ARG_MOOK_STATE = "mook_state"
     }
 
     data object EditProfile : NavRoutes("edit_profile")

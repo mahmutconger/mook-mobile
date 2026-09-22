@@ -28,15 +28,35 @@ import com.mcclabs.mook.feature.filters.FiltersViewModel
 import com.mcclabs.mook.feature.liked.LikedViewModel
 import com.mcclabs.mook.feature.match.MatchViewModel
 import com.mcclabs.mook.feature.settings.SettingsViewModel
+import com.mcclabs.mook.feature.paywall.PaywallViewModel
 import com.mcclabs.mook.data.repository.UpdateRepositoryImpl
 import com.mcclabs.mook.feature.update.UpdateViewModel
-import com.mcclabs.mook.data.billing.FreePremiumRepository
+import com.mcclabs.mook.data.billing.TierAwarePremiumRepository
 import com.mcclabs.mook.domain.billing.PremiumRepository
+import com.mcclabs.mook.data.billing.createPlatformSubscriptionRepository
+import com.mcclabs.mook.domain.billing.SubscriptionRepository
 import com.mcclabs.mook.feature.sso.SsoAuthorizeViewModel
 import com.mcclabs.mook.feature.profile.edit.EditProfileViewModel
 import com.mcclabs.mook.data.translation.FirebaseFunctionsTranslator
 import com.mcclabs.mook.domain.translation.Translator
 import com.mcclabs.mook.feature.walktalkdemo.WalkTalkDemoViewModel
+import com.mcclabs.mook.data.sso.FirebaseSsoAuthRepository
+import com.mcclabs.mook.data.sso.StaticSsoClientRegistry
+import com.mcclabs.mook.data.sso.createAuthStateStore
+import com.mcclabs.mook.data.sso.platformSecureRandomBytes
+import com.mcclabs.mook.domain.sso.AuthStateStore
+import com.mcclabs.mook.domain.sso.AuthStateValidator
+import com.mcclabs.mook.domain.sso.EpochClock
+import com.mcclabs.mook.domain.sso.GenerateAuthStateUseCase
+import com.mcclabs.mook.domain.sso.SecureRandomSource
+import com.mcclabs.mook.domain.sso.SsoAuthRepository
+import com.mcclabs.mook.domain.sso.SsoClientRegistry
+import com.mcclabs.mook.domain.sso.VerifyAuthCallbackUseCase
+import com.mcclabs.mook.domain.sso.WhitelistCallbackValidator
+import com.mcclabs.mook.util.getCurrentTimeMillis
+import org.koin.core.module.dsl.factoryOf
+import com.mcclabs.mook.domain.account.DeleteAccountUseCase
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.module.dsl.viewModel
@@ -50,14 +70,29 @@ val appModule = module {
     singleOf(::SettingsRepositoryImpl) bind SettingsRepository::class
     singleOf(::InteractionRepositoryImpl) bind InteractionRepository::class
     singleOf(::UpdateRepositoryImpl) bind com.mcclabs.mook.domain.repository.UpdateRepository::class
-    // Billing: swap FreePremiumRepository for the RevenueCat-backed impl once store
-    // products + the RevenueCat dashboard are configured (see setup checklist).
-    singleOf(::FreePremiumRepository) bind PremiumRepository::class
+    // Android receives the RevenueCat implementation; iOS stays a no-op until iOS commerce
+    // is deliberately launched. Older premium-only gates observe only the true Premium tier.
+    single<SubscriptionRepository> { createPlatformSubscriptionRepository() }
+    single<PremiumRepository> { TierAwarePremiumRepository(get()) }
+
+    // Hesap silme iş kuralı (Google Play uyumu) — durumsuz use case.
+    factoryOf(::DeleteAccountUseCase)
 
     // Translation for the WalkTalk demo. The DeepL key lives in the Cloud Function's
     // server config, never here: swapping this line for a Ktor-backed Translator is the
     // only change needed to move off callables.
     single<Translator> { FirebaseFunctionsTranslator() }
+
+    // SSO güvenliği: beyaz liste, state üretimi/doğrulaması ve token üretimi.
+    single<SsoClientRegistry> { StaticSsoClientRegistry() }
+    single<AuthStateStore> { createAuthStateStore() }
+    single<SecureRandomSource> { SecureRandomSource(::platformSecureRandomBytes) }
+    single<EpochClock> { EpochClock(::getCurrentTimeMillis) }
+    singleOf(::WhitelistCallbackValidator)
+    single { AuthStateValidator(get()) }
+    factoryOf(::GenerateAuthStateUseCase)
+    factoryOf(::VerifyAuthCallbackUseCase)
+    singleOf(::FirebaseSsoAuthRepository) bind SsoAuthRepository::class
 
     viewModelOf(::OnboardingViewModel)
     viewModelOf(::LoginViewModel)
@@ -74,6 +109,7 @@ val appModule = module {
     viewModelOf(::EditProfileViewModel)
     viewModelOf(::WalkTalkDemoViewModel)
     viewModelOf(::ChatListViewModel)
+    viewModelOf(::PaywallViewModel)
 
     singleOf(::ChatRepositoryImpl) bind ChatRepository::class
     singleOf(::PushTokenRepositoryImpl) bind PushTokenRepository::class

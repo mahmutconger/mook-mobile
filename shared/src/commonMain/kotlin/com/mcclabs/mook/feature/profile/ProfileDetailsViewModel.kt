@@ -2,12 +2,13 @@ package com.mcclabs.mook.feature.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mcclabs.mook.domain.billing.PremiumRepository
+import com.mcclabs.mook.domain.billing.SubscriptionRepository
 import com.mcclabs.mook.domain.model.MatchResult
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.functions.functions
 import dev.gitlive.firebase.firestore.FieldValue
 import com.mcclabs.mook.data.appFirestore
 import com.mcclabs.mook.domain.repository.ChatRepository
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.profile_not_found
@@ -44,7 +46,7 @@ sealed class ProfileDetailsEvent {
 class ProfileDetailsViewModel(
     private val repository: DiscoverRepository,
     private val interactionRepository: InteractionRepository,
-    private val premiumRepository: PremiumRepository,
+    private val subscriptions: SubscriptionRepository,
     private val chatRepository: ChatRepository,
     private val profileId: String
 ) : ViewModel() {
@@ -61,16 +63,17 @@ class ProfileDetailsViewModel(
 
     init {
         loadProfile()
-        observePremium()
+        observeEntitlement()
     }
 
-    /** Keeps the premium flag current so the daily-limit gate lifts right after a purchase. */
-    private fun observePremium() {
+    /** Keeps all plan limits current immediately after purchase or restore. */
+    private fun observeEntitlement() {
         viewModelScope.launch {
-            premiumRepository.isPremium.collect { premium ->
-                _state.value = _state.value.copy(isPremium = premium)
+            subscriptions.state.collect { entitlement ->
+                _state.value = _state.value.copy(entitlement = entitlement)
             }
         }
+        viewModelScope.launch { subscriptions.refresh() }
     }
 
     // ── Like / pass ─────────────────────────────────────────────────────────
@@ -88,21 +91,21 @@ class ProfileDetailsViewModel(
     private fun act(isLike: Boolean) {
         val current = _state.value
         if (current.isActionInFlight || current.isActedOn || current.isOwnProfile) return
-        if (!current.canSwipe) {
+        if (isLike && !current.canSwipe) {
             _state.value = current.copy(showLimitDialog = true)
             return
         }
 
         _state.value = current.copy(
             isActionInFlight = true,
-            swipesUsedToday = current.swipesUsedToday + 1
+            swipesUsedToday = if (isLike) current.swipesUsedToday + 1 else current.swipesUsedToday
         )
         viewModelScope.launch {
             when (interactionRepository.swipeUser(profileId, isLike = isLike)) {
                 is MatchResult.Error -> {
                     _state.value = _state.value.copy(
                         isActionInFlight = false,
-                        swipesUsedToday = (_state.value.swipesUsedToday - 1).coerceAtLeast(0)
+                        swipesUsedToday = if (isLike) (_state.value.swipesUsedToday - 1).coerceAtLeast(0) else _state.value.swipesUsedToday
                     )
                     _events.emit(ProfileDetailsEvent.ShowMessage(getString(Res.string.error_swipe_failed)))
                 }
@@ -236,6 +239,14 @@ class ProfileDetailsViewModel(
                 val swipesUsedToday = if (isOwnProfile) 0 else repository.getSwipesUsedToday()
 
                 if (profile != null) {
+                    if (!isOwnProfile) {
+                        // Analytics/audience visibility is server-owned so incognito cannot be
+                        // bypassed by a modified client. Failure must not prevent reading a profile.
+                        runCatching {
+                            Firebase.functions.httpsCallable("recordProfileVisit")
+                                .invoke(ProfileVisitRequest(profileId))
+                        }
+                    }
                     _state.value = _state.value.copy(
                         profile = profile,
                         isLoading = false,
@@ -259,3 +270,6 @@ class ProfileDetailsViewModel(
         }
     }
 }
+
+@Serializable
+private data class ProfileVisitRequest(val profileUid: String)

@@ -41,7 +41,7 @@ import org.jetbrains.compose.resources.stringResource
 fun BottomNavBar(
     currentRoute: String,
     onNavigate: (String) -> Unit,
-    enabledRoutes: Set<String> = setOf("discover", "liked", "chats", "voices", "profile")
+    enabledRoutes: Set<String> = setOf("discover", "liked", "chats", "paywall", "profile")
 ) {
     Row(
         modifier = Modifier
@@ -81,9 +81,9 @@ fun BottomNavBar(
         BottomNavItem(
             icon = Res.drawable.ic_crown,
             label = stringResource(Res.string.nav_subscription),
-            route = "voices",
+            route = "paywall",
             currentRoute = currentRoute,
-            isEnabled = "voices" in enabledRoutes,
+            isEnabled = "paywall" in enabledRoutes,
             onNavigate = onNavigate
         )
         BottomNavItem(

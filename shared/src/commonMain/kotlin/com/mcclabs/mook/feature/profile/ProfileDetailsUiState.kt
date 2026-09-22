@@ -1,6 +1,6 @@
 package com.mcclabs.mook.feature.profile
 
-import com.mcclabs.mook.domain.billing.BillingConfig
+import com.mcclabs.mook.domain.billing.EntitlementState
 import com.mcclabs.mook.domain.model.DiscoverProfile
 
 data class ProfileDetailsUiState(
@@ -27,16 +27,16 @@ data class ProfileDetailsUiState(
     val isActedOn: Boolean = false,
     /** A like or pass write is in flight; both buttons are disabled meanwhile. */
     val isActionInFlight: Boolean = false,
-    /** Active premium subscription → no daily like limit. */
-    val isPremium: Boolean = false,
-    /** Likes/passes already used today, read from Firestore when the profile loads. */
+    /** Live entitlement; Economy and Standard must not be treated as the Free tier. */
+    val entitlement: EntitlementState = EntitlementState(),
+    /** Likes used today, read from the server when the profile loads. */
     val swipesUsedToday: Int = 0,
     /** True once the free daily allowance runs out; the upgrade dialog takes over. */
     val showLimitDialog: Boolean = false,
 ) {
-    /** Free users get [BillingConfig.FREE_DAILY_SWIPE_LIMIT] likes/day; premium is unlimited. */
+    /** Uses the active tier's limit; a null plan limit is subject only to the server fair-use cap. */
     val canSwipe: Boolean
-        get() = isPremium || swipesUsedToday < BillingConfig.FREE_DAILY_SWIPE_LIMIT
+        get() = entitlement.limits.dailyLikes == null || swipesUsedToday < entitlement.limits.dailyLikes
 
     /** Whether to offer the like/pass row: someone else's profile, not yet acted on. */
     val canAct: Boolean

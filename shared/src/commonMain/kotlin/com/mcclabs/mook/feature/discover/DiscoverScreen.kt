@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-import com.mcclabs.mook.domain.billing.BillingConfig
 import com.mcclabs.mook.feature.filters.FiltersScreen
 import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
@@ -165,12 +165,12 @@ fun DiscoverScreen(
             bottomBar = {
                 BottomNavBar(
                     currentRoute = "discover",
-                    // Voices has no screen yet, so that tab stays inert.
-                    enabledRoutes = setOf("discover", "liked", "chats", "profile"),
+                    enabledRoutes = setOf("discover", "liked", "chats", "paywall", "profile"),
                     onNavigate = { route ->
                         when (route) {
                             "liked" -> onNavigateToLiked()
                             "chats" -> onNavigateToChats()
+                            "paywall" -> onNavigateToPaywall()
                             "profile" -> if (currentUserId.isNotEmpty()) onNavigateToProfile(currentUserId)
                         }
                     }
@@ -192,6 +192,18 @@ fun DiscoverScreen(
                     onAgeClick = { viewModel.onAgeChipClicked() },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
                 )
+
+                if (state.hasRewindablePass || state.canUseBoost) {
+                    DiscoverMonetizationControls(
+                        canRewind = state.canUseRewind,
+                        isRewinding = state.isRewinding,
+                        canBoost = state.canUseBoost,
+                        isBoostActive = (state.boostUntilMillis ?: 0L) > nowMillis,
+                        onRewind = viewModel::rewindLastPass,
+                        onBoost = viewModel::activateBoost,
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                    )
+                }
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     when {
@@ -232,6 +244,7 @@ fun DiscoverScreen(
                                         nowMillis = nowMillis,
                                         onClick = { viewModel.onProfileClicked(profile.id) },
                                         onLike = { viewModel.likeProfile(profile.id) },
+                                        onPass = { viewModel.passProfile(profile.id) },
                                         onReport = { viewModel.onReportClick(profile.id) },
                                         onBlock = { viewModel.onBlockClick(profile.id) }
                                     )
@@ -268,6 +281,7 @@ fun DiscoverScreen(
         // ── Daily like limit ───────────────────────────────────────────────
         if (state.showLimitSheet) {
             LikeLimitDialog(
+                limit = state.entitlement.limits.dailyLikes ?: 0,
                 onUpgrade = { viewModel.onUpgradeClicked() },
                 onDismiss = { viewModel.onLimitSheetDismissed() }
             )
@@ -303,6 +317,46 @@ fun DiscoverScreen(
                 },
                 containerColor = NeonColors.Card
             )
+        }
+    }
+}
+
+/** Immediate controls for the two Discover actions that are backed by monetization callables. */
+@Composable
+private fun DiscoverMonetizationControls(
+    canRewind: Boolean,
+    isRewinding: Boolean,
+    canBoost: Boolean,
+    isBoostActive: Boolean,
+    onRewind: () -> Unit,
+    onBoost: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OutlinedButton(
+            onClick = onRewind,
+            enabled = !isRewinding,
+            modifier = Modifier.weight(1f),
+        ) {
+            if (isRewinding) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+            } else {
+                Text(stringResource(if (canRewind) Res.string.discover_rewind else Res.string.discover_rewind_upgrade))
+            }
+        }
+        if (canBoost || isBoostActive) {
+            Button(
+                onClick = onBoost,
+                enabled = canBoost && !isBoostActive,
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = NeonColors.PrimaryDark),
+            ) {
+                Text(stringResource(if (isBoostActive) Res.string.discover_boost_active else Res.string.discover_boost))
+            }
         }
     }
 }
@@ -443,7 +497,7 @@ private fun LikedMeOverlay(onDismiss: () -> Unit) {
 
 /** Free-tier gate: shown when the daily like allowance runs out. */
 @Composable
-private fun LikeLimitDialog(onUpgrade: () -> Unit, onDismiss: () -> Unit) {
+private fun LikeLimitDialog(limit: Int, onUpgrade: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = NeonColors.Card,
@@ -458,7 +512,7 @@ private fun LikeLimitDialog(onUpgrade: () -> Unit, onDismiss: () -> Unit) {
             Text(
                 text = stringResource(
                     Res.string.discover_swipe_limit_body,
-                    BillingConfig.FREE_DAILY_SWIPE_LIMIT
+                    limit
                 ),
                 color = NeonColors.TextSecondary
             )

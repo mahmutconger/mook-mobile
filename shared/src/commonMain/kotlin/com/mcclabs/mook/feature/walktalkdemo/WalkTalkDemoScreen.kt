@@ -112,6 +112,10 @@ fun WalkTalkDemoScreen(
     val state by viewModel.state.collectAsState()
     val openWalkTalk = rememberWalkTalkChatOpener()
 
+    LaunchedEffect(viewModel) {
+        viewModel.openWalkTalk.collect { url -> openWalkTalk(url) }
+    }
+
     WalkTalkDemoContent(
         state = state,
         onNavigateBack = onNavigateBack,
@@ -122,7 +126,7 @@ fun WalkTalkDemoScreen(
         onSend = viewModel::onSend,
         onRetryMessage = viewModel::onRetryMessage,
         onRetryPreview = viewModel::onRetryPreview,
-        onOpenWalkTalk = { openWalkTalk(viewModel.walkTalkEntryUrl) },
+        onOpenWalkTalk = viewModel::onOpenWalkTalkClicked,
     )
 }
 

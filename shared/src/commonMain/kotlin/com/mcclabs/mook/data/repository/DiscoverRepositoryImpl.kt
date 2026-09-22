@@ -12,12 +12,9 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import com.mcclabs.mook.data.appFirestore
 import dev.gitlive.firebase.firestore.where
+import dev.gitlive.firebase.functions.functions
 import com.mcclabs.mook.util.Log
-import com.mcclabs.mook.util.getCurrentTimeMillis
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.Serializable
 
 /** How many matching profiles one [DiscoverRepositoryImpl.getDiscoverProfiles] call aims to return. */
 private const val PAGE_SIZE = 10
@@ -93,6 +90,10 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         swipedUserIds.add(profileId)
     }
 
+    override fun unmarkActedOn(profileId: String) {
+        swipedUserIds.remove(profileId)
+    }
+
     override fun actedOnProfileIds(): Set<String> = swipedUserIds.toSet()
 
     override fun resetDiscoverPaging() {
@@ -166,8 +167,11 @@ class DiscoverRepositoryImpl : DiscoverRepository {
 
         // Recursive or loop fetching to ensure we get a batch of valid (unswiped) users
         while (profiles.size < PAGE_SIZE && !reachedEnd) {
-            var query = db.collection("users")
+            // Discover never reads private account documents. The server-maintained
+            // projection contains only fields that can be exposed to another member.
+            var query = db.collection("public_profiles")
                 .where { "isMookActive" equalTo true }
+                .where { "incognito" equalTo false }
                 .orderBy("lastActiveTimestamp", dev.gitlive.firebase.firestore.Direction.DESCENDING)
                 .limit(QUERY_BATCH_SIZE)
 
@@ -178,7 +182,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             val querySnapshot = query.get()
             val documents = querySnapshot.documents
 
-            Log.d("users sorgusu döndü: ${documents.size} doküman (isMookActive==true)")
+            Log.d("public_profiles sorgusu döndü: ${documents.size} doküman (isMookActive==true)")
             if (documents.isEmpty()) {
                 reachedEnd = true
                 break
@@ -250,22 +254,10 @@ class DiscoverRepositoryImpl : DiscoverRepository {
     }
 
     override suspend fun getSwipesUsedToday(): Int {
-        val currentUid = Firebase.auth.currentUser?.uid ?: return 0
         return try {
-            // Local midnight → epoch millis, matching how swipe timestamps are written.
-            val tz = TimeZone.currentSystemDefault()
-            val startOfDayMillis = Instant.fromEpochMilliseconds(getCurrentTimeMillis())
-                .toLocalDateTime(tz).date
-                .atStartOfDayIn(tz)
-                .toEpochMilliseconds()
-
-            // Composite query (fromUserId ==, timestamp >=) → needs a Firestore composite index.
-            val snapshot = appFirestore.collection("interactions")
-                .where {
-                    ("fromUserId" equalTo currentUid) and ("timestamp" greaterThanOrEqualTo startOfDayMillis)
-                }
-                .get()
-            snapshot.documents.size
+            // Uses the server's time-zone calculation. Reading interactions here would make
+            // the client-side display disagree with the authoritative quota transaction.
+            Firebase.functions.httpsCallable("getUsage").invoke().data<UsageResponse>().likes
         } catch (e: Exception) {
             Log.e("Günlük kaydırma sayısı okunamadı", e)
             0
@@ -274,7 +266,11 @@ class DiscoverRepositoryImpl : DiscoverRepository {
 
     override suspend fun getProfileDetails(profileId: String): DiscoverProfile? {
         return try {
-            val document = appFirestore.collection("users").document(profileId).get()
+            val currentUid = Firebase.auth.currentUser?.uid
+            // The account owner still reads their private document; every other profile
+            // is resolved through the sanitised projection.
+            val collection = if (profileId == currentUid) "users" else "public_profiles"
+            val document = appFirestore.collection(collection).document(profileId).get()
             if (document.exists) {
                 val profile = mapToProfile(document)
                 Log.d("Profil yüklendi: $profileId (fotoğraf=${profile.photoUrls.size}, yaş=${profile.age}, ülke=${profile.country?.code}, dil=${profile.language?.code})")
@@ -343,3 +339,6 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         return result
     }
 }
+
+@Serializable
+private data class UsageResponse(val likes: Int = 0)

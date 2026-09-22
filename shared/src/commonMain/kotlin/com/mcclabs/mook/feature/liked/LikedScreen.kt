@@ -42,6 +42,7 @@ fun LikedScreen(
     onNavigateToDiscover: () -> Unit,
     onNavigateToChats: () -> Unit,
     onNavigateToWalkTalkDemo: () -> Unit,
+    onNavigateToPaywall: () -> Unit,
     viewModel: LikedViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -63,11 +64,12 @@ fun LikedScreen(
         bottomBar = {
             BottomNavBar(
                 currentRoute = "liked",
-                enabledRoutes = setOf("discover", "liked", "chats", "profile"),
+                enabledRoutes = setOf("discover", "liked", "chats", "paywall", "profile"),
                 onNavigate = { route ->
                     when (route) {
                         "discover" -> onNavigateToDiscover()
                         "chats" -> onNavigateToChats()
+                        "paywall" -> onNavigateToPaywall()
                         "profile" -> if (currentUserId.isNotEmpty()) onNavigateToProfile(currentUserId)
                     }
                 }

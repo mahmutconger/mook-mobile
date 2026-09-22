@@ -96,7 +96,7 @@ fun ProfileDetailsScreen(
                 Text(
                     text = stringResource(
                         Res.string.discover_swipe_limit_body,
-                        com.mcclabs.mook.domain.billing.BillingConfig.FREE_DAILY_SWIPE_LIMIT
+                        state.entitlement.limits.dailyLikes ?: 0
                     ),
                     color = NeonColors.TextSecondary
                 )

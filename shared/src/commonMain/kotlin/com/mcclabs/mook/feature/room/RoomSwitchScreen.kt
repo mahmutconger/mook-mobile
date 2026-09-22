@@ -32,6 +32,8 @@ import mook.shared.generated.resources.room_info_body
 import mook.shared.generated.resources.room_info_confirm
 import mook.shared.generated.resources.room_info_title
 import mook.shared.generated.resources.room_switch_back_cd
+import mook.shared.generated.resources.room_error_slot_limit
+import mook.shared.generated.resources.room_error_unavailable
 import mook.shared.generated.resources.room_switch_title
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -100,8 +102,19 @@ fun RoomSwitchScreen(
                 languages = state.languages,
                 selectedCode = state.selectedCode,
                 onSelect = { viewModel.onRoomSelected(it) },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.weight(1f)
             )
+            state.error?.let { error ->
+                Text(
+                    text = stringResource(
+                        if (error == RoomSelectionError.SLOT_LIMIT) Res.string.room_error_slot_limit
+                        else Res.string.room_error_unavailable,
+                    ),
+                    color = NeonColors.Error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                )
+            }
         }
     }
 }

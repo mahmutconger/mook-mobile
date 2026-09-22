@@ -58,10 +58,30 @@
     <string name="settings_delete_account_message">Hesabını kalıcı olarak silmek istediğinden emin misin? Profil bilgilerin, fotoğrafların ve tüm eşleşmelerin silinecek. Bu işlem geri alınamaz.</string>
     <string name="settings_delete_account_confirm">Evet, Sil</string>
     <string name="settings_delete_account_cancel">İptal</string>
+    <string name="settings_delete_account_subscription_warning">Önemli: Hesabını silmek, aktif aboneliklerini otomatik olarak iptal ETMEZ. Aboneliklerini Google Play üzerinden ayrıca iptal etmen gerekir.</string>
+    <string name="settings_delete_account_manage_subs">Abonelikleri Yönet</string>
+    <string name="settings_delete_account_progress">Hesabın siliniyor…</string>
     <string name="settings_title">Ayarlar</string>
     <string name="settings_language_dialog_title">Uygulama Dili</string>
     <string name="settings_language_dialog_close">Kapat</string>
     <string name="settings_account_section">HESAP</string>
+    <string name="room_error_slot_limit">Mevcut paketindeki oda slotu dolu. Paketini yükselt veya mevcut odanı değiştir.</string>
+    <string name="room_error_unavailable">Oda değiştirilemedi. Lütfen tekrar dene.</string>
+    <string name="settings_membership_section">ABONELİK</string>
+    <string name="settings_membership_label">Mook üyeliği</string>
+    <string name="settings_membership_action">Paketleri görüntüle</string>
+    <string name="settings_membership_current_plan">Mevcut paket</string>
+    <string name="settings_membership_free">Ücretsiz</string>
+    <string name="settings_membership_economy">Ekonomik</string>
+    <string name="settings_membership_standard">Standart</string>
+    <string name="settings_membership_premium">Premium</string>
+    <string name="settings_membership_active">Aktif</string>
+    <string name="settings_membership_trial">Deneme</string>
+    <string name="settings_membership_renews">Yenilenme tarihi</string>
+    <string name="settings_membership_ends">Bitiş tarihi</string>
+    <string name="settings_membership_manage">Aboneliği yönet</string>
+    <string name="settings_membership_restore">Satın alımları geri yükle</string>
+    <string name="settings_membership_restoring">Geri yükleniyor…</string>
     <string name="settings_email_label">E-posta</string>
     <string name="settings_appearance_section">GÖRÜNÜM</string>
     <string name="settings_dark_mode_title">Koyu Tema</string>
@@ -145,8 +165,8 @@
     <string name="discover_switch_room_cd">Oda değiştir</string>
     <string name="discover_empty_room_message">Üzgünüz, burada henüz birini bulamadık. Dilersen başka odalara bakabilirsin.</string>
     <string name="discover_swipe_limit_title">Günlük hakkın doldu</string>
-    <string name="discover_swipe_limit_body">Bugünlük %1$d ücretsiz kaydırma hakkını kullandın. Yarın yenilenecek — ya da Premium ile sınırsız kaydır.</string>
-    <string name="discover_upgrade_cta">Premium\'a Yükselt</string>
+    <string name="discover_swipe_limit_body">Bugünlük %1$d beğeni hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
+    <string name="discover_upgrade_cta">Planları gör</string>
 
     <!-- Paywall -->
     <string name="paywall_title">Mook Premium</string>
@@ -228,6 +248,16 @@
     <string name="sso_body">%1$s, Mook hesabınla giriş yapmak istiyor.</string>
     <string name="sso_allow">İzin Ver</string>
     <string name="sso_deny">Reddet</string>
+    <string name="sso_verifying">İstek doğrulanıyor…</string>
+    <string name="sso_retry">Tekrar dene</string>
+    <string name="sso_close">Kapat</string>
+    <string name="sso_error_network">Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene.</string>
+    <string name="sso_error_server">Giriş şu anda tamamlanamadı. Lütfen tekrar dene.</string>
+    <string name="sso_error_client_unavailable">%1$s açılamadı. Uygulamanın güncel sürümünün yüklü olduğundan emin ol.</string>
+    <string name="sso_blocked_title">İstek doğrulanamadı</string>
+    <string name="sso_blocked_body">Güvenliğin için bu giriş isteği durduruldu. İsteği sen başlattıysan uygulamayı açıp yeniden dene.</string>
+    <string name="sso_expired_title">İsteğin süresi doldu</string>
+    <string name="sso_expired_body">Bu giriş isteği zaman aşımına uğradı. İşlemi uygulamadan yeniden başlat.</string>
 
     <!-- Update dialogs -->
     <string name="update_required_title">Güncelleme Gerekli</string>
@@ -287,6 +317,13 @@
     <string name="discover_age_chip_value">%1$d–%2$d</string>
     <string name="discover_online">Çevrimiçi</string>
     <string name="discover_card_like_cd">Beğen</string>
+    <string name="discover_card_pass_cd">Geç</string>
+    <string name="discover_rewind">Geçişi geri al</string>
+    <string name="discover_rewind_upgrade">Geri al · Yükselt</string>
+    <string name="discover_rewind_success">Son geçtiğin profil geri getirildi.</string>
+    <string name="discover_boost">Boost</string>
+    <string name="discover_boost_active">Boost aktif</string>
+    <string name="discover_boost_started">Profilin 30 dakika boyunca Boost aldı.</string>
     <string name="discover_card_more_cd">Diğer seçenekler</string>
     <string name="discover_report_profile">Profili şikayet et</string>
 

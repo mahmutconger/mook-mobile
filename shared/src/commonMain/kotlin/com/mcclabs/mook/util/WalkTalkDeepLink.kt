@@ -43,30 +43,34 @@ fun buildWalkTalkChatUrl(
 }
 
 /**
- * Builds the URL the live-translation demo's CTA opens to hand the user over to WalkTalk.
+ * Canlı çeviri demosunun CTA'sının, kullanıcıyı WalkTalk'a devretmek için açtığı adres.
  *
- * This URL carries **no identity and no secret** — only a provenance hint. That is
- * deliberate: the SSO token is minted by Mook's existing `generateSsoToken` callable
- * during the `mook://authorize` handshake that *WalkTalk* initiates once it is open.
- * Putting a token in this URL would leak it into browser history and referrer headers
- * on the not-installed path, and would duplicate a flow that already exists.
+ * Adres **kimlik ya da token taşımaz**. Token, WalkTalk açıldıktan sonra başlattığı
+ * yetkilendirme isteğinde, kullanıcı onay verince Mook tarafından üretilir.
  *
- * The handshake this button starts:
- * 1. Mook opens `https://walktalkk.com/chat?source=mook&flow=sso`.
- * 2. WalkTalk opens `mook://authorize?client=WalkTalk&callback=walktalk%3A%2F%2Fsso-callback`.
- * 3. Mook's [com.mcclabs.mook.feature.sso.SsoAuthorizeScreen] mints the custom token and
- *    returns `walktalk://sso-callback?token=…`.
+ * Başlattığı el sıkışma:
+ * 1. Mook `M` değerini üretip saklar ve `https://walktalkk.com/chat?source=…&flow=sso&mook_state=M` adresini açar.
+ * 2. WalkTalk **kendi** `W` değerini üretip saklar ve
+ *    `https://mook-sso.web.app/sso/authorize?client_id=walktalk&redirect_uri=https%3A%2F%2Fwalktalkk.com%2Fsso-callback&state=W&mook_state=M`
+ *    adresini açar. `M`'yi yalnızca iletir, kendi CSRF değeri olarak kullanmaz.
+ * 3. Mook istemciyi, redirect_uri'yi ve `M`'yi doğrular, onay alır ve
+ *    `https://walktalkk.com/sso-callback#token=…&state=W` adresini yalnızca WalkTalk paketine teslim eder.
+ * 4. WalkTalk dönen `W`'yi kendi kaydıyla karşılaştırır.
  *
- * Opening it through [rememberWalkTalkChatOpener] gives the store fallback for free:
- * Google Play on Android when the package is absent, and the web page (which redirects
- * to the App Store) on iOS.
- *
- * @param source Provenance tag recorded by WalkTalk's analytics. Not user data.
+ * @param source WalkTalk analitiği için kaynak etiketi; kullanıcı verisi değildir.
+ * @param mookState [com.mcclabs.mook.domain.sso.GenerateAuthStateUseCase] ile üretilmiş değer.
+ *   Üretilemediyse `null` verilir; akış bu durumda WalkTalk'un kendi başlattığı akış gibi sürer.
  */
-fun buildWalkTalkSsoEntryUrl(source: String = WALKTALK_SOURCE_DEMO): String = buildString {
+fun buildWalkTalkSsoEntryUrl(
+    source: String = WALKTALK_SOURCE_DEMO,
+    mookState: String? = null,
+): String = buildString {
     append(WALKTALK_SSO_ENTRY_URL)
     append("?source=").append(encodeUrlComponent(source))
     append("&flow=sso")
+    if (mookState != null) {
+        append("&mook_state=").append(encodeUrlComponent(mookState))
+    }
 }
 
 /** Provenance tag for the live-translation demo CTA. */

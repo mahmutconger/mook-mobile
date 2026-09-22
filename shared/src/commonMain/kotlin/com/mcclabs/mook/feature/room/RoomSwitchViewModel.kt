@@ -23,7 +23,11 @@ data class RoomSwitchUiState(
     val selectedCode: String? = null,
     /** Shown once (first visit) to explain what rooms are and how to use this screen. */
     val showInfo: Boolean = false,
+    /** A quota rejection is an expected product state, never an app crash. */
+    val error: RoomSelectionError? = null,
 )
+
+enum class RoomSelectionError { SLOT_LIMIT, UNAVAILABLE }
 
 sealed class RoomSwitchEvent {
     /** The room was changed; return to the previous screen. */
@@ -66,8 +70,13 @@ class RoomSwitchViewModel(
 
     fun onRoomSelected(language: Language) {
         viewModelScope.launch {
-            settingsRepository.setRoomLanguageCode(language.code)
-            _events.emit(RoomSwitchEvent.Done)
+            _state.update { it.copy(error = null) }
+            try {
+                settingsRepository.setRoomLanguageCode(language.code)
+                _events.emit(RoomSwitchEvent.Done)
+            } catch (error: Exception) {
+                _state.update { it.copy(error = error.toRoomSelectionError()) }
+            }
         }
     }
 
@@ -77,3 +86,10 @@ class RoomSwitchViewModel(
         viewModelScope.launch { settingsRepository.setHasSeenRoomSwitchInfo(true) }
     }
 }
+
+internal fun Throwable.toRoomSelectionError(): RoomSelectionError =
+    if (message?.contains("room-slot-limit", ignoreCase = true) == true) {
+        RoomSelectionError.SLOT_LIMIT
+    } else {
+        RoomSelectionError.UNAVAILABLE
+    }

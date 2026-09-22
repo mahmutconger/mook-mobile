@@ -61,6 +61,7 @@ fun ChatListScreen(
     onNavigateToDiscover: () -> Unit,
     onNavigateToLiked: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
+    onNavigateToPaywall: () -> Unit,
     viewModel: ChatListViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -82,11 +83,12 @@ fun ChatListScreen(
         bottomBar = {
             BottomNavBar(
                 currentRoute = "chats", // Custom route for highlighting
-                enabledRoutes = setOf("discover", "liked", "chats", "profile"),
+                enabledRoutes = setOf("discover", "liked", "chats", "paywall", "profile"),
                 onNavigate = { route ->
                     when (route) {
                         "discover" -> onNavigateToDiscover()
                         "liked" -> onNavigateToLiked()
+                        "paywall" -> onNavigateToPaywall()
                         "profile" -> if (currentUid.isNotEmpty()) onNavigateToProfile(currentUid)
                     }
                 }

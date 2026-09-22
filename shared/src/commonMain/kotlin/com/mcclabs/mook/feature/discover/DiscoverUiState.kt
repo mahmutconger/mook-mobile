@@ -1,6 +1,6 @@
 package com.mcclabs.mook.feature.discover
 
-import com.mcclabs.mook.domain.billing.BillingConfig
+import com.mcclabs.mook.domain.billing.EntitlementState
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.domain.model.Language
 
@@ -39,16 +39,30 @@ data class DiscoverUiState(
     val likedMeTutorialProfileId: String? = null,
 
     // ── Monetization: free daily like limit ─────────────────────────────────
-    /** Active premium subscription → no daily limit, no paywall. */
-    val isPremium: Boolean = false,
-    /** Likes/passes already used today, seeded from Firestore on load. */
+    /** Live RevenueCat entitlement, used only for fast UX gates; Functions remain authoritative. */
+    val entitlement: EntitlementState = EntitlementState(),
+    /** Server-reported likes used today, seeded from Firestore on load. */
     val swipesUsedToday: Int = 0,
     /** True once the user hits the free limit; the grid shows the upgrade sheet. */
     val showLimitSheet: Boolean = false,
+    /** Keeps rapid taps from making the locally undoable pass diverge from the server's last pass. */
+    val isSwipeInFlight: Boolean = false,
+    /** The locally displayed last pass is eligible to be restored through `rewind`. */
+    val hasRewindablePass: Boolean = false,
+    val isRewinding: Boolean = false,
+    val isBoosting: Boolean = false,
+    /** Set after a successful activation so the user receives an immediate confirmation. */
+    val boostUntilMillis: Long? = null,
 ) {
-    /** Free users get [BillingConfig.FREE_DAILY_SWIPE_LIMIT] likes/day; premium is unlimited. */
+    /** Paid plan limits apply immediately rather than treating Economy/Standard as Free. */
     val canSwipe: Boolean
-        get() = isPremium || swipesUsedToday < BillingConfig.FREE_DAILY_SWIPE_LIMIT
+        get() = !isSwipeInFlight && (entitlement.limits.dailyLikes == null || swipesUsedToday < entitlement.limits.dailyLikes)
+
+    val canUseRewind: Boolean
+        get() = hasRewindablePass && !isRewinding && entitlement.limits.rewindsPerDay != 0
+
+    val canUseBoost: Boolean
+        get() = !isBoosting && entitlement.limits.boostsPerMonth > 0
 
     /** True when the grid has nothing to show and is not mid-load — drives the empty state. */
     val isEmpty: Boolean

@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.mcclabs.mook.domain.sso.SsoConfig
 import com.mcclabs.mook.feature.discover.DiscoverScreen
 import com.mcclabs.mook.feature.eula.EulaGateScreen
 import com.mcclabs.mook.feature.filters.FiltersScreen
@@ -136,6 +137,9 @@ fun AppNavGraph() {
                 },
                 onNavigateToProfile = { profileId ->
                     navController.navigate(NavRoutes.ProfileDetails.createRoute(profileId))
+                },
+                onNavigateToPaywall = {
+                    navController.navigate(NavRoutes.Paywall.route) { launchSingleTop = true }
                 }
             )
         }
@@ -154,6 +158,9 @@ fun AppNavGraph() {
                 },
                 onNavigateToWalkTalkDemo = {
                     navController.navigate(NavRoutes.WalkTalkDemo.route) { launchSingleTop = true }
+                },
+                onNavigateToPaywall = {
+                    navController.navigate(NavRoutes.Paywall.route) { launchSingleTop = true }
                 }
             )
         }
@@ -214,7 +221,10 @@ fun AppNavGraph() {
                     navController.navigate(NavRoutes.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
-                }
+                },
+                onNavigateToPaywall = {
+                    navController.navigate(NavRoutes.Paywall.route) { launchSingleTop = true }
+                },
             )
         }
 
@@ -239,7 +249,16 @@ fun AppNavGraph() {
 
         composable(
             route = NavRoutes.SsoAuthorize.route,
-            deepLinks = listOf(navDeepLink { uriPattern = "mook://authorize?client={client}&callback={callback}" })
+            // Yalnızca doğrulanmış https App Link. Özel `mook://` şeması, başka bir uygulamanın
+            // aynı şemayı kaydedip isteği ele geçirebilmesi nedeniyle kaldırıldı. Açık (explicit)
+            // Intent ile bu bağlantı yine de sahte parametrelerle gönderilebilir; asıl koruma
+            // SsoAuthorizeViewModel içindeki doğrulamadır.
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://${SsoConfig.APP_LINK_HOST}${SsoConfig.AUTHORIZE_PATH}" +
+                        "?client_id={client_id}&redirect_uri={redirect_uri}&state={state}&mook_state={mook_state}"
+                },
+            )
         ) {
             SsoAuthorizeScreen(
                 onNavigateBack = { navController.popBackStack() },

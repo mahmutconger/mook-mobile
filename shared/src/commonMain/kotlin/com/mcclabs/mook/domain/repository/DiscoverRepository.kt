@@ -35,6 +35,9 @@ interface DiscoverRepository {
      */
     fun markActedOn(profileId: String)
 
+    /** Re-includes a profile after the server has successfully rewound its last pass. */
+    fun unmarkActedOn(profileId: String)
+
     /**
      * Every id excluded from Discover for this session — past interactions, blocks, and
      * anything passed to [markActedOn]. Discovery prunes its visible cards against this on

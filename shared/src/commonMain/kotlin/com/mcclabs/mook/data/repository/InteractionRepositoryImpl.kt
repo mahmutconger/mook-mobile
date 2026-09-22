@@ -1,69 +1,30 @@
 package com.mcclabs.mook.data.repository
 
-import com.mcclabs.mook.domain.model.Interaction
-import com.mcclabs.mook.domain.model.Match
 import com.mcclabs.mook.domain.model.MatchResult
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import com.mcclabs.mook.data.appFirestore
-import kotlinx.datetime.Clock
+import dev.gitlive.firebase.functions.functions
+import kotlinx.serialization.Serializable
 import com.mcclabs.mook.util.Log
 
 class InteractionRepositoryImpl : InteractionRepository {
 
     override suspend fun swipeUser(toUserId: String, isLike: Boolean): MatchResult {
         return try {
-            val currentUserId = Firebase.auth.currentUser?.uid
+            Firebase.auth.currentUser?.uid
                 ?: return MatchResult.Error("User not logged in")
-
-            val db = appFirestore
-            val type = if (isLike) "like" else "pass"
-            val timestamp = com.mcclabs.mook.util.getCurrentTimeMillis()
-            val interactionId = "${currentUserId}_${toUserId}"
-
-            Log.d("Kaydırma: $type -> $toUserId (doküman: interactions/$interactionId)")
-
-            // 1. Save the interaction
-            val interaction = Interaction(
-                id = interactionId,
-                fromUserId = currentUserId,
-                toUserId = toUserId,
-                type = type,
-                timestamp = timestamp
-            )
-            db.collection("interactions").document(interactionId).set(interaction)
-
-            // 2. If it's a pass, return immediately
-            if (!isLike) {
-                return MatchResult.Pass
+            val response = Firebase.functions
+                .httpsCallable("swipe")
+                .invoke(SwipeRequest(toUserId = toUserId, isLike = isLike))
+                .data<SwipeResponse>()
+            when (response.result) {
+                "mutual_match" -> MatchResult.MutualMatch
+                "single_like" -> MatchResult.SingleLike
+                "pass" -> MatchResult.Pass
+                else -> MatchResult.Error("Unexpected swipe result")
             }
-
-            // 3. If it's a like, check if the other user has already liked us
-            val reverseInteractionId = "${toUserId}_${currentUserId}"
-            val reverseInteractionDoc = db.collection("interactions").document(reverseInteractionId).get()
-            
-            if (reverseInteractionDoc.exists) {
-                val reverseType = reverseInteractionDoc.get<String>("type")
-                Log.d("Karşı taraf ($toUserId) beni '$reverseType' geçmiş")
-                if (reverseType == "like") {
-                    // It's a mutual match! Create a match document.
-                    val matchId = if (currentUserId < toUserId) "${currentUserId}_${toUserId}" else "${toUserId}_${currentUserId}"
-                    val match = Match(
-                        id = matchId,
-                        users = listOf(currentUserId, toUserId),
-                        timestamp = timestamp
-                    )
-                    db.collection("matches").document(matchId).set(match)
-                    Log.d("EŞLEŞME! matches/$matchId yazıldı")
-
-                    return MatchResult.MutualMatch
-                }
-            } else {
-                Log.d("Karşı taraf ($toUserId) beni henüz kaydırmamış")
-            }
-
-            MatchResult.SingleLike
 
         } catch (e: Exception) {
             Log.e("Kaydırma başarısız: $toUserId (isLike=$isLike)", e)
@@ -83,4 +44,35 @@ class InteractionRepositoryImpl : InteractionRepository {
             false
         }
     }
+
+    override suspend fun rewindLastPass(): Result<String> = runCatching {
+        Firebase.auth.currentUser?.uid ?: error("User not logged in")
+        Firebase.functions
+            .httpsCallable("rewind")
+            .invoke()
+            .data<RewindResponse>()
+            .profileUid
+    }
+
+    override suspend fun activateBoost(): Result<Long> = runCatching {
+        Firebase.auth.currentUser?.uid ?: error("User not logged in")
+        Firebase.functions
+            .httpsCallable("activateBoost")
+            .invoke()
+            .data<BoostResponse>()
+            .boostUntil
+    }
 }
+
+/** Payload and response names intentionally mirror `functions/src/monetization.ts`. */
+@Serializable
+private data class SwipeRequest(val toUserId: String, val isLike: Boolean)
+
+@Serializable
+private data class SwipeResponse(val result: String, val idempotent: Boolean = false)
+
+@Serializable
+private data class RewindResponse(val profileUid: String)
+
+@Serializable
+private data class BoostResponse(val boostUntil: Long)
