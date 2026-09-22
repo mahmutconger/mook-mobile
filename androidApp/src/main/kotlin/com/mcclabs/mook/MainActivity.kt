@@ -13,8 +13,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import com.mcclabs.mook.data.billing.RevenueCatActivityHolder
 
 class MainActivity : ComponentActivity() {
+
+    override fun onResume() {
+        super.onResume()
+        RevenueCatActivityHolder.activity = this
+    }
+
+    override fun onPause() {
+        if (RevenueCatActivityHolder.activity === this) RevenueCatActivityHolder.activity = null
+        super.onPause()
+    }
 
     /**
      * Android 13+ drops every notification silently until the user grants this, while

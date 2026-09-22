@@ -56,6 +56,13 @@ kotlin {
             // FirebaseMessaging is linked into the Xcode target there, and the token is
             // handed in from Swift instead.
             implementation("com.google.firebase:firebase-messaging")
+            // The purchase/restore path forces an ID-token refresh after RevenueCat
+            // confirms a transaction, so newly-written entitlement claims are picked
+            // up without requiring the user to relaunch the app.
+            implementation("com.google.firebase:firebase-auth")
+            // Android-first commercial implementation. The common subscription contract
+            // remains iOS-safe through an explicit no-op actual implementation.
+            implementation(libs.revenuecat.purchases)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -88,6 +95,16 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
         }
+        getByName("androidHostTest").dependencies {
+            // SSO güvenlik testleri JUnit 5 + MockK ile JVM üzerinde çalışır. Vintage motoru,
+            // commonTest'teki mevcut kotlin.test (JUnit 4) testlerinin de aynı çalıştırmada
+            // koşmaya devam etmesini sağlar.
+            implementation(project.dependencies.platform(libs.junit5.bom))
+            implementation(libs.junit5.jupiter)
+            implementation(libs.mockk)
+            runtimeOnly(libs.junit5.vintage.engine)
+            runtimeOnly(libs.junit5.platform.launcher)
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             // Virtual time for the WalkTalk demo's debounce / stale-response tests.
@@ -98,4 +115,8 @@ kotlin {
 
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }

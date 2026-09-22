@@ -32,6 +32,7 @@
     </queries>
 
     <application
+        android:name=".MookApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
@@ -43,6 +44,7 @@
         android:theme="@style/Theme.Mook">
         <activity
             android:exported="true"
+            android:launchMode="singleTop"
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -50,12 +52,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             
-            <!-- Deep link for SSO Authorization (e.g. from WalkTalk) -->
-            <intent-filter>
+            <!--
+                SSO yetkilendirme isteği (ör. WalkTalk'tan): yalnızca doğrulanmış Android App Link.
+
+                autoVerify="true": Android, kurulumda https://${ssoAppLinkHost}/.well-known/assetlinks.json
+                dosyasını indirir ve Mook'un imza sertifikasıyla eşleşirse bu adresleri seçim
+                penceresi göstermeden yalnızca Mook'a açar. Başka bir uygulama aynı adresi
+                kaydetse bile isteği ele geçiremez.
+
+                Eski "mook://authorize" özel şeması bilinçli olarak kaldırıldı: özel şemalar
+                doğrulanamaz ve herhangi bir uygulama tarafından kaydedilebilir.
+
+                Not: Bu filtre gelen isteğin kaynağını KANITLAMAZ; dışa açık bir Activity'ye açık
+                (explicit) Intent ile sahte parametre gönderilebilir. İstemci, redirect_uri ve
+                state doğrulaması bu yüzden VerifyAuthCallbackUseCase içinde yapılır.
+            -->
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="mook" android:host="authorize" />
+                <data
+                    android:scheme="https"
+                    android:host="${ssoAppLinkHost}"
+                    android:path="/sso/authorize" />
             </intent-filter>
         </activity>
     </application>
