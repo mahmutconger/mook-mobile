@@ -32,9 +32,10 @@ enum class MessageStatus {
  *   or `null` when the translation has not yet resolved.
  * @property senderLanguage ISO language code the sender wrote in (e.g. "TR").
  * @property timestamp Epoch millis when the message was sent.
- * @property type Message type — "text" or "deleted"; reserved for future
+ * @property type Message type — "text", "deleted" or "system"; reserved for future
  *   media types ("image", "voice").
- * @property isMine `true` when the current signed-in user is the sender.
+ * @property isMine `true` when the current signed-in user is the sender. Meaningless
+ *   for a [TYPE_SYSTEM] message — always `false`, since it belongs to neither side.
  * @property status Delivery state; see [MessageStatus].
  */
 data class ChatMessage(
@@ -51,8 +52,16 @@ data class ChatMessage(
     /** A message the sender retracted. Rendered as a placeholder for both sides. */
     val isDeleted: Boolean get() = type == TYPE_DELETED
 
+    /**
+     * A locally-generated informational notice (Gereksinim 1.6) — e.g. "this user has
+     * reached their daily limit". Never written to Firestore and never sent by either
+     * participant, so it is rendered centered, without a bubble or a sender side.
+     */
+    val isSystem: Boolean get() = type == TYPE_SYSTEM
+
     companion object {
         const val TYPE_TEXT: String = "text"
         const val TYPE_DELETED: String = "deleted"
+        const val TYPE_SYSTEM: String = "system"
     }
 }

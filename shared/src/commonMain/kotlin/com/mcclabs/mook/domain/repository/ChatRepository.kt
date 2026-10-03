@@ -61,6 +61,8 @@ interface ChatRepository {
      * @param text The plain-text message body.
      * @param senderLanguage DeepL code of the sender's language (e.g. "TR", "EN-US").
      * @param messageId Document id from [newMessageId].
+     * @return Gönderimin bilgilendirici sonuçları (bkz. [SendMessageResult]); hiçbiri
+     *   gönderimi engellemez.
      */
     suspend fun sendMessage(
         chatId: String,
@@ -68,7 +70,7 @@ interface ChatRepository {
         text: String,
         senderLanguage: String,
         messageId: String,
-    )
+    ): SendMessageResult
 
     /**
      * Retracts one of the current user's own messages.
@@ -107,8 +109,40 @@ interface ChatRepository {
     fun observeChats(): Flow<List<ChatRoom>>
 
     /**
+     * One-shot lookup of a single chat room by id — e.g. to read the
+     * [ChatRoom.roomLanguageCode] a specific conversation was tagged with
+     * (Gereksinim 1.7), without subscribing to the whole chat list.
+     *
+     * Returns `null` if the chat does not exist or the read fails; callers treat a
+     * `null` room tag the same as a chat that predates this field (never read-only).
+     */
+    suspend fun getChatRoom(chatId: String): ChatRoom?
+
+    /**
      * Marks all messages in the specified chat as read for the current user,
      * resetting their unread badge count to 0.
      */
     suspend fun markAsRead(chatId: String)
+
+    /**
+     * Karşı tarafın bu sohbeti en son okuduğu an (epoch ms). Okundu bilgisi bir Premium
+     * ayrıcalığıdır: Firestore kuralları okumayı yalnızca Premium yetkili katılımcıya izin verir;
+     * yetki yoksa veya bilgi henüz yazılmadıysa `null` yayınlanır. Hata fırlatmaz.
+     */
+    fun observePeerReadAt(chatId: String, peerUid: String): Flow<Long?>
 }
+
+/**
+ * Başarılı bir `sendMessage` çağrısının bilgilendirici sonuçları. Hiçbiri gönderimi engellemez;
+ * yalnızca sohbete yerel bir sistem notu düşmek için kullanılır.
+ *
+ * @property recipientAtDailyLimit Alıcı kendi günlük mesaj kotasını doldurmuş (Gereksinim 1.6)
+ *   — yanıt hemen gelmeyebilir.
+ * @property translationQuotaExhausted Yalnızca Çeviri Kotası Mantığı: mesaj çeviri gerektiriyordu
+ *   ama gönderenin günlük/aylık çeviri karakter kotası yetmedi; mesaj ÇEVRİLMEDEN teslim edildi.
+ *   Aynı dildeki mesajlar kotaya hiç dokunmadığından bu durumda asla `true` olmaz.
+ */
+data class SendMessageResult(
+    val recipientAtDailyLimit: Boolean = false,
+    val translationQuotaExhausted: Boolean = false,
+)

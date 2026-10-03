@@ -4,6 +4,8 @@ import com.mcclabs.mook.domain.translation.DemoLanguages
 import com.mcclabs.mook.domain.translation.TranslationError
 import com.mcclabs.mook.domain.translation.TranslationException
 import com.mcclabs.mook.domain.translation.Translator
+import com.mcclabs.mook.domain.moderation.BannedUserException
+import com.mcclabs.mook.domain.moderation.ModerationGate
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.functions.FirebaseFunctions
 import dev.gitlive.firebase.functions.FirebaseFunctionsException
@@ -59,6 +61,11 @@ class FirebaseFunctionsTranslator(
         if (target.isBlank()) {
             throw TranslationException(TranslationError.INVALID_INPUT)
         }
+        // Gereksinim 1.13: bu sınıf, test edilebilirlik için kendi `functions` örneğini
+        // DI ile aldığından `appHttpsCallable()` sarmalayıcısını KULLANAMAZ (o, yalnızca
+        // global `Firebase.functions` tekilini sarar) — bu yüzden aynı global kapı burada
+        // ayrıca, doğrudan kontrol edilir.
+        if (ModerationGate.isBanned.value) throw BannedUserException()
 
         val response = try {
             functions

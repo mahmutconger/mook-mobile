@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.chat
 
+import mook.shared.generated.resources.chat_read_receipt_seen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -56,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -73,11 +75,13 @@ import mook.shared.generated.resources.chat_action_report
 import mook.shared.generated.resources.chat_action_retry
 import mook.shared.generated.resources.chat_composer_placeholder
 import mook.shared.generated.resources.chat_empty
+import mook.shared.generated.resources.chat_error_character_quota_exhausted
 import mook.shared.generated.resources.chat_error_not_matched
 import mook.shared.generated.resources.chat_error_rate_limited
 import mook.shared.generated.resources.chat_error_send_failed
 import mook.shared.generated.resources.chat_message_deleted
 import mook.shared.generated.resources.chat_report_subtitle
+import mook.shared.generated.resources.chat_room_closed_read_only
 import mook.shared.generated.resources.chat_report_title
 import mook.shared.generated.resources.chat_send_cd
 import mook.shared.generated.resources.chat_status_failed
@@ -176,11 +180,19 @@ fun ChatScreen(
                     .imePadding(),
             ) {
                 HorizontalDivider(color = NeonColors.DividerColor)
-                ChatComposer(
-                    text = state.composerText,
-                    onTextChange = viewModel::onComposerTextChange,
-                    onSend = viewModel::onSend,
-                )
+                // Gereksinim 1.7: oda kapatıldığında sohbet erişilebilir kalır ama
+                // salt-okunur olur — kompozer yerine bir bilgi şeridi gösterilir.
+                // Yalnızca Çeviri Kotası: çeviri kotası bitse bile kompozer KAPANMAZ — mesajlar
+                // çevrilmeden gönderilir ve sohbete bir kez bilgilendirme notu düşülür.
+                if (state.isReadOnly) {
+                    ReadOnlyRoomBanner()
+                } else {
+                    ChatComposer(
+                        text = state.composerText,
+                        onTextChange = viewModel::onComposerTextChange,
+                        onSend = viewModel::onSend,
+                    )
+                }
             }
         },
     ) { padding ->
@@ -215,10 +227,26 @@ fun ChatScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(state.messages, key = { it.id }) { message ->
-                        MessageBubble(
-                            message = message,
-                            onLongPress = { viewModel.onMessageLongPressed(message) },
-                        )
+                        if (message.isSystem) {
+                            SystemMessageRow(message = message)
+                        } else {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                MessageBubble(
+                                    message = message,
+                                    onLongPress = { viewModel.onMessageLongPressed(message) },
+                                )
+                                // Okundu bilgisi (Premium): yalnızca görülen en son mesajın altında.
+                                if (message.id == state.seenMessageId) {
+                                    Text(
+                                        text = stringResource(Res.string.chat_read_receipt_seen),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = NeonColors.TextTertiary,
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier.fillMaxWidth().padding(top = 2.dp, end = 4.dp),
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -267,6 +295,30 @@ private fun ChatTopBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background),
     )
+}
+
+// ── System notice ───────────────────────────────────────────────────────
+
+/**
+ * A locally-injected informational notice (Gereksinim 1.6) — e.g. "this user has
+ * reached their daily limit". Centered and unbubbled so it never reads as something
+ * either participant said.
+ */
+@Composable
+private fun SystemMessageRow(message: ChatMessage) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = message.text,
+            style = MaterialTheme.typography.bodySmall,
+            color = NeonColors.TextTertiary,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = 280.dp).padding(vertical = 4.dp),
+        )
+    }
 }
 
 // ── Message bubble ──────────────────────────────────────────────────────
@@ -526,10 +578,32 @@ private fun ReportReasonDialog(
 private fun ChatSendError.messageRes(): StringResource = when (this) {
     ChatSendError.NOT_MATCHED -> Res.string.chat_error_not_matched
     ChatSendError.RATE_LIMITED -> Res.string.chat_error_rate_limited
+    ChatSendError.CHARACTER_QUOTA_EXHAUSTED -> Res.string.chat_error_character_quota_exhausted
     ChatSendError.GENERIC -> Res.string.chat_error_send_failed
 }
 
 // ── Composer ────────────────────────────────────────────────────────────
+
+/**
+ * Shown instead of [ChatComposer] when [ChatUiState.isReadOnly] is `true`
+ * (Gereksinim 1.7) — the conversation stays visible, but nothing can be typed.
+ */
+@Composable
+private fun ReadOnlyRoomBanner() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(Res.string.chat_room_closed_read_only),
+            style = MaterialTheme.typography.bodySmall,
+            color = NeonColors.TextTertiary,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
 
 @Composable
 private fun ChatComposer(

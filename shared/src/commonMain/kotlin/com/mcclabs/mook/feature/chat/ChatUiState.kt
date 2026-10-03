@@ -19,8 +19,14 @@ import com.mcclabs.mook.domain.model.ChatSendError
  *   message so the screen can show a localized, translatable sentence.
  * @property reportSubmitted One-shot flag: a report was filed and the confirmation
  *   has not been shown yet.
+ * @property isReadOnly `true` when this chat's origin room (Gereksinim 1.7) is not
+ *   among the current user's open room slots — e.g. after a tier downgrade closed it.
+ *   The conversation stays visible but the composer is disabled; sending is also
+ *   blocked in the ViewModel as a second line of defense.
  */
 data class ChatUiState(
+    /** "Görüldü" etiketinin gösterileceği kendi mesajım (yalnızca Premium; bkz. ReadReceiptRules). */
+    val seenMessageId: String? = null,
     val messages: List<ChatMessage> = emptyList(),
     val peerName: String? = null,
     val peerPhotoUrl: String? = null,
@@ -30,4 +36,5 @@ data class ChatUiState(
     val reportTarget: ChatMessage? = null,
     val sendError: ChatSendError? = null,
     val reportSubmitted: Boolean = false,
+    val isReadOnly: Boolean = false,
 )

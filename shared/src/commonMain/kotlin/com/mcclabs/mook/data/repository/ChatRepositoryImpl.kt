@@ -1,5 +1,7 @@
 package com.mcclabs.mook.data.repository
 
+import kotlinx.coroutines.flow.catch
+import com.mcclabs.mook.data.appHttpsCallable
 import com.mcclabs.mook.data.appFirestore
 import com.mcclabs.mook.domain.model.ChatMessage
 import com.mcclabs.mook.domain.model.ChatRoom
@@ -8,6 +10,7 @@ import com.mcclabs.mook.domain.model.ChatSendException
 import com.mcclabs.mook.domain.model.MessageStatus
 import com.mcclabs.mook.domain.model.chatSendErrorFor
 import com.mcclabs.mook.domain.repository.ChatRepository
+import com.mcclabs.mook.domain.repository.SendMessageResult
 import com.mcclabs.mook.util.Log
 import com.mcclabs.mook.util.getCurrentTimeMillis
 import dev.gitlive.firebase.Firebase
@@ -17,7 +20,6 @@ import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.where
 import dev.gitlive.firebase.functions.FirebaseFunctionsException
 import dev.gitlive.firebase.functions.code
-import dev.gitlive.firebase.functions.functions
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -33,6 +35,23 @@ internal data class SendMessageRequest(
     val text: String,
     val senderLanguage: String,
     val messageId: String,
+)
+
+/**
+ * Response of the `sendMessage` callable. Field names must match `functions/src/index.ts`.
+ *
+ * [recipientAtDailyLimit] is read-only telemetry (Gereksinim 1.6): the server sets it
+ * whether or not this particular send was a new chat or a reply, and it never blocks
+ * or affects the send itself.
+ */
+@Serializable
+internal data class SendMessageResponse(
+    val success: Boolean = true,
+    val messageId: String? = null,
+    val translatedText: String? = null,
+    val recipientAtDailyLimit: Boolean = false,
+    /** Yalnızca Çeviri Kotası: kota yetmediği için mesaj çevrilmeden gönderildi. */
+    val translationQuotaExhausted: Boolean = false,
 )
 
 /** Payload of the `deleteMessage` callable. */
@@ -141,13 +160,13 @@ class ChatRepositoryImpl : ChatRepository {
         text: String,
         senderLanguage: String,
         messageId: String,
-    ) {
+    ): SendMessageResult {
         if (currentUid == null) {
             Log.e("Mesaj gönderilemedi — kullanıcı oturumu yok")
             throw ChatSendException(ChatSendError.GENERIC)
         }
 
-        callable(
+        val response = callableWithResponse<SendMessageRequest, SendMessageResponse>(
             name = "sendMessage",
             context = "chatId=$chatId",
             payload = SendMessageRequest(
@@ -157,6 +176,10 @@ class ChatRepositoryImpl : ChatRepository {
                 senderLanguage = senderLanguage,
                 messageId = messageId,
             ),
+        )
+        return SendMessageResult(
+            recipientAtDailyLimit = response.recipientAtDailyLimit,
+            translationQuotaExhausted = response.translationQuotaExhausted,
         )
     }
 
@@ -183,7 +206,7 @@ class ChatRepositoryImpl : ChatRepository {
      */
     private suspend inline fun <reified T> callable(name: String, context: String, payload: T) {
         try {
-            Firebase.functions.httpsCallable(name).invoke(payload)
+            appHttpsCallable(name).invoke(payload)
         } catch (cancellation: CancellationException) {
             // Cooperative cancellation is not a failure — let structured concurrency
             // keep working.
@@ -191,7 +214,42 @@ class ChatRepositoryImpl : ChatRepository {
         } catch (e: Throwable) {
             Log.e("$name çağrısı başarısız ($context)", e)
             throw ChatSendException(
-                chatSendErrorFor((e as? FirebaseFunctionsException)?.code?.name),
+                chatSendErrorFor(
+                    (e as? FirebaseFunctionsException)?.code?.name,
+                    // Gereksinim 2.2: RESOURCE_EXHAUSTED kodunun ALTINDAKİ asıl sebebi
+                    // (ör. karakter kotası mı, dakikalık hız sınırı mı) ayırt etmek için.
+                    (e as? FirebaseFunctionsException)?.message,
+                ),
+                e,
+            )
+        }
+    }
+
+    /**
+     * Like [callable], but decodes and returns the callable's response body instead of
+     * discarding it. Kept as a separate overload rather than changing [callable]'s
+     * signature, since most callables here (delete, report, ...) have nothing useful
+     * to decode and a `Unit` response would need lenient/ignore-unknown-keys decoding
+     * to tolerate the server's actual payload.
+     */
+    private suspend inline fun <reified TRequest, reified TResponse> callableWithResponse(
+        name: String,
+        context: String,
+        payload: TRequest,
+    ): TResponse {
+        try {
+            return appHttpsCallable(name).invoke(payload).data<TResponse>()
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (e: Throwable) {
+            Log.e("$name çağrısı başarısız ($context)", e)
+            throw ChatSendException(
+                chatSendErrorFor(
+                    (e as? FirebaseFunctionsException)?.code?.name,
+                    // Gereksinim 2.2: RESOURCE_EXHAUSTED kodunun ALTINDAKİ asıl sebebi
+                    // (ör. karakter kotası mı, dakikalık hız sınırı mı) ayırt etmek için.
+                    (e as? FirebaseFunctionsException)?.message,
+                ),
                 e,
             )
         }
@@ -261,7 +319,20 @@ class ChatRepositoryImpl : ChatRepository {
             unreadCount = unreadCounts?.get(currentUid) ?: 0,
             lastMessageDeleted = runCatching { get<Boolean?>("lastMessageDeleted") }
                 .getOrNull() ?: false,
+            roomLanguageCode = runCatching { get<String?>("roomLanguageCode") }.getOrNull(),
         )
+    }
+
+    // ── Single chat lookup ──────────────────────────────────────────────
+
+    override suspend fun getChatRoom(chatId: String): ChatRoom? {
+        val uid = currentUid ?: return null
+        return try {
+            db.collection("chats").document(chatId).get().toChatRoom(currentUid = uid)
+        } catch (e: Exception) {
+            Log.e("Sohbet dokümanı okunamadı (chatId=$chatId)", e)
+            null
+        }
     }
 
     // ── Mark as read ────────────────────────────────────────────────────
@@ -278,5 +349,33 @@ class ChatRepositoryImpl : ChatRepository {
             // The room has no document until the first message is sent — nothing to clear.
             Log.e("Okundu işaretleme hatası (chatId=$chatId)", e)
         }
+        // Okundu bilgisi: karşı taraf Premium ise "Görüldü" etiketini bu kayıttan okur.
+        // Kayıt yalnızca kendi adıma ve katılımcısı olduğum sohbet için yazılabilir (kurallar).
+        try {
+            db.collection("read_receipts")
+                .document("${chatId}_$uid")
+                .set(
+                    mapOf(
+                        "chatId" to chatId,
+                        "readerUid" to uid,
+                        "lastReadAt" to getCurrentTimeMillis(),
+                    ),
+                )
+        } catch (e: Exception) {
+            Log.e("Okundu bilgisi yazılamadı (chatId=$chatId)", e)
+        }
     }
+
+    override fun observePeerReadAt(chatId: String, peerUid: String): Flow<Long?> =
+        db.collection("read_receipts")
+            .document("${chatId}_$peerUid")
+            .snapshots
+            .map { snapshot ->
+                if (!snapshot.exists) null else runCatching { snapshot.get<Long?>("lastReadAt") }.getOrNull()
+            }
+            .catch { error ->
+                // Premium değilse kurallar okumayı reddeder — bu beklenen bir durumdur.
+                Log.d("Okundu bilgisi dinlenemiyor: ${error.message}")
+                emit(null)
+            }
 }
