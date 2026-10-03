@@ -7,6 +7,7 @@ import com.mcclabs.mook.domain.model.Country
 import com.mcclabs.mook.domain.model.Gender
 import com.mcclabs.mook.domain.model.Language
 import com.mcclabs.mook.domain.repository.AuthRepository
+import com.mcclabs.mook.domain.repository.RemoteConfigRepository
 import com.mcclabs.mook.domain.validation.InputValidator
 import com.mcclabs.mook.util.getAvailableCountries
 import com.mcclabs.mook.util.getCurrentRegionCode
@@ -32,7 +33,10 @@ import mook.shared.generated.resources.legal_terms_error
 import mook.shared.generated.resources.legal_eula_error
 
 class RegistrationViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    // Gereksinim 2.13 (Faz 4): onboarding tamamlandığında "show_onboarding_trial_offer"
+    // Remote Config bayrağını okumak için — bkz. completeProfile().
+    private val remoteConfigRepository: RemoteConfigRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegistrationUiState())
@@ -43,6 +47,13 @@ class RegistrationViewModel(
 
     sealed class RegistrationNavigationEvent {
         data object NavigateToHome : RegistrationNavigationEvent()
+
+        /**
+         * Gereksinim 2.13 (Faz 4): "show_onboarding_trial_offer" Remote Config bayrağı
+         * açıkken profil onboarding'i bittiği anda ateşlenir — normal ana ekran akışı
+         * yerine kullanıcı doğrudan, Deneme paketi ön-seçili olarak Paywall'a gider.
+         */
+        data object NavigateToPaywallWithTrial : RegistrationNavigationEvent()
     }
 
     init {
@@ -328,7 +339,16 @@ class RegistrationViewModel(
                     when (profileResult) {
                         is AuthResult.Success -> {
                             _uiState.update { it.copy(isLoading = false) }
-                            _navigationEvent.emit(RegistrationNavigationEvent.NavigateToHome)
+                            // Gereksinim 2.13 (Faz 4): Remote Config bayrağı açıksa profil
+                            // tamamlanır tamamlanmaz doğrudan Deneme paketi ön-seçili Paywall'a
+                            // yönlendir; kapalıysa (ya da okunamazsa — güvenli varsayılan)
+                            // normal akış (ana ekran) değişmeden devam eder.
+                            val event = if (remoteConfigRepository.shouldShowOnboardingTrialOffer()) {
+                                RegistrationNavigationEvent.NavigateToPaywallWithTrial
+                            } else {
+                                RegistrationNavigationEvent.NavigateToHome
+                            }
+                            _navigationEvent.emit(event)
                         }
                         is AuthResult.Error -> {
                             _uiState.update {

@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.profile
 
+import com.mcclabs.mook.domain.billing.PaywallRequest
+import com.mcclabs.mook.ui.components.PremiumBadge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.ui.components.ImageCarousel
+import com.mcclabs.mook.ui.components.LimitSheet
 import com.mcclabs.mook.ui.components.NeonChip
 import com.mcclabs.mook.ui.components.ReportBottomSheet
 import com.mcclabs.mook.ui.components.WalkTalkRedirectDialog
@@ -51,7 +54,7 @@ fun ProfileDetailsScreen(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToMatch: (String) -> Unit = {},
-    onNavigateToPaywall: () -> Unit = {},
+    onNavigateToPaywall: (PaywallRequest) -> Unit = {},
     onNavigateToChat: (chatId: String, peerUid: String) -> Unit = { _, _ -> },
     viewModel: ProfileDetailsViewModel = koinViewModel<ProfileDetailsViewModel>(
         parameters = { parametersOf(profileId) }
@@ -73,44 +76,27 @@ fun ProfileDetailsScreen(
                 is ProfileDetailsEvent.NavigateToMatch -> onNavigateToMatch(event.matchedUserId)
                 is ProfileDetailsEvent.NavigateToChat -> onNavigateToChat(event.chatId, event.peerUid)
                 // The feed is what the user was doing; a like or pass returns them to it.
-                ProfileDetailsEvent.ActionCompleted -> onNavigateBack()
-                is ProfileDetailsEvent.NavigateToPaywall -> onNavigateToPaywall()
+                ProfileDetailsEvent.ActionCompleted -> {
+                    onNavigateBack()
+                }
+                is ProfileDetailsEvent.NavigateToPaywall -> onNavigateToPaywall(event.request)
                 is ProfileDetailsEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
 
     // ── Daily like limit ────────────────────────────────────────────────────
-    if (state.showLimitDialog) {
-        AlertDialog(
-            onDismissRequest = viewModel::onLimitDialogDismissed,
-            containerColor = NeonColors.Card,
-            title = {
-                Text(
-                    text = stringResource(Res.string.discover_swipe_limit_title),
-                    color = NeonColors.TextPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(
-                        Res.string.discover_swipe_limit_body,
-                        state.entitlement.limits.dailyLikes ?: 0
-                    ),
-                    color = NeonColors.TextSecondary
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = viewModel::onUpgradeClicked) {
-                    Text(stringResource(Res.string.discover_upgrade_cta), color = NeonColors.Primary)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = viewModel::onLimitDialogDismissed) {
-                    Text(stringResource(Res.string.profile_block_cancel), color = NeonColors.TextSecondary)
-                }
-            }
+    state.limitReason?.let { reason ->
+        LimitSheet(
+            reason = reason,
+            entitlement = state.entitlement,
+            rewardedLikesToday = state.rewardedLikesToday,
+            isFairUseCap = state.limitIsFairUseCap,
+            showRewardedAd = state.canEarnRewardedLike,
+            onRewardConfirmed = viewModel::onRewardedLikeConfirmed,
+            onUpgrade = { viewModel.onUpgradeClicked() },
+            onStartTrial = viewModel::onTrialClicked,
+            onDismiss = { viewModel.onLimitDialogDismissed() },
         )
     }
 
@@ -358,6 +344,10 @@ private fun ProfileSheetContent(
                     color = NeonColors.TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
+                if (profile.isPremium) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    PremiumBadge()
+                }
                 profile.country?.let {
                     Text(
                         text = it.name,

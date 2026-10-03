@@ -1,5 +1,12 @@
 package com.mcclabs.mook.navigation
 
+import com.mcclabs.mook.domain.billing.LimitReason
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import org.koin.compose.koinInject
+import com.mcclabs.mook.ui.components.DailyUpsellCard
+import com.mcclabs.mook.domain.billing.DailyUpsellCoordinator
+import com.mcclabs.mook.feature.likedme.LikedMeScreen
 import androidx.compose.runtime.Composable
 import androidx.savedstate.read
 import androidx.navigation.compose.NavHost
@@ -33,6 +40,20 @@ fun AppNavGraph() {
     // A logged-out user starts at Login; an authenticated user goes through the EULA
     // gate, which forwards straight to Discover if they have already accepted.
     val startDestination = if (Firebase.auth.currentUser != null) NavRoutes.EulaGate.route else NavRoutes.Login.route
+
+    // Günlük Premium upsell kartı: bir geçiş reklamı kapatıldıktan sonra, hangi ekranda
+    // olunursa olsun burada (uygulama düzeyinde) gösterilir — günde en fazla bir kez.
+    val upsellCoordinator = koinInject<DailyUpsellCoordinator>()
+    val showDailyUpsell by upsellCoordinator.isVisible.collectAsState()
+    if (showDailyUpsell) {
+        DailyUpsellCard(
+            onUpgrade = {
+                upsellCoordinator.dismiss()
+                navController.navigate(NavRoutes.Paywall.createRoute()) { launchSingleTop = true }
+            },
+            onDismiss = upsellCoordinator::dismiss,
+        )
+    }
 
     NavHost(
         navController = navController,
@@ -75,6 +96,17 @@ fun AppNavGraph() {
                     navController.navigate(NavRoutes.RoomGate.route) {
                         popUpTo(NavRoutes.Login.route) { inclusive = true }
                     }
+                },
+                onNavigateToPaywallWithTrial = {
+                    // Gereksinim 2.13 (Faz 4): önce normal ana ekran hedefine (RoomGate)
+                    // geçip Login'i geri yığınından temizliyoruz, ardından Deneme paketi
+                    // ön-seçili Paywall'ı bunun ÜZERİNE açıyoruz — böylece Paywall'ın
+                    // "kapat" davranışı (popBackStack) kullanıcıyı RoomGate'e, akışın
+                    // normalde zaten gideceği yere bırakır.
+                    navController.navigate(NavRoutes.RoomGate.route) {
+                        popUpTo(NavRoutes.Login.route) { inclusive = true }
+                    }
+                    navController.navigate(NavRoutes.Paywall.createRoute(preselectTrial = true))
                 }
             )
         }
@@ -91,7 +123,8 @@ fun AppNavGraph() {
 
         composable(NavRoutes.RoomSwitch.route) {
             RoomSwitchScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToPaywall = { request -> navController.navigate(NavRoutes.Paywall.createRoute(request)) },
             )
         }
 
@@ -112,15 +145,36 @@ fun AppNavGraph() {
                 onNavigateToRoomSwitch = {
                     navController.navigate(NavRoutes.RoomSwitch.route)
                 },
-                onNavigateToPaywall = {
-                    navController.navigate(NavRoutes.Paywall.route)
+                onNavigateToPaywall = { request ->
+                    navController.navigate(NavRoutes.Paywall.createRoute(request))
                 }
             )
         }
 
-        composable(NavRoutes.Paywall.route) {
+        composable(
+            NavRoutes.Paywall.route,
+            arguments = listOf(
+                navArgument(NavRoutes.Paywall.ARG_PRESELECT_TRIAL) {
+                    type = androidx.navigation.NavType.BoolType
+                    defaultValue = false
+                },
+                navArgument(NavRoutes.Paywall.ARG_REASON) {
+                    type = androidx.navigation.NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+            ),
+        ) { backStackEntry ->
             com.mcclabs.mook.feature.paywall.PaywallScreen(
-                onClose = { navController.popBackStack() }
+                onClose = { navController.popBackStack() },
+                // Gereksinim 2.13 (Faz 4): bkz. NavRoutes.Paywall KDoc'u. Klasik Bundle API'si
+                // (`getBoolean(key, default)`) kasıtlı olarak kullanılır — `SavedStateReader`in
+                // `getBoolean` üyesi TEK argümanlıdır (varsayılan değer parametresi YOKTUR).
+                preselectTrial = backStackEntry.arguments?.getBoolean(NavRoutes.Paywall.ARG_PRESELECT_TRIAL, false) ?: false,
+                // Dinamik başlık: Paywall'ı açan limit (yoksa genel başlık).
+                limitReason = backStackEntry.arguments
+                    ?.read { getStringOrNull(NavRoutes.Paywall.ARG_REASON) }
+                    ?.let { name -> LimitReason.entries.firstOrNull { it.name == name } },
             )
         }
 
@@ -139,13 +193,16 @@ fun AppNavGraph() {
                     navController.navigate(NavRoutes.ProfileDetails.createRoute(profileId))
                 },
                 onNavigateToPaywall = {
-                    navController.navigate(NavRoutes.Paywall.route) { launchSingleTop = true }
+                    navController.navigate(NavRoutes.Paywall.createRoute()) { launchSingleTop = true }
                 }
             )
         }
 
         composable(NavRoutes.Liked.route) {
             LikedScreen(
+                onNavigateToLikedMe = {
+                    navController.navigate(NavRoutes.LikedMe.route) { launchSingleTop = true }
+                },
                 onNavigateToProfile = { profileId ->
                     navController.navigate(NavRoutes.ProfileDetails.createRoute(profileId))
                 },
@@ -160,8 +217,20 @@ fun AppNavGraph() {
                     navController.navigate(NavRoutes.WalkTalkDemo.route) { launchSingleTop = true }
                 },
                 onNavigateToPaywall = {
-                    navController.navigate(NavRoutes.Paywall.route) { launchSingleTop = true }
+                    navController.navigate(NavRoutes.Paywall.createRoute()) { launchSingleTop = true }
                 }
+            )
+        }
+
+        composable(NavRoutes.LikedMe.route) {
+            LikedMeScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToProfile = { profileId ->
+                    navController.navigate(NavRoutes.ProfileDetails.createRoute(profileId))
+                },
+                onNavigateToPaywall = { request ->
+                    navController.navigate(NavRoutes.Paywall.createRoute(request)) { launchSingleTop = true }
+                },
             )
         }
 
@@ -194,8 +263,8 @@ fun AppNavGraph() {
                         popUpTo(NavRoutes.ProfileDetails.route) { inclusive = true }
                     }
                 },
-                onNavigateToPaywall = {
-                    navController.navigate(NavRoutes.Paywall.route)
+                onNavigateToPaywall = { request ->
+                    navController.navigate(NavRoutes.Paywall.createRoute(request))
                 },
                 onNavigateToChat = { chatId, peerUid ->
                     navController.navigate(NavRoutes.Chat.createRoute(chatId, peerUid)) { launchSingleTop = true }
@@ -223,7 +292,7 @@ fun AppNavGraph() {
                     }
                 },
                 onNavigateToPaywall = {
-                    navController.navigate(NavRoutes.Paywall.route) { launchSingleTop = true }
+                    navController.navigate(NavRoutes.Paywall.createRoute()) { launchSingleTop = true }
                 },
             )
         }

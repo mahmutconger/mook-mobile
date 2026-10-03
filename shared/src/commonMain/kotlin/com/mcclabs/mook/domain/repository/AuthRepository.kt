@@ -83,7 +83,10 @@ interface AuthRepository {
     suspend fun acceptEula()
 
     /**
-     * Logs out the current user.
+     * YALNIZCA kimlik oturumunu kapatır (Firebase `signOut()`).
+     *
+     * Tam çıkış için bunu doğrudan ÇAĞIRMAYIN; FCM jetonu ve RevenueCat kimliği de temizlenmelidir.
+     * Doğru sıra `com.mcclabs.mook.domain.auth.LogoutUseCase` tarafından uygulanır.
      */
     suspend fun logout()
 

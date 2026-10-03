@@ -1,5 +1,6 @@
 package com.mcclabs.mook.data.repository
 
+import com.mcclabs.mook.data.appHttpsCallable
 import com.mcclabs.mook.domain.model.AuthResult
 import com.mcclabs.mook.domain.model.UserProfile
 import com.mcclabs.mook.domain.repository.AuthRepository
@@ -8,7 +9,6 @@ import dev.gitlive.firebase.auth.FirebaseAuthException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.storage.storage
-import dev.gitlive.firebase.functions.functions
 import com.mcclabs.mook.data.appFirestore
 import com.mcclabs.mook.util.Log
 
@@ -53,8 +53,9 @@ class AuthRepositoryImpl : AuthRepository {
             val authResult = Firebase.auth.signInWithEmailAndPassword(email, password)
             val uid = authResult.user?.uid ?: return AuthResult.Error("User not found")
 
-            // Activate Mook
-            appFirestore.collection("users").document(uid).set(mapOf("isMookActive" to true), merge = true)
+            // `isMookActive` artık istemciden YAZILMAZ (Firestore kuralları reddeder); profil,
+            // oturum açıldığında App.kt üzerinden `activateMookProfile` callable'ı ile sunucuda
+            // etkinleştirilir (bkz. MookProfileRepository).
 
             // Fetch profile
             val document = appFirestore.collection("users").document(uid).get()
@@ -101,7 +102,6 @@ class AuthRepositoryImpl : AuthRepository {
             val userData = mapOf(
                 "email" to email,
                 "displayName" to displayName,
-                "isMookActive" to true,
                 "lastActiveTimestamp" to timestamp,
                 "acceptedEula" to true,
                 // Google Play requires recording when the user accepted the EULA/UGC policy.
@@ -236,7 +236,7 @@ class AuthRepositoryImpl : AuthRepository {
             // Ağır silme işlemini sunucu yapar: güvenlik kuralları istemci tarafında
             // toplu silmeyi engellediğinden, Storage + Firestore + RevenueCat + Auth
             // temizliği `deleteAccount` Cloud Function içinde Admin SDK ile yürütülür.
-            Firebase.functions.httpsCallable("deleteAccount").invoke()
+            appHttpsCallable("deleteAccount").invoke()
 
             // Sunucu Auth kaydını sildi; yerel oturumu da temizleyelim ki uygulama
             // Login'e dönebilsin ve önbellekteki kullanıcı kalmasın.

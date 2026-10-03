@@ -1,5 +1,18 @@
 package com.mcclabs.mook.feature.settings
 
+import mook.shared.generated.resources.settings_update_payment_method
+import mook.shared.generated.resources.settings_billing_issue_notice
+import mook.shared.generated.resources.settings_scheduled_change
+import mook.shared.generated.resources.settings_scheduled_change_on
+import androidx.compose.foundation.layout.width
+import mook.shared.generated.resources.settings_incognito_subtitle_locked
+import mook.shared.generated.resources.settings_incognito_subtitle
+import mook.shared.generated.resources.settings_incognito_title
+import com.mcclabs.mook.ui.components.PremiumBadge
+import mook.shared.generated.resources.settings_privacy_consent_value
+import mook.shared.generated.resources.settings_privacy_consent_label
+import com.mcclabs.mook.feature.consent.PrivacyConsentViewModel
+import com.mcclabs.mook.feature.consent.PrivacyConsentHost
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +48,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalUriHandler
 import com.mcclabs.mook.domain.billing.Tier
+import com.mcclabs.mook.domain.billing.playStoreSubscriptionManagementUrl
+import com.mcclabs.mook.ads.AdPrivacyOptionsEntry
 import com.mcclabs.mook.ui.components.NeonToggle
 import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.datetime.Instant
@@ -46,7 +61,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 /** Google Play abonelik yönetimi derin bağlantısı (Play Store uygulamasında açılır). */
-private const val PLAY_STORE_SUBSCRIPTIONS_URL = "https://play.google.com/store/account/subscriptions"
+private const val PLAY_STORE_SUBSCRIPTIONS_URL =
+    // Gereksinim 1.8: `package` parametresi eklenerek genel abonelik listesi yerine
+    // doğrudan bu uygulamanın (Mook) aboneliklerine derin bağlantı kurulur.
+    "https://play.google.com/store/account/subscriptions?package=com.mcclabs.mook"
 
 @Composable
 fun SettingsScreen(
@@ -56,6 +74,8 @@ fun SettingsScreen(
     onNavigateToPaywall: () -> Unit = {},
     viewModel: SettingsViewModel = koinViewModel()
 ) {
+    // KVKK tercih düzenleyicisi; kök ekrandaki zorunlu onaydan bağımsız örnek.
+    val consentViewModel: PrivacyConsentViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -63,6 +83,7 @@ fun SettingsScreen(
             when (event) {
                 is SettingsEvent.NavigateToLogin -> onNavigateToLogin()
                 is SettingsEvent.AccountDeleted -> onNavigateToLogin()
+                is SettingsEvent.NavigateToPaywall -> onNavigateToPaywall()
             }
         }
     }
@@ -91,24 +112,29 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = NeonColors.TextSecondary
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    // Play Store zorunluluğu: silmenin abonelikleri iptal ETMEDİĞİ uyarısı.
-                    Text(
-                        text = stringResource(Res.string.settings_delete_account_subscription_warning),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = NeonColors.Error,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    // Kullanıcıyı Google Play abonelik yönetimi sayfasına derin bağlantıyla götürür.
-                    TextButton(onClick = { uriHandler.openUri(PLAY_STORE_SUBSCRIPTIONS_URL) }) {
-                        Text(
-                            text = stringResource(Res.string.settings_delete_account_manage_subs),
-                            color = NeonColors.Primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
 
                     val deleteState = state.deleteAccount
+                    // Gereksinim 1.8: abonelik uyarısı artık HER ZAMAN değil, yalnızca use case
+                    // gerçekten aktif ücretli bir abonelik tespit ettiğinde gösterilir — Free
+                    // bir kullanıcı artık kendisiyle alakasız bir uyarı görmez.
+                    if (deleteState is DeleteAccountUiState.ActiveSubscriptionWarning) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(Res.string.settings_delete_account_subscription_warning),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = NeonColors.Error,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        // Kullanıcıyı Google Play abonelik yönetimi sayfasına derin bağlantıyla götürür.
+                        TextButton(onClick = { uriHandler.openUri(PLAY_STORE_SUBSCRIPTIONS_URL) }) {
+                            Text(
+                                text = stringResource(Res.string.settings_delete_account_manage_subs),
+                                color = NeonColors.Primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
                     when (deleteState) {
                         is DeleteAccountUiState.Loading -> {
                             Spacer(modifier = Modifier.height(4.dp))
@@ -131,8 +157,20 @@ fun SettingsScreen(
                 }
             },
             confirmButton = {
+                val deleteState = state.deleteAccount
+                val isAwaitingSubscriptionAck = deleteState is DeleteAccountUiState.ActiveSubscriptionWarning
                 Button(
-                    onClick = viewModel::onDeleteConfirm,
+                    onClick = {
+                        // Gereksinim 1.8: kullanıcı zaten aktif abonelik uyarısını gördüyse bu
+                        // tıklama "yine de sil" onayıdır (kontrol tekrar edilmez); aksi halde
+                        // normal silme denemesi başlatılır — ki bu deneme abonelik varsa
+                        // yukarıdaki uyarı durumuna geçecektir.
+                        if (isAwaitingSubscriptionAck) {
+                            viewModel.onDeleteConfirmDespiteActiveSubscription()
+                        } else {
+                            viewModel.onDeleteConfirm()
+                        }
+                    },
                     enabled = !isDeleting,
                     colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Error)
                 ) {
@@ -144,7 +182,10 @@ fun SettingsScreen(
                         )
                     } else {
                         Text(
-                            text = stringResource(Res.string.settings_delete_account_confirm),
+                            text = stringResource(
+                                if (isAwaitingSubscriptionAck) Res.string.settings_delete_account_confirm_anyway
+                                else Res.string.settings_delete_account_confirm
+                            ),
                             color = androidx.compose.ui.graphics.Color.White,
                             fontWeight = FontWeight.Bold
                         )
@@ -263,7 +304,16 @@ fun SettingsScreen(
         SectionLabel(stringResource(Res.string.settings_membership_section))
         val tierLabel = state.subscription.tier.displayName()
         val membershipStatus = if (state.subscription.inTrial) {
-            stringResource(Res.string.settings_membership_trial)
+            // Gereksinim 1.10: yalnızca "Deneme" değil, kalan gün sayısını da göster.
+            val daysLeft = com.mcclabs.mook.domain.billing.TrialPeriod.remainingDays(
+                state.subscription,
+                com.mcclabs.mook.util.getCurrentTimeMillis(),
+            )
+            if (daysLeft != null) {
+                stringResource(Res.string.settings_membership_trial_days, daysLeft)
+            } else {
+                stringResource(Res.string.settings_membership_trial)
+            }
         } else {
             stringResource(Res.string.settings_membership_active)
         }
@@ -281,12 +331,70 @@ fun SettingsScreen(
                 value = expiresAt.formatSubscriptionDate(),
             )
         }
+        // Ertelenmiş düşürme: "Şu tarihte Ekonomik pakete geçilecek".
+        val status = state.subscriptionStatus
+        status.scheduledTier?.let { target ->
+            val targetName = target.displayName()
+            SettingsNotice(
+                text = status.scheduledAtMillis
+                    ?.let { stringResource(Res.string.settings_scheduled_change_on, it.formatSubscriptionDate(), targetName) }
+                    ?: stringResource(Res.string.settings_scheduled_change, targetName),
+                color = NeonColors.TextSecondary,
+            )
+        }
+        // Ödeme sorunu: kullanıcı mağazada ödeme yöntemini güncelleyene kadar uyarı + bağlantı.
+        if (status.showBillingIssue) {
+            SettingsNotice(
+                text = stringResource(Res.string.settings_billing_issue_notice),
+                color = NeonColors.Error,
+            )
+            SettingsRow(
+                title = stringResource(Res.string.settings_update_payment_method),
+                value = stringResource(Res.string.settings_view_label),
+                onClick = { uriHandler.openUri(status.paymentUpdateUrl) },
+            )
+        }
         if (state.subscription.tier != Tier.FREE) {
             SettingsRow(
                 title = stringResource(Res.string.settings_membership_manage),
                 value = stringResource(Res.string.settings_view_label),
                 onClick = { uriHandler.openUri(PLAY_STORE_SUBSCRIPTIONS_URL) },
             )
+        }
+        // Gereksinim 2.3/2.4: bu cihazda en son satın alındığından bu yana fiyat artışı
+        // tespit edildiyse (bkz. `PriceChangeConfirmationUseCase`), kullanıcıyı Google'ın
+        // RESMİ Play Store onay yüzeyine yönlendiren bir bilgi şeridi gösterilir — Billing
+        // Library'nin artık kaldırdığı uygulama içi bir onay ekranı TAKLİT EDİLMEZ (bkz.
+        // use case'in sınıf yorumu).
+        state.priceChangeNotice?.let { notice ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(
+                    Res.string.settings_price_change_notice,
+                    notice.previousLocalizedPrice,
+                    notice.currentLocalizedPrice,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = NeonColors.Error,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+            TextButton(
+                onClick = {
+                    uriHandler.openUri(
+                        playStoreSubscriptionManagementUrl(
+                            packageName = "com.mcclabs.mook",
+                            productIdentifier = notice.productIdentifier,
+                        ),
+                    )
+                },
+            ) {
+                Text(
+                    text = stringResource(Res.string.settings_price_change_cta),
+                    color = NeonColors.Primary,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
         SettingsRow(
             title = stringResource(Res.string.settings_membership_restore),
@@ -374,6 +482,43 @@ fun SettingsScreen(
                 onCheckedChange = viewModel::onDiscoverVisibleChange
             )
         }
+        // Gizli mod (Premium): Keşfet'te yalnızca beğendiğin kişilere görünürsün ve profil
+        // ziyaretlerin kaydedilmez. Premium olmayan kullanıcıda anahtar Paywall'a götürür.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(Res.string.settings_incognito_title),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = NeonColors.TextPrimary
+                    )
+                    if (!state.subscription.limits.incognito) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        PremiumBadge(compact = true)
+                    }
+                }
+                Text(
+                    text = stringResource(
+                        if (state.subscription.limits.incognito) Res.string.settings_incognito_subtitle
+                        else Res.string.settings_incognito_subtitle_locked
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = NeonColors.TextSecondary
+                )
+                state.incognitoMessage?.let { message ->
+                    Text(text = message, style = MaterialTheme.typography.labelSmall, color = NeonColors.Error)
+                }
+            }
+            NeonToggle(
+                checked = state.incognitoEnabled,
+                onCheckedChange = viewModel::onIncognitoChange
+            )
+        }
         SettingsRow(
             title = stringResource(Res.string.settings_age_preferences_label),
             value = "${state.ageRangeStart} - ${state.ageRangeEnd}",
@@ -389,6 +534,14 @@ fun SettingsScreen(
             value = stringResource(Res.string.settings_view_label),
             onClick = { uriHandler.openUri("https://walktalkk.com/legal.html") }
         )
+        AdPrivacyOptionsEntry()
+        // KVKK: kullanıcı açık rızasını istediği an geri alabilmeli ya da değiştirebilmeli.
+        SettingsRow(
+            title = stringResource(Res.string.settings_privacy_consent_label),
+            value = stringResource(Res.string.settings_privacy_consent_value),
+            onClick = consentViewModel::openEditor,
+        )
+        PrivacyConsentHost(promptWhenRequired = false, viewModel = consentViewModel)
 
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -403,6 +556,48 @@ fun SettingsScreen(
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(stringResource(Res.string.settings_logout_button), color = NeonColors.Error, fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // ── Gereksinim 5 (Faz 6, KVKK Madde 11): Verilerimi Dışa Aktar ─────────
+        val isExporting = state.exportData is ExportDataUiState.Loading
+        Button(
+            onClick = viewModel::onExportDataClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .height(52.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder),
+            shape = RoundedCornerShape(12.dp),
+            enabled = !isExporting,
+        ) {
+            if (isExporting) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = NeonColors.TextPrimary)
+            } else {
+                Text(stringResource(Res.string.settings_export_data_button), fontWeight = FontWeight.Bold)
+            }
+        }
+        when (val exportState = state.exportData) {
+            is ExportDataUiState.Requested -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(Res.string.settings_export_data_requested),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = NeonColors.TextSecondary,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                )
+            }
+            is ExportDataUiState.Error -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = exportState.message,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = NeonColors.Error,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                )
+            }
+            else -> Unit
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -453,6 +648,17 @@ private fun SectionLabel(text: String) {
         color = NeonColors.Primary,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+    )
+}
+
+/** Abonelik bölümünde tek satırlık bilgilendirme metni. */
+@Composable
+private fun SettingsNotice(text: String, color: androidx.compose.ui.graphics.Color) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = color,
+        modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
     )
 }
 

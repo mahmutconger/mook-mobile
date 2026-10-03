@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.settings
 
+import com.mcclabs.mook.domain.billing.Tier
+
 /**
  * Hesap silme akışının tek yönlü veri akışındaki (UDF) durumları.
  *
@@ -18,4 +20,11 @@ sealed interface DeleteAccountUiState {
 
     /** Silme başarısız oldu; [message] kullanıcıya gösterilecek Türkçe hata metnidir. */
     data class Error(val message: String) : DeleteAccountUiState
+
+    /**
+     * Gereksinim 1.8: silme henüz yapılmadı — [DeleteAccountUseCase] cihazda aktif, ücretli
+     * bir abonelik tespit etti. Diyalog bu durumda hesabı silmez; bunun yerine kullanıcıyı
+     * Google Play abonelik yönetimine yönlendiren bir uyarı ve "yine de sil" onayı gösterir.
+     */
+    data class ActiveSubscriptionWarning(val tier: Tier, val expiresAtMillis: Long?) : DeleteAccountUiState
 }

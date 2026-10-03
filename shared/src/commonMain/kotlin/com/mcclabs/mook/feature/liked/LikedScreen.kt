@@ -1,5 +1,10 @@
 package com.mcclabs.mook.feature.liked
 
+import mook.shared.generated.resources.liked_me_title
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -38,6 +43,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikedScreen(
+    /** "Beni Beğenenler" ekranına geçiş. */
+    onNavigateToLikedMe: () -> Unit,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToDiscover: () -> Unit,
     onNavigateToChats: () -> Unit,
@@ -57,6 +64,13 @@ fun LikedScreen(
                         color = NeonColors.Primary,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    TextButton(onClick = onNavigateToLikedMe) {
+                        Icon(Icons.Filled.Favorite, contentDescription = null, tint = NeonColors.Primary)
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(Res.string.liked_me_title), color = NeonColors.Primary)
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background)
             )

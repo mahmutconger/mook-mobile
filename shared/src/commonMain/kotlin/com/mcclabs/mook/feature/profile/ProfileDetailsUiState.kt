@@ -1,6 +1,8 @@
 package com.mcclabs.mook.feature.profile
 
+import com.mcclabs.mook.domain.billing.BillingConfig
 import com.mcclabs.mook.domain.billing.EntitlementState
+import com.mcclabs.mook.domain.billing.LimitReason
 import com.mcclabs.mook.domain.model.DiscoverProfile
 
 data class ProfileDetailsUiState(
@@ -31,12 +33,36 @@ data class ProfileDetailsUiState(
     val entitlement: EntitlementState = EntitlementState(),
     /** Likes used today, read from the server when the profile loads. */
     val swipesUsedToday: Int = 0,
-    /** True once the free daily allowance runs out; the upgrade dialog takes over. */
-    val showLimitDialog: Boolean = false,
+    /** Verified bonus likes used today, read from the same server usage record. */
+    val rewardedLikesToday: Int = 0,
+    /** Lifetime successful likes, used for the interstitial onboarding grace period. */
+    val likesEver: Int = 0,
+    /**
+     * [FeatureGate][com.mcclabs.mook.domain.billing.FeatureGate] bir `LimitReached` kararı
+     * ürettiğinde set edilir; Limit Sheet açıktır (bkz. Gereksinim 1.5). `null` iken kapalıdır.
+     */
+    val limitReason: LimitReason? = null,
+    /** [limitReason] bir adil kullanım tavanıysa (yükseltme çözmez) `true` — bkz. Gereksinim 1.5. */
+    val limitIsFairUseCap: Boolean = false,
 ) {
+    /** Geriye dönük uyumluluk: mevcut arayüz kodu bu boolean'ı okumaya devam edebilir. */
+    val showLimitDialog: Boolean
+        get() = limitReason != null
+
     /** Uses the active tier's limit; a null plan limit is subject only to the server fair-use cap. */
+    val effectiveDailyLikeLimit: Int?
+        get() = BillingConfig.effectiveDailyLikeLimit(entitlement.limits, entitlement.tier, rewardedLikesToday)
+
+    // Gereksinim 2.5: Economy artık Free ile aynı ödüllü-reklam bonus hakkına sahip —
+    // bkz. BillingConfig.canEarnRewardedLikeBonus KDoc'u.
+    val canEarnRewardedLike: Boolean
+        get() = BillingConfig.canEarnRewardedLikeBonus(entitlement.tier, rewardedLikesToday)
+
     val canSwipe: Boolean
-        get() = entitlement.limits.dailyLikes == null || swipesUsedToday < entitlement.limits.dailyLikes
+        get() {
+            val limit = effectiveDailyLikeLimit
+            return limit == null || swipesUsedToday < limit
+        }
 
     /** Whether to offer the like/pass row: someone else's profile, not yet acted on. */
     val canAct: Boolean

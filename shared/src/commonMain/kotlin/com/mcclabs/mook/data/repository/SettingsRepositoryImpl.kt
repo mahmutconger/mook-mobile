@@ -1,10 +1,13 @@
 package com.mcclabs.mook.data.repository
 
+import com.mcclabs.mook.domain.repository.IncognitoUpdateResult
+import com.mcclabs.mook.data.appHttpsCallable
+import com.mcclabs.mook.data.room.toRoomSwitchDomainError
+import kotlinx.coroutines.CancellationException
 import com.mcclabs.mook.domain.model.MatchSettings
 import com.mcclabs.mook.domain.repository.SettingsRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
-import dev.gitlive.firebase.functions.functions
 import com.mcclabs.mook.data.appFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,6 +84,30 @@ class SettingsRepositoryImpl : SettingsRepository {
             Log.e("Discover görünürlüğü okunamadı, varsayılana dönülüyor", e)
             true
         }
+    }
+
+    override suspend fun getIncognito(): Boolean {
+        val userId = Firebase.auth.currentUser?.uid ?: return false
+        return try {
+            val document = appFirestore.collection("users").document(userId).get()
+            runCatching { document.get<Boolean?>("incognito") }.getOrNull() ?: false
+        } catch (e: Exception) {
+            Log.e("Gizli mod durumu okunamadı, kapalı varsayılıyor", e)
+            false
+        }
+    }
+
+    override suspend fun setIncognito(enabled: Boolean): IncognitoUpdateResult = try {
+        val response = appHttpsCallable("setIncognito")
+            .invoke(IncognitoRequest(enabled))
+            .data<IncognitoResponse>()
+        IncognitoUpdateResult.Updated(response.enabled)
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (error: Exception) {
+        Log.e("Gizli mod güncellenemedi", error)
+        if (error.message?.contains("upgrade-required") == true) IncognitoUpdateResult.UpgradeRequired
+        else IncognitoUpdateResult.Failed
     }
 
     override suspend fun setDiscoverVisible(visible: Boolean) {
@@ -199,11 +226,25 @@ class SettingsRepositoryImpl : SettingsRepository {
         // Membership and daily room-switch quotas are enforced by Cloud Functions.
         // Do not write this protected field directly: a modified client could otherwise
         // join every room without spending its tier allowance.
-        Firebase.functions.httpsCallable("switchRoom")
-            .invoke(SwitchRoomRequest(code))
+        try {
+            appHttpsCallable("switchRoom")
+                .invoke(SwitchRoomRequest(code))
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            // Günlük hak dolduysa genel bir hata yerine alan istisnası fırlatılır; sunum katmanı
+            // bunu limit sayfasına yönlendirir (bkz. DailyRoomChangeLimitReachedException).
+            throw error.toRoomSwitchDomainError()
+        }
         state.value = getSettings().copy(roomLanguageCode = code)
     }
 }
 
 @Serializable
 private data class SwitchRoomRequest(val languageCode: String)
+
+@Serializable
+private data class IncognitoRequest(val enabled: Boolean)
+
+@Serializable
+private data class IncognitoResponse(val enabled: Boolean = false)

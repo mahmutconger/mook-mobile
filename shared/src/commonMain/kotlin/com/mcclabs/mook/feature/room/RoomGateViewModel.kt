@@ -2,6 +2,7 @@ package com.mcclabs.mook.feature.room
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mcclabs.mook.domain.connectivity.ConnectivityObserver
 import com.mcclabs.mook.domain.model.Language
 import com.mcclabs.mook.domain.model.Languages
 import com.mcclabs.mook.domain.repository.DiscoverRepository
@@ -39,7 +40,8 @@ sealed class RoomGateEvent {
  */
 class RoomGateViewModel(
     private val settingsRepository: SettingsRepository,
-    private val discoverRepository: DiscoverRepository
+    private val discoverRepository: DiscoverRepository,
+    private val connectivityObserver: ConnectivityObserver,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RoomGateUiState())
@@ -65,6 +67,11 @@ class RoomGateViewModel(
 
     fun onRoomSelected(language: Language) {
         if (_state.value.isSubmitting) return
+        // Gereksinim 1.2: bağlantı yokken denemek yerine anında çevrimdışı hatası gösterilir.
+        if (!connectivityObserver.isOnline.value) {
+            _state.update { it.copy(error = RoomSelectionError.OFFLINE) }
+            return
+        }
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, error = null) }
             try {

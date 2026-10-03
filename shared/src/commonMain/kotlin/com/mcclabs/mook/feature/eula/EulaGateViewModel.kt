@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.eula
 
+import com.mcclabs.mook.domain.auth.LogoutUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.repository.AuthRepository
@@ -32,7 +33,8 @@ sealed class EulaGateEvent {
  * it forwards immediately; otherwise it shows the mandatory acceptance UI.
  */
 class EulaGateViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EulaGateUiState())
@@ -66,7 +68,8 @@ class EulaGateViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            authRepository.logout()
+            // Katı çıkış sırası: FCM jetonu → RevenueCat → signOut (bkz. LogoutUseCase).
+            logoutUseCase()
             _events.emit(EulaGateEvent.LoggedOut)
         }
     }

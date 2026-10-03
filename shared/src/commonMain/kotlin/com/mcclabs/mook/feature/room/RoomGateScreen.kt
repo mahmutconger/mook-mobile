@@ -27,6 +27,8 @@ import mook.shared.generated.resources.room_gate_subtitle
 import mook.shared.generated.resources.room_gate_title
 import mook.shared.generated.resources.room_error_slot_limit
 import mook.shared.generated.resources.room_error_unavailable
+import mook.shared.generated.resources.room_error_daily_limit
+import mook.shared.generated.resources.error_offline
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -90,8 +92,12 @@ fun RoomGateScreen(
         state.error?.let { error ->
             Text(
                 text = stringResource(
-                    if (error == RoomSelectionError.SLOT_LIMIT) Res.string.room_error_slot_limit
-                    else Res.string.room_error_unavailable,
+                    when (error) {
+                        RoomSelectionError.SLOT_LIMIT -> Res.string.room_error_slot_limit
+                        RoomSelectionError.OFFLINE -> Res.string.error_offline
+                        RoomSelectionError.UNAVAILABLE -> Res.string.room_error_unavailable
+                        RoomSelectionError.DAILY_LIMIT -> Res.string.room_error_daily_limit
+                    },
                 ),
                 color = NeonColors.Error,
                 style = MaterialTheme.typography.bodySmall,

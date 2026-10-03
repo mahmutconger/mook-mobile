@@ -16,6 +16,15 @@ interface SettingsRepository {
     /** Persists the user's Discover visibility opt-in to their `users` document. */
     suspend fun setDiscoverVisible(visible: Boolean)
 
+    /** Gizli modun mevcut durumu (`users/{uid}.incognito`, yalnızca sunucu yazar). */
+    suspend fun getIncognito(): Boolean
+
+    /**
+     * Gizli modu `setIncognito` callable'ı ile açar/kapatır. Açma yalnızca Premium'da izinlidir;
+     * sunucu bunu doğrular. Hata fırlatmaz.
+     */
+    suspend fun setIncognito(enabled: Boolean): IncognitoUpdateResult
+
     /** Gets whether dark mode is enabled. */
     suspend fun getIsDarkMode(): Boolean
 
@@ -49,6 +58,22 @@ interface SettingsRepository {
     /** Gets the language code (DeepL format) of the room the user is currently in, or `null` if none chosen yet. */
     suspend fun getRoomLanguageCode(): String?
 
-    /** Persists the user's chosen room language. */
+    /**
+     * Kullanıcıyı seçilen odaya geçirir (sunucu tarafında `switchRoom`). Slotlar doluysa en uzun
+     * süredir kullanılmayan oda atomik olarak yenisiyle takas edilir; kapasite hatası oluşmaz.
+     *
+     * @throws com.mcclabs.mook.domain.room.DailyRoomChangeLimitReachedException Bugünkü oda
+     *   değiştirme hakkı dolduysa.
+     */
     suspend fun setRoomLanguageCode(code: String)
+}
+
+/** Gizli mod güncellemesinin sonucu. */
+sealed interface IncognitoUpdateResult {
+    data class Updated(val enabled: Boolean) : IncognitoUpdateResult
+
+    /** Gizli mod bir Premium ayrıcalığıdır; kullanıcı yükseltmeye yönlendirilir. */
+    data object UpgradeRequired : IncognitoUpdateResult
+
+    data object Failed : IncognitoUpdateResult
 }

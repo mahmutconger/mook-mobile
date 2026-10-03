@@ -1,5 +1,6 @@
 package com.mcclabs.mook.data.sso
 
+import com.mcclabs.mook.data.appHttpsCallable
 import com.mcclabs.mook.data.translation.mapCallableErrorCode
 import com.mcclabs.mook.domain.sso.SsoAccount
 import com.mcclabs.mook.domain.sso.SsoAuthRepository
@@ -9,7 +10,6 @@ import com.mcclabs.mook.domain.translation.TranslationError
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.functions.FirebaseFunctionsException
-import dev.gitlive.firebase.functions.functions
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.Serializable
 
@@ -24,8 +24,7 @@ class FirebaseSsoAuthRepository : SsoAuthRepository {
 
     override suspend fun mintSsoToken(): SsoTokenResult {
         val response = try {
-            Firebase.functions
-                .httpsCallable(CALLABLE_NAME)
+            appHttpsCallable(CALLABLE_NAME)
                 .invoke()
                 .data<SsoTokenResponse>()
         } catch (cancellation: CancellationException) {

@@ -88,6 +88,9 @@ private fun formatBirthDate(millis: Long): String {
 fun RegistrationScreen(
     onNavigateToHome: () -> Unit,
     onNavigateBack: () -> Unit = {},
+    // Gereksinim 2.13 (Faz 4): Remote Config bayrağı açıkken onboarding sonunda
+    // doğrudan Deneme paketi ön-seçili Paywall'a yönlendirmek için.
+    onNavigateToPaywallWithTrial: () -> Unit = onNavigateToHome,
     viewModel: RegistrationViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -99,6 +102,8 @@ fun RegistrationScreen(
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 is RegistrationViewModel.RegistrationNavigationEvent.NavigateToHome -> onNavigateToHome()
+                is RegistrationViewModel.RegistrationNavigationEvent.NavigateToPaywallWithTrial ->
+                    onNavigateToPaywallWithTrial()
             }
         }
     }
