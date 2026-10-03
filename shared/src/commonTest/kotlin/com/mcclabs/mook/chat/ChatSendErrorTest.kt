@@ -34,6 +34,47 @@ class ChatSendErrorTest {
     }
 
     @Test
+    fun resourceExhaustedWithNoMessageStillFallsBackToRateLimited() {
+        // Geriye dönük uyumluluk: eski çağrı yerleri (ya da testler) message'ı hiç
+        // vermeyebilir — davranış asla KIRILMAMALI, yalnızca Gereksinim 2.2 ile daha
+        // SPESİFİK hale gelmiştir.
+        assertEquals(ChatSendError.RATE_LIMITED, chatSendErrorFor("RESOURCE_EXHAUSTED", message = null))
+    }
+
+    @Test
+    fun resourceExhaustedWithOtherReasonsStillMeansRateLimited() {
+        // `enforceMessageQuota`'nın diğer resource-exhausted sebepleri (dakikalık hız
+        // sınırı, günlük mesaj sayısı, günlük yeni sohbet sayısı) Gereksinim 2.2'nin
+        // karakter kotasıyla KARIŞTIRILMAMALI — hepsi RATE_LIMITED olarak kalır.
+        listOf("rate-limit-exceeded", "daily-message-limit", "daily-new-chat-limit").forEach { reason ->
+            assertEquals(
+                ChatSendError.RATE_LIMITED,
+                chatSendErrorFor("RESOURCE_EXHAUSTED", message = reason),
+                "Unexpected mapping for message=$reason",
+            )
+        }
+    }
+
+    @Test
+    fun resourceExhaustedWithCharacterQuotaMessageMeansQuotaExhausted() {
+        // Gereksinim 2.2: sunucudaki `enforceMessageQuota`nın attığı iki karakter-kotası
+        // sebebi de aynı yerelleştirilmiş, RATE_LIMITED'dan AYRI duruma eşlenmeli.
+        assertEquals(
+            ChatSendError.CHARACTER_QUOTA_EXHAUSTED,
+            chatSendErrorFor("RESOURCE_EXHAUSTED", message = "character-quota-daily-exhausted"),
+        )
+        assertEquals(
+            ChatSendError.CHARACTER_QUOTA_EXHAUSTED,
+            chatSendErrorFor("RESOURCE_EXHAUSTED", message = "character-quota-monthly-exhausted"),
+        )
+        // Büyük/küçük harf ve baştaki/sondaki boşluk normalize edilir.
+        assertEquals(
+            ChatSendError.CHARACTER_QUOTA_EXHAUSTED,
+            chatSendErrorFor("resource-exhausted", message = "  CHARACTER-QUOTA-DAILY-EXHAUSTED  "),
+        )
+    }
+
+    @Test
     fun everythingElseFallsBackToTheGenericMessage() {
         // NOT_FOUND is the one a region mismatch produces — it must not be silently
         // reported as something the user can fix by waiting.
