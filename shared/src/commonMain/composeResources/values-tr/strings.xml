@@ -61,12 +61,26 @@
     <string name="settings_delete_account_subscription_warning">Önemli: Hesabını silmek, aktif aboneliklerini otomatik olarak iptal ETMEZ. Aboneliklerini Google Play üzerinden ayrıca iptal etmen gerekir.</string>
     <string name="settings_delete_account_manage_subs">Abonelikleri Yönet</string>
     <string name="settings_delete_account_progress">Hesabın siliniyor…</string>
+    <string name="settings_delete_account_confirm_anyway">Yine de Sil</string>
+    <!-- Gereksinim 1.9: Hesap Çakışması diyaloğu -->
+    <string name="account_conflict_title">Hesap Çakışması</string>
+    <string name="account_conflict_message">Bu cihazda zaten farklı bir hesaba bağlı, aktif bir %1$s aboneliği var. Bu aboneliği yeni hesabına aktarmak mı istersin, yoksa destek ile mi iletişime geçmek istersin?</string>
+    <string name="account_conflict_transfer_button">Aboneliği Aktar</string>
+    <string name="account_conflict_support_button">Destek İle İletişime Geç</string>
+    <!-- Gereksinim 1.13: Hesap Askıya Alındı ekranı -->
+    <string name="moderation_suspended_title">Hesap Askıya Alındı</string>
+    <string name="moderation_suspended_message">Hesabın, Kullanım Şartlarımızı ihlal ettiği için askıya alındı. Bunun bir hata olduğunu düşünüyorsan lütfen destek ile iletişime geç.</string>
+    <string name="moderation_suspended_contact_support">Destek İle İletişime Geç</string>
     <string name="settings_title">Ayarlar</string>
     <string name="settings_language_dialog_title">Uygulama Dili</string>
     <string name="settings_language_dialog_close">Kapat</string>
     <string name="settings_account_section">HESAP</string>
     <string name="room_error_slot_limit">Mevcut paketindeki oda slotu dolu. Paketini yükselt veya mevcut odanı değiştir.</string>
     <string name="room_error_unavailable">Oda değiştirilemedi. Lütfen tekrar dene.</string>
+    <string name="room_downgrade_title">Oda sınırı aşıldı</string>
+    <string name="room_downgrade_body">Mevcut planınız en fazla %1$d oda destekliyor. Kapatmak istediğiniz fazla odaları seçin — kapalı bir odadaki eşleşme ve sohbetler görünür kalır, yalnızca salt-okunur olur.</string>
+    <string name="room_downgrade_confirm">Seçilenleri kapat</string>
+    <string name="room_downgrade_later">Daha sonra karar ver</string>
     <string name="settings_membership_section">ABONELİK</string>
     <string name="settings_membership_label">Mook üyeliği</string>
     <string name="settings_membership_action">Paketleri görüntüle</string>
@@ -77,9 +91,12 @@
     <string name="settings_membership_premium">Premium</string>
     <string name="settings_membership_active">Aktif</string>
     <string name="settings_membership_trial">Deneme</string>
+    <string name="settings_membership_trial_days">Deneme · %1$d gün kaldı</string>
     <string name="settings_membership_renews">Yenilenme tarihi</string>
     <string name="settings_membership_ends">Bitiş tarihi</string>
     <string name="settings_membership_manage">Aboneliği yönet</string>
+    <string name="settings_price_change_notice">Fiyat güncellemesi: %1$s idi, şimdi %2$s. Yürürlüğe girmeden önce Google Play senden onay isteyecek.</string>
+    <string name="settings_price_change_cta">Google Play\'de incele</string>
     <string name="settings_membership_restore">Satın alımları geri yükle</string>
     <string name="settings_membership_restoring">Geri yükleniyor…</string>
     <string name="settings_email_label">E-posta</string>
@@ -166,16 +183,84 @@
     <string name="discover_empty_room_message">Üzgünüz, burada henüz birini bulamadık. Dilersen başka odalara bakabilirsin.</string>
     <string name="discover_swipe_limit_title">Günlük hakkın doldu</string>
     <string name="discover_swipe_limit_body">Bugünlük %1$d beğeni hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
+    <string name="limit_sheet_title_monthly">Bu ayki limitine ulaştın</string>
+    <string name="limit_sheet_title_fair_use">Adil kullanım limitine ulaşıldı</string>
+    <string name="limit_sheet_body_messages">Bugünlük %1$d mesaj hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
+    <string name="limit_sheet_body_new_chats">Bugünlük %1$d yeni sohbet başlatma hakkını kullandın. Zaten başlattığın sohbetlere yanıt vermenin bir sınırı yoktur — daha fazlası için planları incele.</string>
+    <string name="limit_sheet_body_room_switches">Bugünlük %1$d oda değiştirme hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
+    <string name="limit_sheet_body_liked_me">Bugünlük %1$d \'seni beğenenler\' açma hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
+    <string name="limit_sheet_body_rewinds">Bugünlük %1$d geri alma hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
+    <string name="limit_sheet_body_boosts">Bu ayki %1$d Boost hakkını kullandın — daha fazlası için planları incele.</string>
+    <string name="limit_sheet_body_boosts_fair_use">Planına dahil aylık %1$d Boost hakkına ulaştın.</string>
+    <string name="limit_sheet_ok_button">Anladım</string>
+    <string name="ads_reward_button">Reklam izle, +5 beğeni kazan</string>
+    <string name="ads_reward_loading">Ödüllü reklam yükleniyor…</string>
+    <string name="ads_reward_waiting">Ödülün doğrulanıyor, lütfen birkaç saniye bekle.</string>
+    <string name="ads_reward_done">5 ek beğeni hesabına eklendi.</string>
+    <string name="ads_reward_error">Reklam tamamlanamadı veya doğrulanamadı. Daha sonra tekrar dene.</string>
+    <string name="ads_reward_no_fill">Şu anda gösterilecek ödüllü reklam yok. Lütfen daha sonra tekrar dene.</string>
+    <!-- Gereksinim 2.9 (Faz 4): sunucudaki AdMob SSV gunluk tavanina ulasildiginda gosterilir. -->
+    <string name="ads_reward_daily_limit_reached">Günlük ödül sınırına ulaştınız.</string>
+    <string name="ads_privacy_options">Reklam gizlilik tercihleri</string>
+    <string name="ads_sponsored">Sponsorlu</string>
     <string name="discover_upgrade_cta">Planları gör</string>
 
     <!-- Paywall -->
     <string name="paywall_title">Mook Premium</string>
-    <string name="paywall_subtitle">Mook\'un tamamını aç</string>
+    <string name="paywall_subtitle">Sana uygun planı seç, Mook\'ta daha fazlasını keşfet.</string>
     <string name="paywall_benefit_unlimited">Her gün sınırsız kaydırma</string>
     <string name="paywall_benefit_likes">Seni beğenen herkesi gör</string>
     <string name="paywall_benefit_filters">Gelişmiş filtreler ve tüm dil odaları</string>
     <string name="paywall_not_ready">Paketler ve satın alma, faturalandırma kurulunca burada görünecek.</string>
     <string name="paywall_close">Kapat</string>
+    <string name="paywall_choose_plan">Planını seç</string>
+    <string name="paywall_plan_options">Abonelik seçenekleri</string>
+    <string name="paywall_tier_economy">Economy</string>
+    <string name="paywall_tier_standard">Standard</string>
+    <string name="paywall_tier_premium">Premium</string>
+    <string name="paywall_period_monthly">Aylık</string>
+    <string name="paywall_period_yearly">Yıllık</string>
+    <string name="paywall_billed_monthly">Aylık tahsil edilir</string>
+    <string name="paywall_billed_yearly">Yıllık tahsil edilir</string>
+    <string name="paywall_recommended">Önerilen</string>
+    <string name="paywall_current_plan">Mevcut plan</string>
+    <string name="paywall_continue_with">%1$s ile devam et</string>
+    <string name="paywall_start_free_trial">Ücretsiz denemeyi başlat</string>
+    <string name="paywall_manage_plan">Aboneliği yönet</string>
+    <string name="paywall_renewal_terms">%1$s · %2$s. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_renewal_terms_trial">Ücretsiz deneme, ardından %1$s · %2$s. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_restore">Satın alımları geri yükle</string>
+    <string name="paywall_manage_google_play">Google Play'de yönet</string>
+    <string name="paywall_terms_privacy">Kullanım koşulları · Gizlilik</string>
+    <string name="paywall_distance_selling_contract_waiver">Mesafeli Sözleşmeler Yönetmeliği kapsamındaki Cayma Hakkı İstisnası Ön Bilgilendirmesi\'ni okudum, dijital içerik ifasının hemen başlamasını onaylıyorum ve bu onayla cayma hakkımdan feragat ettiğimi kabul ediyorum.</string>
+    <string name="paywall_active_title">%1$s planın aktif</string>
+    <string name="paywall_trial_detail">Şu anda deneme dönemindesin.</string>
+    <string name="paywall_trial_days_remaining">Deneme sürende %1$d gün kaldı.</string>
+    <string name="paywall_trial_cancelled_detail">Deneme iptal edildi — %1$s tarihine kadar erişimin devam edecek.</string>
+    <string name="paywall_renews_date">Yenilenme: %1$s</string>
+    <string name="paywall_ends_date">Bitiş: %1$s</string>
+    <string name="paywall_included_title">%1$s planına dahil</string>
+    <string name="paywall_economy_likes">Günde 30 beğeni</string>
+    <string name="paywall_economy_rooms">En fazla 3 odaya katıl</string>
+    <string name="paywall_economy_no_ads">Mook\'u reklamsız kullan</string>
+    <string name="paywall_standard_likes">Günde 100 beğeni</string>
+    <string name="paywall_standard_liked_by">Seni beğenen en fazla 5 kişiyi her gün gör</string>
+    <string name="paywall_standard_tools">Günde 3 Geri Al · Ayda 1 Boost</string>
+    <string name="paywall_premium_roam">Tüm dil odalarını keşfet</string>
+    <string name="paywall_premium_privacy">Gizli gezin</string>
+    <string name="paywall_premium_boosts">Her ay 4 Boost</string>
+    <!-- Gereksinim 2.11 (Faz 4): "Sınırsız" iddiası taşıyan bir paket özelliği — her zaman paywall_fair_use_disclaimer ile birlikte gösterilir. -->
+    <string name="paywall_unlimited_messaging">Sınırsız mesajlaşma</string>
+    <!-- Gereksinim 2.11 (Faz 4): "Sınırsız" olarak reklamı yapılan HER paket özelliğinin hemen altında görünmesi ZORUNLU tüketici yasası/Play Store uyum açıklaması. -->
+    <string name="paywall_fair_use_disclaimer">Adil Kullanım Kotası Uygulanır</string>
+    <string name="paywall_purchase_success_title">Abonelik aktif</string>
+    <string name="paywall_purchase_success_text">Mook avantajların kullanıma hazır.</string>
+    <string name="paywall_done">Tamam</string>
+    <string name="paywall_purchase_success">Abonelik aktif.</string>
+    <string name="paywall_purchase_cancelled">Satın alma iptal edildi.</string>
+    <string name="paywall_purchase_pending">Ödemeniz onay bekliyor. Onaylandığında sizi bilgilendireceğiz.</string>
+    <string name="paywall_restore_success">Satın almalar geri yüklendi.</string>
+    <string name="paywall_restore_pending">Geri yükleme onay bekliyor.</string>
     <string name="room_language_independent">Dilden bağımsız</string>
 
     <!-- Common -->
@@ -288,6 +373,17 @@
     <!-- Snackbars / errors -->
     <string name="error_generic">Bir şeyler ters gitti.</string>
     <string name="error_swipe_failed">Kaydırma başarısız, bağlantını kontrol et.</string>
+    <string name="info_swipe_queued_offline">Bağlantı yok — bu işlem, bağlantı kurulduğunda otomatik olarak gönderilecek.</string>
+    <string name="settings_export_data_button">Verilerimi Dışa Aktar</string>
+    <string name="settings_export_data_requested">İsteğiniz alındı — birkaç dakika içinde indirme bağlantısını içeren bir e-posta alacaksınız.</string>
+    <string name="error_offline">İnternet bağlantısı yok. Lütfen bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="billing_error_unavailable">Bu cihazda Google Play Store kullanılamıyor. Bir Google hesabıyla oturum açtığınızdan emin olun.</string>
+    <string name="billing_error_already_owned">Bu plana zaten farklı bir Google hesabıyla sahipsiniz.</string>
+    <string name="billing_error_network">Satın alma sırasında bir ağ sorunu oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="billing_error_in_progress">Zaten devam eden bir satın alma var. Lütfen tamamlanmasını bekleyin.</string>
+    <string name="billing_error_activity_unavailable">Satın alırken lütfen uygulamayı açık tutun.</string>
+    <string name="billing_error_product_unavailable">Bu plan artık mevcut değil. Yenileyip tekrar deneyin.</string>
+    <string name="billing_error_linked_to_another_account">Bu abonelik zaten başka bir WalkMatch hesabına bağlı. Aktarmak için lütfen destek ile iletişime geç.</string>
     <string name="report_submitted">Şikayet başarıyla gönderildi.</string>
     <string name="report_failed">Şikayet gönderilemedi.</string>
     <string name="user_blocked">Kullanıcı engellendi.</string>
@@ -317,6 +413,7 @@
     <string name="discover_age_chip_value">%1$d–%2$d</string>
     <string name="discover_online">Çevrimiçi</string>
     <string name="discover_card_like_cd">Beğen</string>
+    <string name="discover_card_liked">Beğenildi</string>
     <string name="discover_card_pass_cd">Geç</string>
     <string name="discover_rewind">Geçişi geri al</string>
     <string name="discover_rewind_upgrade">Geri al · Yükselt</string>
@@ -324,6 +421,11 @@
     <string name="discover_boost">Boost</string>
     <string name="discover_boost_active">Boost aktif</string>
     <string name="discover_boost_started">Profilin 30 dakika boyunca Boost aldı.</string>
+    <!-- Gereksinim 2.12 (Faz 4): %1$s önceden formatlanmış bir DD:SS geri sayım metnidir. -->
+    <string name="discover_boost_active_countdown">Boost aktif · %1$s</string>
+    <string name="discover_boost_summary_title">Boost bitti</string>
+    <!-- Gereksinim 2.12 (Faz 4): %1$d Boost aktifken kazanilan ekstra profil goruntulenme sayisidir. -->
+    <string name="discover_boost_summary_body">Boost bitti! Profilin %1$d kişiye fazladan gösterildi.</string>
     <string name="discover_card_more_cd">Diğer seçenekler</string>
     <string name="discover_report_profile">Profili şikayet et</string>
 
@@ -371,6 +473,7 @@
     <string name="chat_send_cd">Gönder</string>
     <string name="chat_error_not_matched">Yalnızca eşleştiğin kişilere mesaj gönderebilirsin.</string>
     <string name="chat_error_rate_limited">Çok hızlı mesaj gönderiyorsun. Lütfen biraz bekle.</string>
+    <string name="chat_error_character_quota_exhausted">Bugünkü çeviri hakkını kullandın. Kota otomatik olarak yenilenecek.</string>
     <string name="chat_error_send_failed">Mesaj gönderilemedi. Lütfen tekrar dene.</string>
     <string name="chat_list_yesterday">Dün</string>
     <string name="chat_message_deleted">Bu mesaj silindi</string>
@@ -384,4 +487,82 @@
     <string name="chat_report_title">Mesajı bildir</string>
     <string name="chat_report_subtitle">Bu mesajı neden bildiriyorsun?</string>
     <string name="chat_error_delete_failed">Mesaj silinemedi. Lütfen tekrar dene.</string>
+    <string name="chat_system_recipient_limit_reached">Bu kullanıcı günlük mesaj limitine ulaştı ve şu anda yanıt veremiyor.</string>
+    <string name="chat_system_translation_quota_exhausted">Çeviri kotan doldu; mesajların şimdilik çevrilmeden gönderiliyor. Kotan otomatik olarak yenilenecek.</string>
+    <string name="chat_room_closed_read_only">Bu sohbetin odası kapatıldı — görüntüleyebilirsiniz ama yeni mesaj gönderemezsiniz.</string>
+    <string name="billing_error_existing_subscription_not_found">Mevcut aboneliğin bu cihazdaki Google hesabında bulunamadı. Aboneliği satın aldığın Google hesabıyla Play Store\'a giriş yapıp tekrar dene ya da planını Google Play\'den yönet.</string>
+    <string name="billing_error_subscription_managed_elsewhere">Mevcut aboneliğin Google Play dışında yönetiliyor. Plan değişikliğini aboneliği satın aldığın yerden yapabilirsin.</string>
+    <string name="billing_error_plan_already_active">Bu plan zaten aktif.</string>
+    <string name="billing_error_active_plan_unknown">Mevcut aboneliğin şu an doğrulanamadı. İnternet bağlantını kontrol edip tekrar dene.</string>
+    <string name="paywall_upgrade_to">%1$s planına yükselt</string>
+    <string name="paywall_schedule_downgrade_to">Dönem sonunda %1$s planına geç</string>
+    <string name="paywall_switch_to_yearly">Yıllık plana geç</string>
+    <string name="paywall_schedule_switch_to_monthly">Dönem sonunda aylık plana geç</string>
+    <string name="paywall_change_terms_immediate">%1$s · %2$s. Yeni planın hemen başlar; mevcut planından kalan süre Google Play tarafından yeni planına ek süre olarak eklenir. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_change_terms_deferred">%1$s · %2$s. Mevcut planın dönem sonuna kadar sürer; yeni plan ve fiyatı yenileme tarihinde başlar. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_change_scheduled">Plan değişikliğin %1$s tarihinde geçerli olacak. O zamana kadar mevcut planının tüm avantajları sürer.</string>
+    <string name="paywall_change_scheduled_no_date">Plan değişikliğin mevcut fatura döneminin sonunda geçerli olacak. O zamana kadar mevcut planının tüm avantajları sürer.</string>
+    <string name="room_error_daily_limit">Bugünkü oda değiştirme hakkını kullandın. Yarın tekrar deneyebilir ya da planını yükseltebilirsin.</string>
+    <string name="consent_title">Gizliliğin ve veri tercihlerin</string>
+    <string name="consent_intro">Aşağıdaki iki izin tamamen isteğe bağlıdır. İzin vermesen de WalkMatch\'in tüm temel özelliklerini kullanmaya devam edebilirsin. Kararını istediğin zaman Ayarlar &gt; Gizlilik ve veri tercihleri bölümünden değiştirebilirsin.</string>
+    <string name="consent_cross_border_title">Analiz için yurt dışına veri aktarımı</string>
+    <string name="consent_cross_border_body">Uygulamayı geliştirmek için kullanım verilerin (ör. ziyaret ettiğin ekranlar ve uygulama içi etkinlikler) Google Firebase Analytics aracılığıyla yurt dışındaki sunuculara aktarılarak işlenir. Bu aktarım, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında açık rızana dayanır.</string>
+    <string name="consent_personalized_ads_title">Kişiselleştirilmiş reklamlar</string>
+    <string name="consent_personalized_ads_body">Ücretsiz planda gösterilen reklamların ilgi alanlarına göre seçilebilmesi için reklam kimliğin ve uygulama kullanım bilgilerin Google AdMob ile paylaşılır. İzin vermezsen reklamlar yine gösterilir ancak kişiselleştirilmez.</string>
+    <string name="consent_read_notice">Aydınlatma Metni\'ni oku</string>
+    <string name="consent_accept_all">Tümünü kabul et</string>
+    <string name="consent_reject_all">Tümünü reddet</string>
+    <string name="consent_save_choices">Seçimlerimi kaydet</string>
+    <string name="settings_privacy_consent_label">Gizlilik ve veri tercihleri</string>
+    <string name="settings_privacy_consent_value">Düzenle</string>
+    <string name="ads_reward_liked_me_button">Reklam izle, bir profili aç</string>
+    <string name="ads_reward_liked_me_done">Bir profil açma hakkı kazandın.</string>
+    <string name="ads_reward_room_button">Reklam izle, odanı değiştir</string>
+    <string name="ads_reward_room_done">Ek oda değiştirme hakkın tanımlandı, odan değiştiriliyor.</string>
+    <!-- Beni Beğenenler ekranı ve günlük Premium upsell kartı -->
+    <string name="liked_me_title">Beni Beğenenler</string>
+    <string name="liked_me_counter">%1$s kişi seni beğendi</string>
+    <string name="liked_me_unlocks_remaining">Bugün %1$d profilin kilidini açabilirsin</string>
+    <string name="liked_me_unlocks_none">Bugünkü açma hakkın bitti. Reklam izleyerek ya da Premium\'a geçerek seni beğenenleri gör.</string>
+    <string name="liked_me_all_revealed">Premium: seni beğenen herkesi görüyorsun</string>
+    <string name="liked_me_hidden_name">Gizli hayran</string>
+    <string name="liked_me_liked_you">Seni beğendi</string>
+    <string name="liked_me_unlock">Kilidi Aç</string>
+    <string name="liked_me_view_profile">Profili Gör</string>
+    <string name="liked_me_go_premium">Premium\'a Geç</string>
+    <string name="liked_me_empty_title">Henüz seni beğenen yok</string>
+    <string name="liked_me_empty_body">Keşfet\'te aktif kaldıkça seni beğenenler burada görünecek.</string>
+    <string name="liked_me_error">Liste yüklenemedi. Lütfen tekrar dene.</string>
+    <string name="liked_me_retry">Tekrar Dene</string>
+    <string name="liked_me_not_liked_anymore">Bu kişi artık seni beğenmiyor.</string>
+    <string name="liked_me_unlock_failed">Kilit açılamadı. Lütfen tekrar dene.</string>
+    <string name="upsell_daily_title">Reklamsız ve sınırsız keşfet</string>
+    <string name="upsell_daily_body">Premium ile reklamlar kalkar, seni beğenen herkesi görürsün ve sınırsız beğenebilirsin.</string>
+    <string name="upsell_daily_cta">Premium\'a Geç</string>
+    <string name="upsell_daily_dismiss">Belki Sonra</string>
+    <!-- Premium ayrıcalıkları ve dinamik Paywall/limit ekranı -->
+    <string name="premium_badge">Premium</string>
+    <string name="chat_read_receipt_seen">Görüldü</string>
+    <string name="settings_incognito_title">Gizli Mod</string>
+    <string name="settings_incognito_subtitle">Keşfet\'te yalnızca beğendiğin kişiler seni görür; profil ziyaretlerin kaydedilmez.</string>
+    <string name="settings_incognito_subtitle_locked">Premium ayrıcalığı: görünmeden gez.</string>
+    <string name="settings_incognito_error">Gizli mod güncellenemedi. Lütfen tekrar dene.</string>
+    <string name="limit_sheet_try_standard_trial">Standart\'ı %1$d gün ücretsiz dene</string>
+    <string name="limit_sheet_come_back_tomorrow">Ya da yarın tekrar gel</string>
+    <string name="limit_sheet_resets_in">Hakların %1$s sonra yenilenir</string>
+    <string name="paywall_limit_title_likes">Beğeni hakkın bitti</string>
+    <string name="paywall_limit_title_messages">Günlük mesaj limitine ulaştın</string>
+    <string name="paywall_limit_title_new_chats">Bugünlük yeni sohbet hakkın doldu</string>
+    <string name="paywall_limit_title_room_switches">Oda değiştirme hakkın bitti</string>
+    <string name="paywall_limit_title_liked_me">Seni beğenen herkesi gör</string>
+    <string name="paywall_limit_title_rewinds">Geri alma hakkın bitti</string>
+    <string name="paywall_limit_title_boosts">Bu dönemki Boost hakkın bitti</string>
+    <string name="paywall_most_popular">En Popüler</string>
+    <string name="paywall_load_error">Planlar yüklenemedi. Bağlantını kontrol edip tekrar dene.</string>
+    <string name="paywall_retry">Tekrar Dene</string>
+    <!-- Ayarlar: ertelenmiş düşürme ve ödeme sorunu -->
+    <string name="settings_scheduled_change_on">%1$s tarihinde %2$s pakete geçilecek</string>
+    <string name="settings_scheduled_change">Dönem sonunda %1$s pakete geçilecek</string>
+    <string name="settings_billing_issue_notice">Ödemen alınamadı. Aboneliğinin kesintiye uğramaması için ödeme yöntemini güncelle.</string>
+    <string name="settings_update_payment_method">Ödeme Yöntemini Güncelle</string>
 </resources>
