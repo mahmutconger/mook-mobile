@@ -1,5 +1,10 @@
 package com.mcclabs.mook.feature.discover
 
+import com.mcclabs.mook.domain.billing.PaywallRequest
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import org.koin.compose.koinInject
+import com.mcclabs.mook.domain.billing.AdConfigRepository
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.mcclabs.mook.feature.filters.FiltersScreen
+import com.mcclabs.mook.ads.NativeAdFeedCard
+import com.mcclabs.mook.ads.onDiscoveryAdsHidden
+import com.mcclabs.mook.ads.onDiscoveryAdsVisible
 import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
+import com.mcclabs.mook.ui.components.LimitSheet
 import com.mcclabs.mook.ui.components.ReportBottomSheet
 import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.getCurrentTimeMillis
@@ -61,7 +70,7 @@ fun DiscoverScreen(
     onNavigateToLiked: () -> Unit = {},
     onNavigateToChats: () -> Unit = {},
     onNavigateToRoomSwitch: () -> Unit = {},
-    onNavigateToPaywall: () -> Unit = {},
+    onNavigateToPaywall: (PaywallRequest) -> Unit = {},
     viewModel: DiscoverViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -70,6 +79,11 @@ fun DiscoverScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     val gridState = rememberLazyGridState()
+    // Yerel reklam kartı sıklığı ve kill-switch Remote Config'den gelir (bkz. [AdRemoteConfig]).
+    val adConfig by koinInject<AdConfigRepository>().config.collectAsState()
+    val profileChunks = remember(state.profiles, adConfig.nativeAdCardInterval) {
+        state.profiles.chunked(adConfig.nativeAdCardInterval)
+    }
 
     // Presence is derived from a timestamp, so "online" has to be recomputed on a clock, not
     // only when the profile list changes.
@@ -85,7 +99,9 @@ fun DiscoverScreen(
     // re-querying the whole feed and losing their place.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.pruneActedOnProfiles()
+        onDiscoveryAdsVisible(state.entitlement.isResolved && state.entitlement.limits.showsAds)
     }
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { onDiscoveryAdsHidden() }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -93,7 +109,7 @@ fun DiscoverScreen(
                 is DiscoverEvent.NavigateToProfile -> onNavigateToProfile(event.profileId)
                 is DiscoverEvent.NavigateToMatch -> onNavigateToMatch(event.matchedUserId)
                 is DiscoverEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
-                is DiscoverEvent.NavigateToPaywall -> onNavigateToPaywall()
+                is DiscoverEvent.NavigateToPaywall -> onNavigateToPaywall(event.request)
             }
         }
     }
@@ -162,6 +178,8 @@ fun DiscoverScreen(
                     )
                 )
             },
+            // Reklam gösterim kuralı: Discover'da banner reklam YOKTUR (bkz. AdDisplayRules);
+            // alt çubuk yalnızca gezinme çubuğundan oluşur — diğer sekmelerle aynı yerleşim.
             bottomBar = {
                 BottomNavBar(
                     currentRoute = "discover",
@@ -170,7 +188,7 @@ fun DiscoverScreen(
                         when (route) {
                             "liked" -> onNavigateToLiked()
                             "chats" -> onNavigateToChats()
-                            "paywall" -> onNavigateToPaywall()
+                            "paywall" -> onNavigateToPaywall(PaywallRequest())
                             "profile" -> if (currentUserId.isNotEmpty()) onNavigateToProfile(currentUserId)
                         }
                     }
@@ -198,7 +216,9 @@ fun DiscoverScreen(
                         canRewind = state.canUseRewind,
                         isRewinding = state.isRewinding,
                         canBoost = state.canUseBoost,
-                        isBoostActive = (state.boostUntilMillis ?: 0L) > nowMillis,
+                        boostRemainingMillis = state.boostUntilMillis
+                            ?.minus(nowMillis)
+                            ?.takeIf { it > 0L },
                         onRewind = viewModel::rewindLastPass,
                         onBoost = viewModel::activateBoost,
                         modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
@@ -238,16 +258,24 @@ fun DiscoverScreen(
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                items(state.profiles, key = { it.id }) { profile ->
-                                    ProfileGridCard(
-                                        profile = profile,
-                                        nowMillis = nowMillis,
-                                        onClick = { viewModel.onProfileClicked(profile.id) },
-                                        onLike = { viewModel.likeProfile(profile.id) },
-                                        onPass = { viewModel.passProfile(profile.id) },
-                                        onReport = { viewModel.onReportClick(profile.id) },
-                                        onBlock = { viewModel.onBlockClick(profile.id) }
-                                    )
+                                profileChunks.forEachIndexed { chunkIndex, profileChunk ->
+                                    items(profileChunk, key = { it.id }) { profile ->
+                                        ProfileGridCard(
+                                            profile = profile,
+                                            nowMillis = nowMillis,
+                                            isLiked = profile.id in state.likedProfileIds,
+                                            onClick = { viewModel.onProfileClicked(profile.id) },
+                                            onLike = { viewModel.likeProfile(profile.id) },
+                                            onPass = { viewModel.passProfile(profile.id) },
+                                            onReport = { viewModel.onReportClick(profile.id) },
+                                            onBlock = { viewModel.onBlockClick(profile.id) }
+                                        )
+                                    }
+                                    if (adConfig.isNativeActive && state.entitlement.isResolved && state.entitlement.limits.showsAds && chunkIndex < profileChunks.lastIndex) {
+                                        item(key = "native_ad_$chunkIndex", span = { GridItemSpan(maxLineSpan) }) {
+                                            NativeAdFeedCard(isFree = true)
+                                        }
+                                    }
                                 }
 
                                 if (state.isLoadingMore || state.endReached) {
@@ -279,15 +307,29 @@ fun DiscoverScreen(
         }
 
         // ── Daily like limit ───────────────────────────────────────────────
-        if (state.showLimitSheet) {
-            LikeLimitDialog(
-                limit = state.entitlement.limits.dailyLikes ?: 0,
+        state.limitReason?.let { reason ->
+            LimitSheet(
+                reason = reason,
+                entitlement = state.entitlement,
+                rewardedLikesToday = state.rewardedLikesToday,
+                isFairUseCap = state.limitIsFairUseCap,
+                showRewardedAd = state.canEarnRewardedLike,
+                onRewardConfirmed = viewModel::onRewardedLikeConfirmed,
                 onUpgrade = { viewModel.onUpgradeClicked() },
-                onDismiss = { viewModel.onLimitSheetDismissed() }
+                onStartTrial = viewModel::onTrialClicked,
+                onDismiss = { viewModel.onLimitSheetDismissed() },
             )
         }
 
         // ── Report bottom sheet ────────────────────────────────────────────
+        // Boost completion summary (Gereksinim 2.12, Faz 4)
+        state.boostSummary?.let { summary ->
+            BoostCompletionDialog(
+                viewsGained = summary.viewsGained,
+                onDismiss = viewModel::onBoostSummaryDismissed,
+            )
+        }
+
         if (state.showReportDialog) {
             ReportBottomSheet(
                 selectedReason = state.selectedReportReason,
@@ -327,11 +369,18 @@ private fun DiscoverMonetizationControls(
     canRewind: Boolean,
     isRewinding: Boolean,
     canBoost: Boolean,
-    isBoostActive: Boolean,
+    /**
+     * Gereksinim 2.12 (Faz 4): Boost aktifse kalan milisaniye (> 0); aktif değilse `null`.
+     * Eski `isBoostActive: Boolean` parametresinin yerini alır — aynı bilgiyi taşır
+     * (`null` değilse aktif demektir), ANCAK ek olarak 30 dakikalık geri sayımı da
+     * göstermeyi mümkün kılar.
+     */
+    boostRemainingMillis: Long?,
     onRewind: () -> Unit,
     onBoost: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isBoostActive = boostRemainingMillis != null
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -355,10 +404,57 @@ private fun DiscoverMonetizationControls(
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(containerColor = NeonColors.PrimaryDark),
             ) {
-                Text(stringResource(if (isBoostActive) Res.string.discover_boost_active else Res.string.discover_boost))
+                Text(
+                    text = if (boostRemainingMillis != null) {
+                        stringResource(Res.string.discover_boost_active_countdown, formatCountdown(boostRemainingMillis))
+                    } else {
+                        stringResource(Res.string.discover_boost)
+                    },
+                )
             }
         }
     }
+}
+
+/**
+ * Gereksinim 2.12 (Faz 4): [remainingMillis]'i "DD:SS" biçiminde biçimlendirir (30 dakikalık
+ * Boost penceresi 60 dakikayı hiçbir zaman aşmadığından saat basamağına gerek yoktur).
+ */
+private fun formatCountdown(remainingMillis: Long): String {
+    val totalSeconds = (remainingMillis / 1000L).coerceAtLeast(0L)
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+}
+
+/**
+ * Gereksinim 2.12 (Faz 4): 30 dakikalık Boost penceresi kapandığında BİR KEZ gösterilen
+ * özet diyaloğu -- bkz. [DiscoverUiState.boostSummary] KDoc'u.
+ */
+@Composable
+private fun BoostCompletionDialog(viewsGained: Int, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = NeonColors.Card,
+        title = {
+            Text(
+                text = stringResource(Res.string.discover_boost_summary_title),
+                color = NeonColors.TextPrimary,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(Res.string.discover_boost_summary_body, viewsGained),
+                color = NeonColors.TextSecondary,
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(Res.string.limit_sheet_ok_button), color = NeonColors.Primary)
+            }
+        },
+    )
 }
 
 /** Footer row under the grid: a spinner while paging, or the end-of-feed note. */
@@ -496,36 +592,3 @@ private fun LikedMeOverlay(onDismiss: () -> Unit) {
 }
 
 /** Free-tier gate: shown when the daily like allowance runs out. */
-@Composable
-private fun LikeLimitDialog(limit: Int, onUpgrade: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = NeonColors.Card,
-        title = {
-            Text(
-                text = stringResource(Res.string.discover_swipe_limit_title),
-                color = NeonColors.TextPrimary,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Text(
-                text = stringResource(
-                    Res.string.discover_swipe_limit_body,
-                    limit
-                ),
-                color = NeonColors.TextSecondary
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onUpgrade) {
-                Text(stringResource(Res.string.discover_upgrade_cta), color = NeonColors.Primary)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.discover_block_cancel), color = NeonColors.TextSecondary)
-            }
-        }
-    )
-}

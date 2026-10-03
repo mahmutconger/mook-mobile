@@ -1,18 +1,19 @@
 package com.mcclabs.mook.data.repository
 
+import com.mcclabs.mook.data.appHttpsCallable
 import com.mcclabs.mook.domain.model.Country
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.domain.model.Languages
 import com.mcclabs.mook.domain.model.LikedProfile
 import com.mcclabs.mook.domain.model.MatchSettings
 import com.mcclabs.mook.domain.repository.DiscoverRepository
+import com.mcclabs.mook.domain.repository.LikeUsage
 import com.mcclabs.mook.util.calculateAge
 import com.mcclabs.mook.util.getCountryName
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import com.mcclabs.mook.data.appFirestore
 import dev.gitlive.firebase.firestore.where
-import dev.gitlive.firebase.functions.functions
 import com.mcclabs.mook.util.Log
 import kotlinx.serialization.Serializable
 
@@ -28,9 +29,10 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         val id = document.id
         val name = runCatching { document.get<String>("displayName") }.getOrNull() ?: "Unknown"
 
-        // Age is derived rather than stored, so it stays correct as the user gets older.
-        val birthDateMillis = runCatching { document.get<Long>("birthDateMillis") }.getOrNull()
-        val age = calculateAge(birthDateMillis)
+        // Profil Gizlilik Kuralı: başkalarının profilinde doğum tarihi YOKTUR; sunucunun
+        // hesapladığı `age` okunur. Kendi profilim (`users` belgesi) doğum tarihini taşır.
+        val age = runCatching { document.get<Int?>("age") }.getOrNull()
+            ?: calculateAge(runCatching { document.get<Long?>("birthDateMillis") }.getOrNull())
 
         val countryCode = runCatching { document.get<String>("countryCode") }.getOrNull()
         val country = countryCode?.takeIf { it.isNotBlank() }?.let { code ->
@@ -69,53 +71,106 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             bio = bio,
             interests = interests,
             verified = verified,
-            lastActiveMillis = lastActiveMillis
+            lastActiveMillis = lastActiveMillis,
+            // Premium rozeti: `public_profiles.subscriptionTier` yalnızca sunucu tarafından yazılır.
+            isPremium = runCatching { document.get<String?>("subscriptionTier") }.getOrNull() == "PREMIUM"
         )
     }
 
-    private var lastVisibleDocument: dev.gitlive.firebase.firestore.DocumentSnapshot? = null
-    private var swipedUserIds = mutableSetOf<String>()
-    private var isInteractionsFetched = false
-    private var lastSettings: MatchSettings? = null
+    /**
+     * Altyapı Gereksinimi (Server-Driven Discover Feed): [DiscoverFeedProfileDto] (sunucudan,
+     * `getDiscoverFeed` callable'ından gelen HAM veri) -> [DiscoverProfile] (istemcinin
+     * gösterdiği türetilmiş model). [mapToProfile]'daki (hâlâ [getProfileDetails] tarafından
+     * kullanılan) türetme mantığıyla BİREBİR AYNIDIR — tek fark kaynağın artık bir Firestore
+     * `DocumentSnapshot` değil, sunucunun JSON yanıtı olmasıdır.
+     */
+    private fun mapFeedProfile(dto: DiscoverFeedProfileDto): DiscoverProfile {
+        // Sunucu yalnızca yaşı gönderir (doğum tarihi herkese açık değildir).
+        val age = dto.age
+        val country = dto.countryCode?.takeIf { it.isNotBlank() }?.let { code ->
+            Country(code = code, name = getCountryName(code) ?: code)
+        }
+        val language = Languages.fromCode(dto.languageCode)
+        val photoUrls = buildList {
+            if (!dto.avatarUrl.isNullOrBlank()) add(dto.avatarUrl)
+            addAll(dto.discoveryPhotos.filter { it.isNotBlank() })
+        }.filter { it.startsWith("http://") || it.startsWith("https://") }
+
+        return DiscoverProfile(
+            id = dto.id,
+            name = dto.displayName.ifBlank { "Unknown" },
+            age = age,
+            country = country,
+            language = language,
+            photoUrls = photoUrls,
+            bio = dto.bio,
+            interests = dto.interests,
+            verified = dto.verified,
+            hasLikedMe = dto.hasLikedMe,
+            isPremium = dto.subscriptionTier == "PREMIUM",
+            lastActiveMillis = dto.lastActiveTimestamp.takeIf { it > 0L },
+        )
+    }
+
+    /** `getDiscoverFeed` callable'ının döndürdüğü sonraki sayfa imleci — artık bir Firestore
+     *  `DocumentSnapshot` DEĞİL, yalnızca son profilin kimliği (sunucu, imleci kendi
+     *  sorgusunda YENİDEN çözümler). `null` ilk sayfa anlamına gelir. */
+    private var nextCursor: String? = null
 
     /**
-     * Set once a `users` page comes back short, meaning the collection is exhausted for the
-     * current filters. Cleared whenever paging restarts (new filters, or [resetDiscoverPaging]).
+     * Set once the server reports the room is exhausted for the current filters. Cleared
+     * whenever paging restarts (new filters, or [resetDiscoverPaging]).
      */
     private var reachedEnd = false
+
+    /**
+     * Bu OTURUMDA (uygulamayı yeniden başlatana/[resetDiscoverPaging] çağrılana kadar)
+     * kullanıcının üzerinde işlem yaptığı (beğendi/geçti/engelledi/şikayet etti) profil
+     * kimlikleri. Sunucu artık `interactions` koleksiyonu üzerinden KALICI dışlamayı kendisi
+     * yapıyor (bkz. `getDiscoverFeed`); bu küme yalnızca YARIŞ KOŞULUNA karşı bir güvenlik
+     * ağıdır — az önce işlem yapılan biri, sunucudaki yazım henüz tamamlanmadan gelen bir
+     * sonraki sayfada YİNE görünürse burada elenir.
+     */
+    private var sessionActedOnIds = mutableSetOf<String>()
 
     override fun hasMoreProfiles(): Boolean = !reachedEnd
 
     override fun markActedOn(profileId: String) {
-        swipedUserIds.add(profileId)
+        sessionActedOnIds.add(profileId)
     }
 
     override fun unmarkActedOn(profileId: String) {
-        swipedUserIds.remove(profileId)
+        sessionActedOnIds.remove(profileId)
     }
 
-    override fun actedOnProfileIds(): Set<String> = swipedUserIds.toSet()
+    override fun actedOnProfileIds(): Set<String> = sessionActedOnIds.toSet()
 
     override fun resetDiscoverPaging() {
-        lastVisibleDocument = null
-        lastSettings = null
+        nextCursor = null
         reachedEnd = false
         // Rebuild the exclusion set too: likes and blocks made elsewhere (another device, the
-        // profile screen) must be reflected, otherwise refreshing resurfaces people already
-        // acted on.
-        isInteractionsFetched = false
-        swipedUserIds = mutableSetOf()
+        // profile screen) must be reflected. The server re-derives its own exclusions from
+        // `interactions`/`blockedUsers` on every call, so nothing needs to be re-fetched here.
+        sessionActedOnIds = mutableSetOf()
     }
 
+    /**
+     * Altyapı Gereksinimi (Server-Driven Discover Feed): istemci artık `public_profiles`i
+     * DOĞRUDAN sorgulamaz. Free Roam doğrulaması, Boost sıralaması ve Incognito filtrelemesi
+     * dahil TÜM erişim/sıralama mantığı `getDiscoverFeed` Cloud Function'ında yaşar (bkz. o
+     * dosyanın KDoc'u); burada yalnızca YAŞ ve ÜLKE filtreleri kalır — ikisi de cihaza özgü
+     * yerelleştirme (`calculateAge`in cihaz saat dilimi, `getCountryName`in cihaz dili)
+     * gerektirdiğinden sunucuda YENİDEN ÜRETİLEMEZ ve saf birer GÖRÜNTÜLEME tercihidir, bir
+     * güvenlik/iş kuralı sınırı değildir.
+     */
     override suspend fun getDiscoverProfiles(settings: MatchSettings): List<DiscoverProfile> {
-        val currentUser = Firebase.auth.currentUser
-        val currentUid = currentUser?.uid ?: return emptyList()
-        val db = appFirestore
+        val currentUid = Firebase.auth.currentUser?.uid ?: return emptyList()
+        if (reachedEnd) return emptyList()
 
-        // A stale/corrupted roomLanguageCode equal to the viewer's own native language
-        // would otherwise hide everyone; treat the room filter as absent in that case.
+        // A stale/corrupted roomLanguageCode equal to the viewer's own native language would
+        // otherwise hide everyone; treat the room filter as absent in that case.
         val ownLanguageCode = runCatching {
-            db.collection("users").document(currentUid).get().get<String>("languageCode")
+            appFirestore.collection("users").document(currentUid).get().get<String>("languageCode")
         }.getOrNull()
         val effectiveSettings = if (
             settings.roomLanguageCode != null &&
@@ -126,124 +181,51 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             settings
         }
 
-        // New filters mean a different result set, so paging must start from the top
-        // instead of continuing after the last document of the previous filter.
-        if (effectiveSettings != lastSettings) {
-            lastVisibleDocument = null
-            lastSettings = effectiveSettings
-            reachedEnd = false
-        }
+        Log.d("Discover akışı isteniyor (uid=$currentUid, oda=${effectiveSettings.roomLanguageCode}, imleç=$nextCursor)")
 
-        // Nothing left for these filters — don't spend a read proving it again on every
-        // scroll to the bottom.
-        if (reachedEnd) return emptyList()
+        val response = appHttpsCallable("getDiscoverFeed")
+            .invoke(DiscoverFeedRequest(roomLanguageCode = effectiveSettings.roomLanguageCode, afterUid = nextCursor))
+            .data<DiscoverFeedResponse>()
 
-        Log.d("Discover sorgusu başlıyor (uid=$currentUid, yaş=${settings.ageRangeStart}-${settings.ageRangeEnd})")
+        nextCursor = response.nextAfterUid
+        reachedEnd = response.reachedEnd
 
-        // Fetch user's past interactions once to filter them out locally
-        if (!isInteractionsFetched) {
-            val interactionsSnapshot = db.collection("interactions")
-                .where { "fromUserId" equalTo currentUid }
-                .get()
-
-            for (doc in interactionsSnapshot.documents) {
-                doc.get<String>("toUserId").let { swipedUserIds.add(it) }
-            }
-            
-            // Fetch blocked users to exclude them from Discovery
-            try {
-                val userDoc = db.collection("users").document(currentUid).get()
-                val blockedUsers = userDoc.get<List<String>>("blockedUsers")
-                swipedUserIds.addAll(blockedUsers)
-            } catch (e: Exception) {
-                // Ignore if blockedUsers doesn't exist
-            }
-
-            isInteractionsFetched = true
-            Log.d("Daha önce kaydırılan: ${swipedUserIds.size} kullanıcı")
-        }
-
-        val profiles = mutableListOf<DiscoverProfile>()
-
-        // Recursive or loop fetching to ensure we get a batch of valid (unswiped) users
-        while (profiles.size < PAGE_SIZE && !reachedEnd) {
-            // Discover never reads private account documents. The server-maintained
-            // projection contains only fields that can be exposed to another member.
-            var query = db.collection("public_profiles")
-                .where { "isMookActive" equalTo true }
-                .where { "incognito" equalTo false }
-                .orderBy("lastActiveTimestamp", dev.gitlive.firebase.firestore.Direction.DESCENDING)
-                .limit(QUERY_BATCH_SIZE)
-
-            lastVisibleDocument?.let {
-                query = query.startAfter(it)
-            }
-
-            val querySnapshot = query.get()
-            val documents = querySnapshot.documents
-
-            Log.d("public_profiles sorgusu döndü: ${documents.size} doküman (isMookActive==true)")
-            if (documents.isEmpty()) {
-                reachedEnd = true
-                break
-            }
-
-            lastVisibleDocument = documents.last()
-
-            // A short page means this was the last one; remember it so the grid can stop
-            // paging after these results are consumed.
-            if (documents.size < QUERY_BATCH_SIZE) reachedEnd = true
-
-            for (document in documents) {
-                if (document.id == currentUid || swipedUserIds.contains(document.id)) continue
-                try {
-                    val profile = mapToProfile(document)
-                    if (profile.matches(effectiveSettings)) {
-                        profiles.add(profile)
-                    } else {
-                        Log.d("Discover: ${document.id} filtrelere takıldı (yaş=${profile.age}, ülke=${profile.country?.name}, dil=${profile.language?.name})")
-                    }
-                } catch (e: Exception) {
-                    Log.e("Discover: ${document.id} profili okunamadı, atlandı", e)
+        val profiles = response.profiles
+            .asSequence()
+            .filter { it.id !in sessionActedOnIds }
+            .map { mapFeedProfile(it) }
+            .filter { profile ->
+                val ok = profile.matches(effectiveSettings)
+                if (!ok) {
+                    Log.d("Discover: ${profile.id} filtrelere takıldı (yaş=${profile.age}, ülke=${profile.country?.name}, dil=${profile.language?.name})")
                 }
+                ok
             }
-        }
+            .toList()
 
-        Log.d("Discover sonuç: ${profiles.size} profil gösterilecek")
-        
-        val profilesWithLikeInfo = profiles.map { profile ->
-            val interactionDocId = "${profile.id}_$currentUid"
-            try {
-                val doc = db.collection("interactions").document(interactionDocId).get()
-                val hasLikedMe = doc.exists && runCatching { doc.get<String>("type") }.getOrNull() == "like"
-                profile.copy(hasLikedMe = hasLikedMe)
-            } catch (e: Exception) {
-                profile
-            }
-        }
-
-        return profilesWithLikeInfo
+        Log.d("Discover sonuç: ${profiles.size} profil gösterilecek (sunucu taraflı akış)")
+        return profiles
     }
 
     /**
-     * Applies the age filter in memory.
-     *
-     * Firestore cannot serve this: a range filter on `birthDateMillis` would have to be
-     * the first `orderBy`, which conflicts with the `lastActiveTimestamp` ordering this
-     * query pages through. Profiles with no birth date are kept rather than hidden.
+     * Applies the age and country filters in memory — the two filters that only make sense
+     * with the viewer's own locale (see the KDoc on [getDiscoverProfiles]). Room/incognito
+     * exclusion already happened server-side in `getDiscoverFeed`.
      */
     private fun DiscoverProfile.matches(settings: MatchSettings): Boolean {
         if (age != null && (age < settings.ageRangeStart || age > settings.ageRangeEnd)) {
             return false
         }
-        
+
         if (settings.targetCountries.isNotEmpty()) {
             val hasCountry = settings.targetCountries.any { country?.name?.contains(it, ignoreCase = true) == true }
             if (!hasCountry) return false
         }
-        
+
         // The language-independent room shows everyone; only a concrete room code filters
-        // down to speakers of that language.
+        // down to speakers of that language. (The server already applies this same room
+        // filter when building the page; re-checking it here is a harmless no-op for the
+        // normal case and a safety net if a future server change ever loosens it.)
         if (settings.roomLanguageCode != null &&
             !settings.roomLanguageCode.equals(Languages.LANGUAGE_INDEPENDENT_ROOM_CODE, ignoreCase = true)
         ) {
@@ -253,14 +235,15 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         return true
     }
 
-    override suspend fun getSwipesUsedToday(): Int {
+    override suspend fun getLikeUsageToday(): LikeUsage {
         return try {
             // Uses the server's time-zone calculation. Reading interactions here would make
             // the client-side display disagree with the authoritative quota transaction.
-            Firebase.functions.httpsCallable("getUsage").invoke().data<UsageResponse>().likes
+            val usage = appHttpsCallable("getUsage").invoke().data<UsageResponse>()
+            LikeUsage(likes = usage.likes, rewardedLikes = usage.rewardedLikes, likesEver = usage.likesEver)
         } catch (e: Exception) {
             Log.e("Günlük kaydırma sayısı okunamadı", e)
-            0
+            LikeUsage()
         }
     }
 
@@ -341,4 +324,42 @@ class DiscoverRepositoryImpl : DiscoverRepository {
 }
 
 @Serializable
-private data class UsageResponse(val likes: Int = 0)
+private data class UsageResponse(val likes: Int = 0, val rewardedLikes: Int = 0, val likesEver: Int = 0)
+
+/** `getDiscoverFeed` callable'ına gönderilen istek gövdesi — sunucudaki (`discoverFeed.ts`)
+ *  `roomLanguageCode`/`afterUid` alanlarıyla BİREBİR AYNI. */
+@Serializable
+private data class DiscoverFeedRequest(
+    val roomLanguageCode: String? = null,
+    val afterUid: String? = null,
+)
+
+/** `getDiscoverFeed`in döndürdüğü HER BİR profilin ham alan seti — `public_profiles`
+ *  dokümanının aynısı, artı sunucunun hesapladığı `hasLikedMe`. */
+@Serializable
+private data class DiscoverFeedProfileDto(
+    val id: String,
+    val displayName: String = "",
+    /** Sunucuda hesaplanan yaş (bkz. functions/src/profilePrivacy.ts). */
+    val age: Int? = null,
+    val countryCode: String? = null,
+    val languageCode: String? = null,
+    val avatarUrl: String? = null,
+    val discoveryPhotos: List<String> = emptyList(),
+    val bio: String = "",
+    val interests: List<String> = emptyList(),
+    val verified: Boolean = false,
+    val lastActiveTimestamp: Long = 0,
+    val hasLikedMe: Boolean = false,
+    /** Sunucunun yazdığı abonelik kademesi (bkz. functions/src/discoverFeed.ts). */
+    val subscriptionTier: String = "FREE",
+)
+
+/** `getDiscoverFeed`in tam yanıtı — bir sayfa profil, sonraki sayfa imleci ve oda bitti mi
+ *  bayrağı. */
+@Serializable
+private data class DiscoverFeedResponse(
+    val profiles: List<DiscoverFeedProfileDto> = emptyList(),
+    val nextAfterUid: String? = null,
+    val reachedEnd: Boolean = false,
+)

@@ -159,6 +159,10 @@ fun SwipeableProfileCard(
                                 modifier = Modifier.size(18.dp)
                             )
                         }
+                        if (profile.isPremium) {
+                            Spacer(Modifier.width(6.dp))
+                            PremiumBadge()
+                        }
                         if (profile.hasLikedMe) {
                             Spacer(Modifier.width(8.dp))
                             Text(

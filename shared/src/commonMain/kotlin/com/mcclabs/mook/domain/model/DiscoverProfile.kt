@@ -21,6 +21,8 @@ data class DiscoverProfile(
     val interests: List<String>,
     val verified: Boolean = false,
     val hasLikedMe: Boolean = false,
+    /** Sunucunun bildirdiği Premium abonelik — profilde Premium rozeti gösterilir. */
+    val isPremium: Boolean = false,
     val lastActiveMillis: Long? = null,
 ) {
     /**

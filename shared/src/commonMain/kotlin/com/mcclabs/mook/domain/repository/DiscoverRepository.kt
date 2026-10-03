@@ -4,6 +4,8 @@ import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.domain.model.LikedProfile
 import com.mcclabs.mook.domain.model.MatchSettings
 
+data class LikeUsage(val likes: Int = 0, val rewardedLikes: Int = 0, val likesEver: Int = 0)
+
 interface DiscoverRepository {
     /**
      * Returns the next page of profiles matching [settings].
@@ -58,5 +60,5 @@ interface DiscoverRepository {
      * Server-derived so the free daily limit cannot be reset by clearing local state.
      * Returns 0 on failure so a transient read error never hard-blocks swiping.
      */
-    suspend fun getSwipesUsedToday(): Int
+    suspend fun getLikeUsageToday(): LikeUsage
 }

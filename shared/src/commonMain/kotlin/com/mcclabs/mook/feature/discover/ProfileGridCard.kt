@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.discover
 
+import com.mcclabs.mook.ui.components.PremiumBadge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -47,6 +49,7 @@ import com.mcclabs.mook.util.countryCodeToFlagEmoji
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.discover_block_user
 import mook.shared.generated.resources.discover_card_like_cd
+import mook.shared.generated.resources.discover_card_liked
 import mook.shared.generated.resources.discover_card_more_cd
 import mook.shared.generated.resources.discover_card_pass_cd
 import mook.shared.generated.resources.discover_online
@@ -68,6 +71,7 @@ private val IconScrim = Color.Black.copy(alpha = 0.35f)
 fun ProfileGridCard(
     profile: DiscoverProfile,
     nowMillis: Long,
+    isLiked: Boolean = false,
     onClick: () -> Unit,
     onLike: () -> Unit,
     onPass: () -> Unit,
@@ -120,8 +124,23 @@ fun ProfileGridCard(
                     Brush.verticalGradient(
                         colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f))
                     )
-                )
+            )
         )
+
+        if (isLiked) {
+            Text(
+                text = stringResource(Res.string.discover_card_liked),
+                color = Color.White,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(Color(0xFFE84D78).copy(alpha = 0.94f))
+                    .padding(horizontal = 9.dp, vertical = 5.dp)
+            )
+        }
 
         // ── Overflow: report / block ───────────────────────────────────────
         Box(modifier = Modifier.align(Alignment.TopEnd).padding(6.dp)) {
@@ -193,6 +212,10 @@ fun ProfileGridCard(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
+                    if (profile.isPremium) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        PremiumBadge(compact = true)
+                    }
                     if (profile.isOnline(nowMillis)) {
                         Spacer(modifier = Modifier.width(6.dp))
                         OnlineBadge()
@@ -227,13 +250,18 @@ fun ProfileGridCard(
                     modifier = Modifier
                         .size(38.dp)
                         .clip(CircleShape)
-                        .background(BrandGradient)
-                        .clickable(onClick = onLike),
+                        .background(
+                            if (isLiked) Brush.linearGradient(listOf(Color(0xFFE84D78), Color(0xFFC93666)))
+                            else BrandGradient
+                        )
+                        .clickable(enabled = !isLiked, onClick = onLike),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = stringResource(Res.string.discover_card_like_cd),
+                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = stringResource(
+                            if (isLiked) Res.string.discover_card_liked else Res.string.discover_card_like_cd
+                        ),
                         tint = Color.White,
                         modifier = Modifier.size(19.dp)
                     )

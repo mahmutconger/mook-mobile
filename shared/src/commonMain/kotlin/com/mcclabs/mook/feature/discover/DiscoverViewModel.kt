@@ -1,12 +1,32 @@
 package com.mcclabs.mook.feature.discover
 
+import com.mcclabs.mook.domain.billing.LimitReason
+import com.mcclabs.mook.domain.billing.PaywallRequest
+import com.mcclabs.mook.domain.analytics.trackGateDecision
+import com.mcclabs.mook.ads.LikeInterstitialAttempt
+import com.mcclabs.mook.domain.billing.AdDisplayRules
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
 import com.mcclabs.mook.domain.billing.SubscriptionRepository
+import com.mcclabs.mook.domain.billing.Feature
+import com.mcclabs.mook.domain.billing.FeatureGate
+import com.mcclabs.mook.domain.billing.GateDecision
+import com.mcclabs.mook.domain.billing.UsageSnapshot
+import com.mcclabs.mook.domain.billing.PendingActionQueue
+import com.mcclabs.mook.domain.billing.PendingSwipeAction
+import com.mcclabs.mook.domain.billing.RecoverPendingSwipeActionsUseCase
+import com.mcclabs.mook.util.getCurrentTimeMillis
+import com.mcclabs.mook.domain.billing.LikeInterstitialGateway
+import com.mcclabs.mook.domain.analytics.AnalyticsRepository
+import com.mcclabs.mook.domain.billing.BoostManagerUseCase
+import com.mcclabs.mook.domain.repository.BoostSummary
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import com.mcclabs.mook.domain.model.DiscoverProfile
+import kotlin.collections.ArrayDeque
 import com.mcclabs.mook.domain.model.Languages
 import com.mcclabs.mook.domain.model.MatchResult
 import com.mcclabs.mook.domain.model.MatchSettings
@@ -26,6 +46,7 @@ import org.jetbrains.compose.resources.getString
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.error_generic
 import mook.shared.generated.resources.error_swipe_failed
+import mook.shared.generated.resources.info_swipe_queued_offline
 import mook.shared.generated.resources.report_submitted
 import mook.shared.generated.resources.report_failed
 import mook.shared.generated.resources.user_blocked
@@ -39,7 +60,8 @@ sealed class DiscoverEvent {
     data class NavigateToMatch(val matchedUserId: String) : DiscoverEvent()
     data class ShowSnackbar(val message: String) : DiscoverEvent()
     /** Free user hit the daily like limit and chose to upgrade. */
-    data object NavigateToPaywall : DiscoverEvent()
+    /** Paywall'a yönlendir; [request] başlığı ve deneme ön seçimini belirler. */
+    data class NavigateToPaywall(val request: PaywallRequest = PaywallRequest()) : DiscoverEvent()
 }
 
 /**
@@ -55,6 +77,14 @@ class DiscoverViewModel(
     private val interactionRepository: InteractionRepository,
     private val settingsRepository: SettingsRepository,
     private val subscriptions: SubscriptionRepository,
+    private val pendingActionQueue: PendingActionQueue,
+    private val recoverPendingSwipeActionsUseCase: RecoverPendingSwipeActionsUseCase,
+    private val likeInterstitialGateway: LikeInterstitialGateway,
+    /** Gereksinim 2.12 (Faz 4): bkz. [BoostManagerUseCase] KDoc'u. */
+    private val boostManagerUseCase: BoostManagerUseCase,
+    /** Gereksinim 2.14 (Faz 4): karşılıklı eşleşme oluştuğunda "match_created" olayını
+     *  Free/Premium havuz sağlığı kırılımıyla kaydetmek için — bkz. [AnalyticsRepository]. */
+    private val analyticsRepository: AnalyticsRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DiscoverUiState())
@@ -63,12 +93,18 @@ class DiscoverViewModel(
     private val _events = MutableSharedFlow<DiscoverEvent>()
     val events: SharedFlow<DiscoverEvent> = _events.asSharedFlow()
 
+    /** Reklam istenmeden önce yerel kota kontrolü yapan saf mantık (bkz. Gereksinim 1.1). */
+    private val featureGate = FeatureGate()
+
     /** The filters the visible page was loaded with; used by refresh and paging. */
     private var currentSettings: MatchSettings = MatchSettings()
 
     init {
         observeEntitlement()
         observeSettingsAndReload()
+        // Gereksinim 1.3: bir önceki oturumda reklam kapanmadan süreç öldüyse, kalıcı
+        // kuyrukta kalmış beğeni eylemlerini şimdi sessizce sunucuya gönder.
+        viewModelScope.launch { recoverPendingSwipeActionsUseCase() }
     }
 
     /** Keeps every tier's client-side gate in sync with RevenueCat, not just Premium. */
@@ -124,17 +160,20 @@ class DiscoverViewModel(
             repository.resetDiscoverPaging()
             val profiles = repository.getDiscoverProfiles(settings)
             val hasSeenTutorial = settingsRepository.getHasSeenLikedMeTutorial()
-            val swipesUsedToday = repository.getSwipesUsedToday()
+            val likeUsage = repository.getLikeUsageToday()
             _state.update {
                 it.copy(
                     profiles = profiles,
+                    likedProfileIds = emptySet(),
                     isLoading = false,
                     isRefreshing = false,
                     isLoadingMore = false,
                     endReached = !repository.hasMoreProfiles(),
                     hasSeenLikedMeTutorial = hasSeenTutorial,
                     likedMeTutorialProfileId = profiles.firstOrNull { p -> p.hasLikedMe }?.id,
-                    swipesUsedToday = swipesUsedToday,
+                    swipesUsedToday = likeUsage.likes,
+                    rewardedLikesToday = likeUsage.rewardedLikes,
+                    likesEver = likeUsage.likesEver,
                 )
             }
         } catch (e: Exception) {
@@ -207,14 +246,15 @@ class DiscoverViewModel(
             if (remaining.size == current.profiles.size) current
             else current.copy(
                 profiles = remaining,
+                likedProfileIds = current.likedProfileIds - acted,
                 likedMeTutorialProfileId = remaining.firstOrNull { it.hasLikedMe }?.id,
             )
         }
         // Acting elsewhere also spends the daily allowance; re-read it so the limit sheet
         // fires at the right moment.
         viewModelScope.launch {
-            val used = repository.getSwipesUsedToday()
-            _state.update { it.copy(swipesUsedToday = used) }
+            val usage = repository.getLikeUsageToday()
+            _state.update { it.copy(swipesUsedToday = usage.likes, rewardedLikesToday = usage.rewardedLikes) }
         }
     }
 
@@ -227,31 +267,89 @@ class DiscoverViewModel(
 
     // ── Liking ──────────────────────────────────────────────────────────────
 
-    /**
-     * Likes someone straight from the grid. The card leaves the feed immediately and is put
-     * back if the write fails, so a dropped connection never silently loses a like.
-     */
+    /** Likes from the grid; successful likes stay visible with a filled heart until reload. */
     fun likeProfile(profileId: String) {
-        if (_state.value.isSwipeInFlight) return
-        val profile = _state.value.profiles.find { it.id == profileId } ?: return
+        val before = _state.value
+        if (before.isSwipeInFlight || profileId in before.likedProfileIds) return
+        if (before.profiles.none { it.id == profileId }) return
         if (!consumeSwipeOrBlock()) return
-        val index = _state.value.profiles.indexOfFirst { it.id == profileId }
         _state.update { it.copy(isSwipeInFlight = true) }
-        removeProfile(profileId)
-        repository.markActedOn(profileId)
         viewModelScope.launch {
-            when (interactionRepository.swipeUser(profileId, isLike = true)) {
+            val isFree = _state.value.entitlement.isResolved && _state.value.entitlement.limits.showsAds
+            // Gereksinim 1.3: sunucuya gönderilmeden ÖNCE eylemi kalıcı kuyruğa yaz. Süreç bu
+            // ağ isteği sürerken öldürülse bile bu kayıt diskte kalır ve bir sonraki açılışta
+            // yukarıdaki kurtarma use case'i tarafından sunucuya (idempotent biçimde) tekrar
+            // gönderilir.
+            val pendingAction = PendingSwipeAction(profileId, isLike = true, enqueuedAtMillis = getCurrentTimeMillis())
+            pendingActionQueue.enqueue(pendingAction)
+            val result = interactionRepository.swipeUser(profileId, isLike = true)
+            // Sunucudan kesin bir cevap alındı (başarı ya da hata) — kalıcı kuyruğun görevi
+            // bitti, kalan hata yönetimi aşağıdaki mevcut akışla (revertSwipeCount + snackbar) sürer.
+            // Gereksinim 1 (Faz 6): sonuç kuyruğa alındıysa (zaman aşımı/bağlantı kaybı) kayıt
+            // BİLEREK kuyrukta bırakılır -- [SwipeTimeoutFallbackHandler] zaten aynı kaydı (aynı
+            // profil+yön eşleşmesiyle, bkz. platform kuyruk implementasyonlarındaki yineleme
+            // engeli) kuyruğa yazdı; asıl kaldırma yalnızca sunucudan KESİN bir cevap (başarı ya da
+            // gerçek hata) geldiğinde yapılır.
+            if (result !is MatchResult.QueuedOffline) {
+                pendingActionQueue.remove(pendingAction)
+            }
+            val succeeded = result !is MatchResult.Error && result !is MatchResult.QueuedOffline
+            when (result) {
                 is MatchResult.Error -> {
-                    insertProfile(profile, index)
+                    repository.unmarkActedOn(profileId)
                     revertSwipeCount()
                     _state.update { it.copy(isSwipeInFlight = false) }
                     _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
                 }
-                is MatchResult.MutualMatch -> {
+                is MatchResult.QueuedOffline -> {
+                    // Gereksinim 1 (Faz 6): kart zaten arayüzden kaldırıldı (iyimser güncelleme) --
+                    // GERİ ALINMAZ; eylem [PendingActionQueue]'da kalıcı olarak bekliyor ve bağlantı
+                    // kurulduğunda [RecoverPendingSwipeActionsUseCase] tarafından sessizce yeniden
+                    // denenecek. Kullanıcıya bir HATA değil, bilgilendirici bir mesaj gösterilir.
                     _state.update { it.copy(isSwipeInFlight = false) }
+                    _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.info_swipe_queued_offline)))
+                }
+                is MatchResult.MutualMatch -> {
+                    repository.markActedOn(profileId)
+                    _state.update {
+                        it.copy(
+                            likedProfileIds = it.likedProfileIds + profileId,
+                            likesEver = it.likesEver + 1,
+                            isSwipeInFlight = false,
+                        )
+                    }
+                    // Gereksinim 2.14 (Faz 4): Free/Premium havuz sağlığını izlemek için
+                    // "match_created" — yukarıda reklam kapısı için zaten hesaplanmış
+                    // `isFree`'nin tersi, izleyicinin (bu kullanıcının) katmanını taşır.
+                    analyticsRepository.logMatchCreated(viewerIsPremium = !isFree)
                     _events.emit(DiscoverEvent.NavigateToMatch(profileId))
                 }
-                else -> _state.update { it.copy(isSwipeInFlight = false) }
+                else -> {
+                    repository.markActedOn(profileId)
+                    _state.update {
+                        it.copy(
+                            likedProfileIds = it.likedProfileIds + profileId,
+                            likesEver = it.likesEver + 1,
+                            isSwipeInFlight = false,
+                        )
+                    }
+                }
+            }
+            // Gereksinim 2.15 (KRİTİK): interstitial YALNIZCA sunucu yanıtı işlendikten ve
+            // arayüz bu karta ait geçişi (kart kaldırma / eşleşme bildirimi) TAMAMLANDIKTAN
+            // SONRA denenir — yukarıdaki `when` bloğu StateFlow'u zaten güncelleyip olayı
+            // yaydığından, buraya gelindiğinde arayüz "kartlar arası" doğal geçiş noktasındadır.
+            // Kullanıcının "Beğen" dokunuşu bu yüzden ASLA senkron olarak kesilmez (bkz.
+            // [LikeInterstitialGateway] KDoc'u).
+            //
+            // Reklam gösterim kuralı: karşılıklı eşleşmede kullanıcı doğrudan kutlama ekranına
+            // gider — geçiş reklamı HİÇ denenmez (bkz. AdDisplayRules). Eşleşme yine de reklam
+            // sıklığı sayacına eklenir.
+            if (AdDisplayRules.allowsLikeInterstitial(result)) {
+                val adAttempt = likeInterstitialGateway.attemptShowAfterTransition(isFree, _state.value.likesEver)
+                likeInterstitialGateway.recordAction(isFree, adAttempt, succeeded)
+            } else if (AdDisplayRules.countsTowardAdCadence(result)) {
+                likeInterstitialGateway.recordAction(isFree, LikeInterstitialAttempt(countSuccessfulLike = true), succeeded)
             }
         }
     }
@@ -272,19 +370,40 @@ class DiscoverViewModel(
                     _state.update { it.copy(isSwipeInFlight = false) }
                     _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.error_swipe_failed)))
                 }
+                is MatchResult.QueuedOffline -> {
+                    // Gereksinim 1 (Faz 6): kart zaten arayüzden kaldırıldı, GERİ ALINMAZ. Sunucu
+                    // henüz bu geçmeyi onaylamadığından (kuyrukta bekliyor) [passedProfileStack]'e
+                    // BİLEREK EKLENMEZ -- aksi halde "geri al", sunucudaki farklı (daha eski, zaten
+                    // senkronize) bir geçmeyi geri alabilirdi.
+                    _state.update { it.copy(isSwipeInFlight = false) }
+                    _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.info_swipe_queued_offline)))
+                }
                 else -> {
-                    lastPassedProfile = PassedProfile(profile, index)
+                    // Gereksinim 1.14: TEK bir alan yerine bir yığına (stack) eklenir — art
+                    // arda birden fazla geçme, sunucunun günlük kotası izin verdiği sürece
+                    // her biri ayrı ayrı geri alınabilsin diye. Eski davranışta bu alan her
+                    // yeni geçmede ÜZERİNE YAZILIYORDU; bu, ilk geçmenin kalıcı olarak geri
+                    // alınamaz hale gelmesine neden oluyordu.
+                    passedProfileStack.addLast(PassedProfile(profile, index))
                     _state.update { it.copy(hasRewindablePass = true, isSwipeInFlight = false) }
                 }
             }
         }
     }
 
-    /** Restores only the latest pass, exactly matching the server's rewind contract. */
+    /**
+     * En son geçilen profili geri getirir (Gereksinim 1.14).
+     *
+     * [passedProfileStack] oturum boyunca geçilen TÜM profilleri (en eskiden en yeniye)
+     * tutar — yalnızca en üsttekini değil. Sunucunun kendi yığını (`usage.passStack`,
+     * `functions/src/monetization.ts`) günlük `rewindsPerDay` kotası izin verdiği sürece
+     * her çağrıda bir öncekini geri getirir, bu yüzden kullanıcı art arda birden fazla kez
+     * "Geri Al"a basarak geçtiği profilleri sırayla (en yeniden en eskiye) geri getirebilir.
+     */
     fun rewindLastPass() {
-        val passed = lastPassedProfile ?: return
+        val passed = passedProfileStack.lastOrNull() ?: return
         if (_state.value.entitlement.limits.rewindsPerDay == 0) {
-            viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall) }
+            viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall(PaywallRequest(LimitReason.REWINDS))) }
             return
         }
         if (_state.value.isRewinding) return
@@ -293,11 +412,17 @@ class DiscoverViewModel(
             interactionRepository.rewindLastPass()
                 .onSuccess { profileUid ->
                     if (profileUid == passed.profile.id) {
+                        passedProfileStack.removeLast()
                         repository.unmarkActedOn(profileUid)
                         insertProfile(passed.profile, passed.index)
+                    } else {
+                        // Sunucudaki yığın istemcininkiyle senkron değil (ör. aynı hesap başka
+                        // bir cihazdan da geçme yapmış olabilir) — hangi kartların hâlâ geçerli
+                        // olduğunu güvenle bilemeyiz, bu yüzden tutarsız kalmaktansa yerel
+                        // yığını TAMAMEN temizliyoruz.
+                        passedProfileStack.clear()
                     }
-                    lastPassedProfile = null
-                    _state.update { it.copy(hasRewindablePass = false, isRewinding = false) }
+                    _state.update { it.copy(hasRewindablePass = passedProfileStack.isNotEmpty(), isRewinding = false) }
                     _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.discover_rewind_success)))
                 }
                 .onFailure {
@@ -307,19 +432,26 @@ class DiscoverViewModel(
         }
     }
 
-    /** Activates the current tier's Boost; the server owns monthly allowance and expiry. */
+    /** Gereksinim 2.12 (Faz 4): bir önceki Boost'un tamamlanma denetimi hala bekliyorsa iptal edilir. */
+    private var boostCompletionJob: Job? = null
+
+    /**
+     * Activates the current tier's Boost; the server owns allowance (now billing-cycle
+     * based, bkz. [BoostManagerUseCase] KDoc'u) and the 30-minute expiry.
+     */
     fun activateBoost() {
         if (_state.value.entitlement.limits.boostsPerMonth == 0) {
-            viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall) }
+            viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall(PaywallRequest(LimitReason.BOOSTS))) }
             return
         }
         if (_state.value.isBoosting) return
         _state.update { it.copy(isBoosting = true) }
         viewModelScope.launch {
-            interactionRepository.activateBoost()
+            boostManagerUseCase.activate()
                 .onSuccess { boostUntil ->
                     _state.update { it.copy(isBoosting = false, boostUntilMillis = boostUntil) }
                     _events.emit(DiscoverEvent.ShowSnackbar(getString(Res.string.discover_boost_started)))
+                    scheduleBoostCompletionCheck(boostUntil)
                 }
                 .onFailure {
                     _state.update { it.copy(isBoosting = false) }
@@ -329,12 +461,45 @@ class DiscoverViewModel(
     }
 
     /**
-     * Enforces the free daily limit. Returns true (and optimistically counts the like) when
-     * allowed; otherwise raises the upgrade sheet and returns false. Premium bypasses it.
+     * Gereksinim 2.12 (Faz 4): [boostUntilMillis] anına kadar bekler, ardından sunucudan
+     * Boost özetini çekip tek seferlik ("Boost bitti! Profilin X kişiye fazladan
+     * gösterildi") özet diyaloğunu tetikler. Ekran kapanıp ViewModel temizlenirse
+     * ([viewModelScope] iptal edilirse) bu bekleme de kendiliğinden durur -- Boost hala
+     * SUNUCUDA aktif kalır, yalnızca bu özel istemci bildirimi kaybolur (ağır bir maliyeti
+     * yoktur, çünkü özet her zaman `getBoostSummary` ile sonradan da çekilebilir).
+     */
+    private fun scheduleBoostCompletionCheck(boostUntilMillis: Long) {
+        boostCompletionJob?.cancel()
+        boostCompletionJob = viewModelScope.launch {
+            val remaining = boostUntilMillis - getCurrentTimeMillis()
+            if (remaining > 0) delay(remaining)
+            boostManagerUseCase.fetchCompletionSummary()
+                .onSuccess { summary -> _state.update { it.copy(boostSummary = summary) } }
+        }
+    }
+
+    /** Gereksinim 2.12 (Faz 4): özet diyaloğu kapatılırken çağrılır -- tek seferlik bayrağı sıfırlar. */
+    fun onBoostSummaryDismissed() {
+        _state.update { it.copy(boostSummary = null) }
+    }
+
+    /**
+     * Günlük beğeni kotasını [FeatureGate] üzerinden denetler. Bu, herhangi bir AdMob
+     * interstitial'ı istenmeden ÖNCE çağrılır (Gereksinim 1.1): kota tükenmişse kullanıcıya
+     * hiçbir şekilde reklam izletilmez, [DiscoverUiState.limitReason] set edilir ve
+     * arayan taraf Limit Sheet'i açar. Kota müsaitse iyimser olarak sayaç bir artırılır ve
+     * eylem (ve ardından olası reklam) devam eder. Premium'da limitler `null` olduğundan bu
+     * kontrol pratikte hiçbir zaman engellemez.
      */
     private fun consumeSwipeOrBlock(): Boolean {
-        if (!_state.value.canSwipe) {
-            _state.update { it.copy(showLimitSheet = true) }
+        val current = _state.value
+        val usage = UsageSnapshot(likes = current.swipesUsedToday, rewardedLikes = current.rewardedLikesToday)
+        val decision = featureGate.decide(Feature.LIKE, current.entitlement, usage, showInterstitial = false)
+        analyticsRepository.trackGateDecision(Feature.LIKE, current.entitlement, decision, source = "discover")
+        if (decision is GateDecision.LimitReached) {
+            _state.update {
+                it.copy(limitReason = decision.reason, limitIsFairUseCap = decision.upgradeTo == null)
+            }
             return false
         }
         _state.update { it.copy(swipesUsedToday = it.swipesUsedToday + 1) }
@@ -347,12 +512,35 @@ class DiscoverViewModel(
     }
 
     fun onUpgradeClicked() {
-        _state.update { it.copy(showLimitSheet = false) }
-        viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall) }
+        val reason = _state.value.limitReason
+        _state.update { it.copy(limitReason = null) }
+        viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall(PaywallRequest(reason))) }
+    }
+
+    /** Limit sayfasında "Standart'ı ücretsiz dene" seçildi: Paywall deneme paketi seçili açılır. */
+    fun onTrialClicked() {
+        val reason = _state.value.limitReason
+        _state.update { it.copy(limitReason = null) }
+        viewModelScope.launch { _events.emit(DiscoverEvent.NavigateToPaywall(PaywallRequest(reason, preselectTrial = true))) }
     }
 
     fun onLimitSheetDismissed() {
-        _state.update { it.copy(showLimitSheet = false) }
+        _state.update { it.copy(limitReason = null) }
+    }
+
+    /** Refreshes only from the server; an AdMob client callback never mutates reward balances. */
+    fun onRewardedLikeConfirmed() {
+        viewModelScope.launch {
+            val usage = repository.getLikeUsageToday()
+            _state.update {
+                val updated = it.copy(
+                    swipesUsedToday = usage.likes,
+                    rewardedLikesToday = usage.rewardedLikes,
+                    likesEver = usage.likesEver,
+                )
+                updated.copy(limitReason = if (updated.canSwipe) null else updated.limitReason)
+            }
+        }
     }
 
     private fun removeProfile(profileId: String) {
@@ -378,7 +566,13 @@ class DiscoverViewModel(
     }
 
     private data class PassedProfile(val profile: DiscoverProfile, val index: Int)
-    private var lastPassedProfile: PassedProfile? = null
+
+    /**
+     * Gereksinim 1.14: bu oturumda geçilen (pas geçilen) profillerin yığını (stack) —
+     * en eskiden en yeniye sıralı. Sunucunun `usage.passStack`'iyle (bkz. `rewindLastPass`
+     * KDoc'u) birebir aynı mantıkla, yalnızca sonundan eklenir/çıkarılır.
+     */
+    private val passedProfileStack = ArrayDeque<PassedProfile>()
 
     fun onProfileClicked(profileId: String) {
         viewModelScope.launch {
