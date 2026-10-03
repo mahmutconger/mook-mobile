@@ -59,3 +59,11 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+# ---- Room / WorkManager ---------------------------------------
+# AdMob, WorkManager 2.7.0'ı (ve onunla Room 2.2.5'i) geçişli olarak getirir. Room bu
+# eski sürümde veritabanı uygulamasını (`WorkDatabase_Impl`) yansımayla, parametresiz
+# kurucusu üzerinden oluşturur; ancak Room 2.2.5'in tüketici kuralı yalnızca sınıfı tutar,
+# kurucuyu tutmaz. R8 tam modu (AGP 8+ varsayılanı) kurucuyu sildiği için uygulama açılışta
+# "Failed to create an instance of androidx.work.impl.WorkDatabase" ile çöküyordu.
+-keep class * extends androidx.room.RoomDatabase { <init>(); }
