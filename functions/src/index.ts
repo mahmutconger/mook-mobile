@@ -2,7 +2,9 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { enforceMessageQuota, resolveTierFor } from "./monetization";
+import { consumeMessageQuota, isRecipientAtDailyMessageLimit, resolveTierFor } from "./monetization";
+import { assertNotBanned } from "./moderation";
+import { recordAbuseSignal } from "./abuseFlags";
 
 if (admin.apps.length === 0) admin.initializeApp();
 const db = admin.firestore();
@@ -11,11 +13,28 @@ const db = admin.firestore();
 // dışa aktarılır. Modül, admin.* çağrılarını yalnızca handler içinde yaptığı için
 // import sırası initializeApp'ten etkilenmez.
 export { deleteAccount } from "./deleteAccount";
+export { activateMookProfile } from "./profileActivation"; // Giriş backend akışı: isMookActive yalnızca sunucuda
+export { exportUserData } from "./exportUserData"; // Gereksinim 5 (Faz 6, KVKK Madde 11)
+export { grantPromotionalEntitlement } from "./customerSupport"; // Gereksinim 7 (Faz 6)
 export { revenueCatWebhook } from "./revenuecatWebhook";
+export { admobRewardedSsv } from "./admobRewardedSsv";
+export { migrateExistingUsers } from "./migrateExistingUsers";
+export { getDiscoverFeed } from "./discoverFeed";
+export { verifyEntitlementNow } from "./subscriptionVerification";
+export { onReportCreated } from "./abuseFlags"; // Şikâyet → kötüye kullanım işareti
+export { refreshPublicProfileAges } from "./publicProfileSync"; // Herkese açık yaşları güncel tutar
+export { getLikedMe } from "./likedMe"; // "Beni Beğenenler" listesi (opak jetonlu)
 export {
     activateBoost,
     bootstrapMonetization,
+    canEarnReward,
+    canEarnRewardedLike,
+    checkDeviceTrialEligibility,
+    checkWinBackEligibility,
+    closeRoomSlots,
     getUsage,
+    recordDeviceTrialConsumption,
+    recordWinBackRedemption,
     rewind,
     recordProfileVisit,
     setIncognito,
@@ -25,9 +44,19 @@ export {
     unlockLikedMe,
     updateTimeZone,
 } from "./monetization";
+export { moderateUser } from "./moderation";
 
 // ---------------------------------------------------------------------------
 // Existing DeepL Demo Logic
+// GÖZLEMLENEBİLİRLİK NOTU (kavramsal Cloud Monitoring eşiği, Gereksinim 7, Faz 6): DeepL
+// karakter kullanımı SABİT bir aylık bütçeye tabidir (DeepL faturalandırma panelinden takip
+// edilir, bu kod tabanında SAYILMAZ). Google Cloud Monitoring'de, DeepL'in KENDİ kullanım
+// metriklerini (veya `translateText`/`sendMessage`in `translationChars*` alanlarının Log-
+// based metric'e dönüştürülmüş toplamını, bkz. `monetization.ts`) izleyen bir eşik
+// tanımlanmalıdır: aylık bütçenin %80'i AŞILIRSA bir UYARI (alert), %100'ü AŞILIRSA (veya
+// DeepL 456 "quota exceeded" durum kodunu döndürmeye BAŞLARSA -- bkz. aşağıdaki 456
+// kontrolü) bir KRİTİK (page) uyarısı tetiklenmelidir; bu, kullanıcı deneyimini (çeviri
+// hatası) beklenmedik bir fatura sürprizinden ÖNCE tespit eder.
 // ---------------------------------------------------------------------------
 
 const DEEPL_AUTH_KEY = defineSecret("DEEPL_AUTH_KEY");
@@ -205,6 +234,9 @@ export const sendMessage = onCall(
         }
 
         const uid = request.auth.uid;
+        // Gereksinim 1.13: yasaklı bir kullanıcının mesaj göndermesini sunucu tarafında
+        // da kesin olarak engeller (istemci taraflı `ModerationGate`in gerçek yedeği).
+        await assertNotBanned(uid);
         const data = request.data as SendMessageRequest;
 
         if (!data.chatId || !data.peerUid || !data.text || data.text.length === 0) {
@@ -241,39 +273,57 @@ export const sendMessage = onCall(
             if (existingMessage.data()?.senderUid !== uid) {
                 throw new HttpsError("already-exists", "messageId is already in use.");
             }
-            return { success: true, messageId, translatedText: existingMessage.data()?.translatedText ?? null };
+            return {
+                success: true,
+                messageId,
+                translatedText: existingMessage.data()?.translatedText ?? null,
+                translationQuotaExhausted: false,
+                recipientAtDailyLimit: await isRecipientAtDailyMessageLimit(data.peerUid),
+            };
         }
 
-        // This transaction combines the original 30/minute guard with tier-specific
-        // daily messages and new-conversation quotas. It runs before DeepL so rejected
-        // requests never spend translation budget.
-        const chatExists = (await chatRef.get()).exists;
-        await enforceMessageQuota(uid, await resolveTierFor(uid, request), !chatExists);
-        const now = Date.now();
-
-        // 2. Read the recipient's profile once — it carries both the language to
-        //    translate into and the tokens to notify at the end.
-        //
-        //    Read fresh on every send rather than cached on the chat document: a
-        //    cached copy would freeze the value, so a user who later switches language
-        //    would keep receiving the old one forever. One document read is negligible
-        //    beside the DeepL call below. "EN-US" is only the last resort — a wrong
-        //    guess here silently mistranslates every message in the conversation.
+        // 2. Alıcının profili bir kez okunur — hem çeviri hedef dilini hem de bildirim
+        //    jetonlarını taşır. Sohbet belgesinde önbelleğe ALINMAZ: dilini sonradan
+        //    değiştiren bir kullanıcı aksi halde eski dilde mesaj almaya devam ederdi.
+        //    "EN-US" yalnızca son çaredir.
         const peerData = (await db.collection("users").doc(data.peerUid).get()).data();
-        let targetLanguage: string = readUserLanguage(peerData) ?? "EN-US";
-
-        targetLanguage = targetLanguage.toUpperCase();
+        const targetLanguage = (readUserLanguage(peerData) ?? "EN-US").toUpperCase();
         const sourceLanguage = (data.senderLanguage || "").toUpperCase();
+
+        // 3. Yalnızca Çeviri Kotası Mantığı: çevirinin GEREKİP GEREKMEDİĞİ, kota adımından
+        //    ÖNCE belirlenir. Temel dil üzerinden karşılaştırılır (EN-US → EN-GB çevrilmez).
+        //    Aynı dildeki veya desteklenmeyen hedef dile giden mesajlar için 0 karakter
+        //    geçilir; bu mesajlar karakter kotasına HİÇ dokunmaz.
+        const sameLanguage = sourceLanguage.split("-")[0] === targetLanguage.split("-")[0];
+        const needsTranslation = !sameLanguage && ALLOWED_TARGETS.has(targetLanguage);
+
+        // Mesaj sayısı, yeni sohbet ve dakikalık hız sınırı her mesajda uygulanır; karakter
+        // kotası yalnızca çeviride düşülür. DeepL'den ÖNCE çalışır, böylece reddedilen bir
+        // istek çeviri bütçesi harcamaz. Kota yetmezse mesaj çevrilmeden gönderilir.
+        const chatExists = (await chatRef.get()).exists;
+        let quota;
+        try {
+            quota = await consumeMessageQuota(
+                uid,
+                await resolveTierFor(uid, request),
+                !chatExists,
+                needsTranslation ? data.text.length : 0,
+            );
+        } catch (error) {
+            // Dakikalık hız sınırını aşmak (spam/bot davranışı) kötüye kullanım sinyalidir.
+            // Kaynak anahtarı saattir: aynı saatteki tekrarlar puanı şişirmez.
+            if (error instanceof HttpsError && error.message === "rate-limit-exceeded") {
+                await recordAbuseSignal(uid, "message_rate_limit", new Date().toISOString().slice(0, 13), { chatId: data.chatId });
+            }
+            throw error;
+        }
+        const now = Date.now();
         let translatedText: string | null = null;
 
-        // 3. Translate if needed. Compared on the base language so an EN-US sender
-        //    writing to an EN-GB reader does not pay for a no-op translation.
-        const sameLanguage =
-            sourceLanguage.split("-")[0] === targetLanguage.split("-")[0];
-        if (!sameLanguage && ALLOWED_TARGETS.has(targetLanguage)) {
+        if (quota.translate) {
             const authKey = DEEPL_AUTH_KEY.value();
             const host = authKey.endsWith(":fx") ? "api-free.deepl.com" : "api.deepl.com";
-            
+
             const body = new URLSearchParams();
             body.append("text", data.text);
             body.append("target_lang", targetLanguage);
@@ -297,7 +347,7 @@ export const sendMessage = onCall(
                 }
             } catch (error) {
                 console.error("DeepL translation failed in sendMessage:", error);
-                // Do not throw; we can still deliver the untranslated message.
+                // Hata fırlatılmaz; mesaj çevrilmeden de teslim edilebilir.
             }
         }
 
@@ -322,6 +372,11 @@ export const sendMessage = onCall(
             },
             // The previous last message may have been retracted; this one is not.
             lastMessageDeleted: false,
+            // Gereksinim 1.7: yalnızca sohbetin İLK mesajında (yeni sohbet) etiketleniyor
+            // — `matchDoc` yukarıda zaten okundu (eşleşme kontrolü için), bu yüzden ek bir
+            // okuma gerekmiyor. Bir yanıtta bu alanı tekrar YAZMIYORUZ: kullanıcı o
+            // sırada farklı bir odada olsa bile sohbetin doğduğu oda değişmemelidir.
+            ...(chatExists ? {} : { roomLanguageCode: matchDoc.data()?.roomLanguageCode ?? null }),
         }, { merge: true });
 
         // Add the message under the id the client minted. Client-owned ids let the
@@ -392,7 +447,13 @@ export const sendMessage = onCall(
         return {
             success: true,
             messageId: messageRef.id,
-            translatedText: translatedText
+            translatedText: translatedText,
+            // Yalnızca Çeviri Kotası: karakter kotası bittiği için mesaj çevrilmeden gönderildi.
+            // İstemci bunu engel olarak DEĞİL, bilgilendirme olarak gösterir.
+            translationQuotaExhausted: quota.translationQuotaExhausted,
+            // Gereksinim 1.6: gönderme asla engellenmez — bu yalnızca istemcinin yerel
+            // bir bilgilendirme sistem mesajı göstermesi için bir sinyaldir.
+            recipientAtDailyLimit: await isRecipientAtDailyMessageLimit(data.peerUid),
         };
     }
 );

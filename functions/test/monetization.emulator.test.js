@@ -118,6 +118,9 @@ test("parallel free swipes never exceed the 10-like daily quota", { timeout: 300
     results.filter((result) => !successful(result)).forEach((result) => assertError(result, "RESOURCE_EXHAUSTED"));
     const usage = (await db.collection("usage").doc(user.uid).get()).data();
     assert.equal(usage.likes, 10);
+    assert.equal(usage.likesEver, 10);
+    const usageResponse = await callable("getUsage", user.token, {});
+    assert.equal(usageResponse.body.result.likesEver, 10);
 });
 
 test("tier like limits enforce Economy 30, Standard 100 and Premium fair-use 1000", { timeout: 30000, concurrency: true }, async () => {
@@ -140,18 +143,30 @@ test("tier like limits enforce Economy 30, Standard 100 and Premium fair-use 100
     }
 });
 
-test("parallel Economy room changes cap room slots and charge only committed switches", { timeout: 30000, concurrency: true }, async () => {
+test("parallel Economy room changes swap rooms atomically within slot and daily limits", { timeout: 30000, concurrency: true }, async () => {
     const user = await actor("ECONOMY");
-    const results = await Promise.all(["TR", "EN-US", "DE", "FR"].map((languageCode) => (
+    const results = await Promise.all(["TR", "EN-US", "DE", "FR", "IT"].map((languageCode) => (
         callable("switchRoom", user.token, { languageCode })
     )));
 
-    assert.equal(results.filter(successful).length, 3, JSON.stringify(results));
+    // İlk seçim ücretsiz + günlük 3 değişiklik = 4 başarılı; 5. çağrı günlük hak hatası alır.
+    // Slotlar doluyken yeni oda artık kapasite hatası değil, atomik takas üretir.
+    assert.equal(results.filter(successful).length, 4, JSON.stringify(results));
     results.filter((result) => !successful(result)).forEach((result) => assertError(result, "RESOURCE_EXHAUSTED"));
     const profile = (await db.collection("users").doc(user.uid).get()).data();
     const usage = (await db.collection("usage").doc(user.uid).get()).data();
     assert.equal(profile.roomLanguageCodes.length, 3);
-    assert.equal(usage.roomSwitches, 2); // Initial mandatory room selection is free.
+    assert.equal(usage.roomSwitches, 3);
+});
+
+test("a Free user at full capacity can swap their single room", { timeout: 30000, concurrency: true }, async () => {
+    const user = await actor("FREE");
+    assert.ok(successful(await callable("switchRoom", user.token, { languageCode: "TR" })));
+    const swap = await callable("switchRoom", user.token, { languageCode: "DE" });
+    assert.ok(successful(swap), JSON.stringify(swap));
+    const profile = (await db.collection("users").doc(user.uid).get()).data();
+    assert.deepEqual(profile.roomLanguageCodes, ["DE"]);
+    assert.equal(profile.roomLanguageCode, "DE");
 });
 
 test("rewind is single-use under concurrent requests", { timeout: 30000, concurrency: true }, async () => {

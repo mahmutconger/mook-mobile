@@ -4,19 +4,57 @@
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "isMookActive", "order": "ASCENDING" },
-        { "fieldPath": "lastActiveTimestamp", "order": "DESCENDING" }
+        {
+          "fieldPath": "isMookActive",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "lastActiveTimestamp",
+          "order": "DESCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "public_profiles",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "isMookActive", "order": "ASCENDING" },
-        { "fieldPath": "incognito", "order": "ASCENDING" },
-        { "fieldPath": "lastActiveTimestamp", "order": "DESCENDING" }
+        {
+          "fieldPath": "isMookActive",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "incognito",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "lastActiveTimestamp",
+          "order": "DESCENDING"
+        }
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "senderUid",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "arrayConfig": "CONTAINS",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    }
+  ]
 }

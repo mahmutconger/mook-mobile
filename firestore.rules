@@ -10,28 +10,156 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ---------------------------------------------------------------------
+    // FIRESTORE GÜVENLİK TEMELİ — users/{uid}
+    //
+    // `users` koleksiyonu WalkTalk ile ORTAKTIR; bu yüzden create kuralı katı bir izin
+    // listesi (allowlist) yerine şu iki katmanı uygular:
+    //   1. Sunucuya ait alanlar (serverOwnedUserKeys) istemci tarafından ne OLUŞTURULABİLİR
+    //      ne de DEĞİŞTİRİLEBİLİR. Bunlar yalnızca Cloud Functions (Admin SDK) ile yazılır ve
+    //      `syncPublicProfile` aracılığıyla public_profiles'a yansır — sahte `verified`,
+    //      sonsuz `boostUntil`, `incognito` ya da sınırsız oda listesi bu yüzden enjekte
+    //      edilemez.
+    //   2. Bilinen istemci alanları, varsa, tip ve boyut açısından doğrulanır
+    //      (isValidUserCreation / hasValidClientFieldTypes).
+    // İstemcinin `set(..., merge = true)` çağrıları belge yoksa CREATE olarak değerlendirilir;
+    // her iki katman da bu yolu kapsar.
+    // ---------------------------------------------------------------------
+    function serverOwnedUserKeys() {
+      return [
+        // Oda/slot durumu: yalnızca switchRoom / closeRoomSlots.
+        "roomLanguageCode", "roomLanguageCodes", "roomLastActiveAt", "roomSlots",
+        // Ücretli ayrıcalıklar: yalnızca activateBoost / setIncognito / swipe.
+        "boostUntil", "boostViewsGained", "incognito", "visibleTo",
+        // Abonelik kademesi (Premium rozeti / Keşfet önceliği): yalnızca RevenueCat senkronizasyonu.
+        "subscriptionTier",
+        // Doğrulama rozeti: yalnızca sunucu/yönetici.
+        "verified",
+        // Kota gün sınırı: yalnızca updateTimeZone.
+        "timeZone", "timeZoneChangedAt",
+        // Discover'a giriş: yalnızca activateMookProfile.
+        "isMookActive", "mookActivatedAt",
+        // Moderasyon: yalnızca moderateUser.
+        "isBanned", "banReason", "bannedAt"
+      ];
+    }
+
+    // `keys`: doğrulanacak alan kümesi. Create'te belgenin tüm alanları, update'te YALNIZCA
+    // değişen alanlar verilir — böylece WalkTalk'ın yazdığı ve Mook şemasına uymayan eski bir
+    // alan, kullanıcının ilgisiz bir güncellemesini (ör. FCM jetonu) engellemez.
+    function isOptionalString(data, keys, key, maxLength) {
+      return !(key in keys) || (data[key] is string && data[key].size() <= maxLength);
+    }
+    function isOptionalNumber(data, keys, key) {
+      return !(key in keys) || data[key] is number;
+    }
+    function isOptionalBool(data, keys, key) {
+      return !(key in keys) || data[key] is bool;
+    }
+    function isOptionalList(data, keys, key, maxSize) {
+      return !(key in keys) || (data[key] is list && data[key].size() <= maxSize);
+    }
+
+    // Mook istemcisinin yazdığı alanların tip/boyut doğrulaması. Listede olmayan alanlar
+    // (ör. WalkTalk'a özgü alanlar) bilinçli olarak serbest bırakılır.
+    function hasValidClientFieldTypes(data, keys) {
+      return isOptionalString(data, keys, "email", 320)
+        && isOptionalString(data, keys, "displayName", 100)
+        && isOptionalString(data, keys, "bio", 2000)
+        && isOptionalString(data, keys, "avatarUrl", 2048)
+        && isOptionalString(data, keys, "languageCode", 16)
+        && isOptionalString(data, keys, "countryCode", 8)
+        && isOptionalString(data, keys, "gender", 32)
+        && isOptionalNumber(data, keys, "birthDateMillis")
+        && isOptionalNumber(data, keys, "lastActiveTimestamp")
+        && isOptionalNumber(data, keys, "acceptedEulaAt")
+        && isOptionalBool(data, keys, "acceptedEula")
+        && isOptionalBool(data, keys, "discoverVisible")
+        && isOptionalList(data, keys, "interests", 30)
+        && isOptionalList(data, keys, "discoveryPhotos", 10)
+        && isOptionalList(data, keys, "photoUrls", 10)
+        && isOptionalList(data, keys, "fcmTokens", 100)
+        && isOptionalList(data, keys, "blockedUsers", 5000);
+    }
+
+    // Yeni bir kullanıcı belgesi yalnızca sahibi tarafından, sunucuya ait hiçbir alan
+    // İÇERMEDEN ve makul bir boyutla oluşturulabilir.
+    function isValidUserCreation(uid) {
+      let data = request.resource.data;
+      return isMe(uid)
+        && data.keys().size() <= 60
+        && !data.keys().hasAny(serverOwnedUserKeys())
+        && hasValidClientFieldTypes(data, data.keys());
+    }
+
+    // Güncellemede sunucuya ait alanlar değiştirilemez; tip doğrulaması yalnızca değişen
+    // alanlara uygulanır.
+    function isValidUserUpdate(uid) {
+      let data = request.resource.data;
+      let changed = data.diff(resource.data).affectedKeys();
+      return isMe(uid)
+        && !changed.hasAny(serverOwnedUserKeys())
+        && hasValidClientFieldTypes(data, changed);
+    }
+
     match /users/{uid} {
-      // Private account document: e-mail, date of birth, FCM tokens and billing-adjacent
-      // state must never be enumerable by Discover. Public discovery data lives in the
-      // server-maintained public_profiles projection below.
+      // Özel hesap belgesi: e-posta, doğum tarihi, FCM jetonları ve ödeme durumu Discover
+      // tarafından listelenemez. Herkese açık keşif verisi sunucunun yönettiği
+      // public_profiles projeksiyonundadır.
       allow get: if isMe(uid);
       allow list: if false;
-      allow create: if isMe(uid);
-      allow update: if isMe(uid)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-          "roomLanguageCode", "roomLanguageCodes", "roomSlots", "boostUntil",
-          "incognito", "verified", "timeZone", "timeZoneChangedAt", "visibleTo"
-        ]);
+      // `delete: if false` sayesinde create yalnızca GERÇEKTEN yeni bir belgede tetiklenir;
+      // var olan bir yasağı silip yeniden oluşturarak atlatmak mümkün değildir.
+      allow create: if isValidUserCreation(uid);
+      allow update: if isValidUserUpdate(uid);
       allow delete: if false;
     }
 
-    // This collection is written only by the syncPublicProfile Cloud Function. It is the
-    // sole cross-account profile surface and intentionally excludes private user fields.
+    // ---------------------------------------------------------------------
+    // public_profiles/{uid} — yalnızca syncPublicProfile (Admin SDK) yazar.
+    //
+    // GET: profil detayı (bildirim, eşleşme, beğendiklerim) için tek belge okumaya izin
+    // verilir; gizli (incognito) profiller yalnızca daha önce beğendikleri kişilere açılır.
+    //
+    // LIST: Discover akışı sunucudadır (getDiscoverFeed); meşru istemci bu koleksiyonu
+    // sorgulamaz. Değiştirilmiş bir istemcinin koleksiyonu kazımasını önlemek için ham bir
+    // sorgu YALNIZCA şu kısıtları AÇIKÇA filtreliyorsa kabul edilir (kurallar sorgunun
+    // kısıtlarını kanıtlayabilmelidir):
+    //   - `isMookActive == true` ve `incognito == false`,
+    //   - `languageCode == <kullanıcının aktif odası>` — Premium (freeRoam) hariç,
+    //   - sayfa boyutu en fazla 20.
+    // `request.app != null`: yalnızca geçerli App Check (Play Integrity) jetonu taşıyan
+    // istemciler okuyabilir; konsolda Firestore için App Check "Enforce" da açılmalıdır.
+    // ---------------------------------------------------------------------
+    function callerUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Kullanıcının şu an AKTİF odası (getDiscoverFeed ile aynı kural: Premium dışındaki
+    // kullanıcılar yalnızca aktif odalarını görebilir).
+    function callerActiveRoom() {
+      return callerUserDoc().get("roomLanguageCode", "");
+    }
+
+    // Özgürce dolaşma (freeRoam) yalnızca Premium'a aittir. Önce Auth jetonundaki RevenueCat
+    // talebine bakılır; yeni satın almada jeton bayat olabileceği için `customers/{uid}`
+    // belgesi yedek olarak okunur (sunucudaki resolveTierFor ile aynı sıra).
+    function callerHasFreeRoam() {
+      return "premium" in request.auth.token.get("revenueCatEntitlements", [])
+        || "premium" in get(/databases/$(database)/documents/customers/$(request.auth.uid))
+             .data.get("revenueCatEntitlements", []);
+    }
+
     match /public_profiles/{uid} {
-      // Incognito users can be fetched only by members they already liked. Discover's
-      // normal query includes incognito == false, which lets the rules prove its scope.
-      allow get, list: if signedIn()
+      allow get: if signedIn() && request.app != null
         && (resource.data.incognito != true || request.auth.uid in resource.data.get("visibleTo", []));
+
+      allow list: if signedIn() && request.app != null
+        && request.query.limit <= 20
+        && resource.data.isMookActive == true
+        && resource.data.incognito == false
+        && (resource.data.languageCode == callerActiveRoom() || callerHasFreeRoam());
+
       allow write: if false;
     }
 
@@ -119,9 +247,32 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Gereksinim (Altyapı): `onRevenueCatEvent` webhook'unun idempotency koruması için
+    // durum belgeleri. Yalnızca Cloud Function (Admin SDK, kuralları atlar) okur/yazar —
+    // istemcinin bu koleksiyona dokunmasının HİÇBİR meşru senaryosu yoktur.
+    match /processed_revenuecat_events/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Plan sınırları (Tek Doğruluk Kaynağı): oturum açmış her istemci okur, YALNIZCA sunucu yazar.
     match /config/plans {
       allow read: if signedIn();
       allow write: if false;
+    }
+
+    // Kötüye kullanım işaretleri ve olay geçmişi: yalnızca Cloud Functions (Admin SDK).
+    // İşaretlenen kullanıcı dahil hiçbir istemci okuyamaz ya da yazamaz.
+    match /abuse_flags/{uid} {
+      allow read, write: if false;
+
+      match /events/{eventId} {
+        allow read, write: if false;
+      }
+    }
+
+    // Yaş yenileme zamanı (doğum günü türevi): yalnızca sunucu; herkese açık profile sızmaz.
+    match /private_profile_meta/{uid} {
+      allow read, write: if false;
     }
 
     match /profileViews/{viewId} {
@@ -135,6 +286,44 @@ service cloud.firestore {
     match /liked_me_unlocks/{unlockId} {
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
       allow write: if false;
+    }
+
+    // Okundu bilgisi (Premium ayrıcalığı): `read_receipts/{chatId}_{readerUid}`.
+    // - YAZMA: yalnızca okuyan kişinin kendisi, yalnızca katılımcısı olduğu sohbet için ve
+    //   gelecekteki bir zamanla değil (en fazla 1 dk saat kayması toleransı).
+    // - OKUMA: yalnızca sohbetin DİĞER katılımcısı ve yalnızca Premium yetkisi (Firebase Auth
+    //   özel talebi `revenueCatEntitlements`) varsa. Premium olmayan kullanıcı karşı tarafın
+    //   okuyup okumadığını göremez.
+    match /read_receipts/{receiptId} {
+      function chatUsers(chatId) {
+        return get(/databases/$(database)/documents/chats/$(chatId)).data.users;
+      }
+
+      function isPremiumCaller() {
+        return "premium" in request.auth.token.get("revenueCatEntitlements", []);
+      }
+
+      // Henüz yazılmamış bir okundu bilgisini dinlemek (resource == null) hiçbir veri
+      // sızdırmaz; Premium dinleyicinin "izin reddedildi" hatası almaması için izinlidir.
+      allow get: if signedIn() && isPremiumCaller() && (
+        resource == null || (
+          request.auth.uid != resource.data.readerUid
+          && request.auth.uid in chatUsers(resource.data.chatId)
+        )
+      );
+
+      allow list: if false;
+
+      allow create, update: if signedIn()
+        && request.resource.data.keys().hasOnly(["chatId", "readerUid", "lastReadAt"])
+        && request.resource.data.readerUid == request.auth.uid
+        && request.resource.data.chatId is string
+        && receiptId == request.resource.data.chatId + "_" + request.auth.uid
+        && request.auth.uid in chatUsers(request.resource.data.chatId)
+        && request.resource.data.lastReadAt is int
+        && request.resource.data.lastReadAt <= request.time.toMillis() + 60000;
+
+      allow delete: if false;
     }
 
     match /chats/{chatId} {
