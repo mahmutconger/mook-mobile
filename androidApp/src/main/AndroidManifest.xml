@@ -42,6 +42,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mook">
+        <!--
+            KVKK: Firebase Analytics, kullanıcı onay ekranında açık rıza verene kadar HİÇ veri
+            toplamaz. Onay verildiğinde AdMobConsentManager.applyAnalyticsGate() toplamayı açar
+            (bu tercih SDK tarafından kalıcı tutulur) ve Consent Mode sinyallerini günceller.
+            Bu bayraklar olmadan SDK, uygulama açılır açılmaz (ör. first_open) veri gönderirdi.
+        -->
+        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
+        <meta-data android:name="google_analytics_default_allow_analytics_storage" android:value="false" />
+        <meta-data android:name="google_analytics_default_allow_ad_storage" android:value="false" />
+        <meta-data android:name="google_analytics_default_allow_ad_user_data" android:value="false" />
+        <meta-data android:name="google_analytics_default_allow_ad_personalization_signals" android:value="false" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5294841790884915~5471307690" />
         <activity
             android:exported="true"
             android:launchMode="singleTop"
@@ -77,6 +91,19 @@
                     android:path="/sso/authorize" />
             </intent-filter>
         </activity>
+
+        <!--
+            Gereksinim 1.12: bekleyen bir ödemenin sunucu tarafında onaylandığını bildiren
+            FCM veri mesajını, uygulama kapalıyken bile almak için. Bkz.
+            com.mcclabs.mook.RevenueCatWebhookService KDoc'u.
+        -->
+        <service
+            android:name=".RevenueCatWebhookService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

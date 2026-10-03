@@ -12,18 +12,24 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test:emulator": "node --test test/monetization.emulator.test.js",
+    "test:ssv": "npm run build && node --test test/admobRewardedSsv.test.js",
+    "test:unit": "npm run build && node --test test/admobRewardedSsv.test.js test/roomSwitch.test.js test/rewards.test.js test/tierPolicy.test.js test/messageQuota.test.js test/deletionSchema.test.js test/likedMe.test.js test/discoverPriority.test.js test/profilePrivacy.test.js test/abuseFlags.test.js test/planCatalog.test.js",
     "test": "npm run build && firebase --config ../firebase.json emulators:exec --only auth,firestore,functions --project walktalk-1123f \"npm run test:emulator\"",
-    "migrate:public-profiles": "node scripts/migrate-public-profiles.js"
+    "migrate:public-profiles": "node scripts/migrate-public-profiles.js",
+    "test:rules": "firebase --config ../firebase.json emulators:exec --only firestore --project demo-walkmatch-rules \"node --test test/firestore.rules.test.js test/firestore.security.test.js\""
   },
   "engines": {
     "node": "20"
   },
   "dependencies": {
     "firebase-admin": "^12.1.0",
-    "firebase-functions": "^5.0.0"
+    "firebase-functions": "^5.0.0",
+    "google-auth-library": "^9.15.1"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
     "@types/node": "^20.14.0",
+    "firebase": "^11.10.0",
     "typescript": "^5.5.0"
   }
 }

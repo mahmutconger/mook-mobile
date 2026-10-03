@@ -10,9 +10,13 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.IntentSenderRequest
+import com.mcclabs.mook.domain.update.InAppUpdateActivityHolder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import com.mcclabs.mook.ads.AdMobActivityHolder
+import com.mcclabs.mook.ads.AdMobConsentManager
 import com.mcclabs.mook.data.billing.RevenueCatActivityHolder
 
 class MainActivity : ComponentActivity() {
@@ -20,11 +24,23 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         RevenueCatActivityHolder.activity = this
+        AdMobActivityHolder.activity = this
+        InAppUpdateActivityHolder.activity = this
+        InAppUpdateActivityHolder.launcher = inAppUpdateLauncher
     }
 
     override fun onPause() {
         if (RevenueCatActivityHolder.activity === this) RevenueCatActivityHolder.activity = null
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        if (AdMobActivityHolder.activity === this) AdMobActivityHolder.activity = null
+        if (InAppUpdateActivityHolder.activity === this) {
+            InAppUpdateActivityHolder.activity = null
+            InAppUpdateActivityHolder.launcher = null
+        }
+        super.onDestroy()
     }
 
     /**
@@ -36,12 +52,24 @@ class MainActivity : ComponentActivity() {
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
+    /**
+     * Zorla Güncelleme: Play Core'un Immediate akışı sonucu — kullanıcı akışı iptal
+     * ederse ya da bir hata olursa özel bir işlem GEREKMEZ: `App.kt`'deki kilit ekranı
+     * (`ForceUpdateScreen`) zaten görünür kalır, çünkü [com.mcclabs.mook.domain.model.UpdateState]
+     * yalnızca bir sonraki başarılı [com.mcclabs.mook.domain.update.ForceUpdateUseCase.evaluate]
+     * çağrısında değişir — kullanıcı butona her tıkladığında akış yeniden denenir.
+     */
+    private val inAppUpdateLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AdMobActivityHolder.activity = this
 
         // Apply the initial theme immediately (before first frame) to avoid a flash.
         applySystemBarStyle(isDark = false)
         askForNotificationPermission()
+        AdMobConsentManager.requestConsent(this)
 
         setContent {
             App(

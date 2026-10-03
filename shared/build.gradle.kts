@@ -60,6 +60,14 @@ kotlin {
             // confirms a transaction, so newly-written entitlement claims are picked
             // up without requiring the user to relaunch the app.
             implementation("com.google.firebase:firebase-auth")
+            implementation("com.google.firebase:firebase-functions")
+            implementation("com.google.android.gms:play-services-ads:25.5.0")
+            // Gereksinim 2 (Faz 6): Play Integrity tabanlı App Check sağlayıcısı --
+            // bkz. AppCheckInstaller.kt ve LimitedUseAppCheckCallableInvoker.android.kt.
+            implementation("com.google.firebase:firebase-appcheck-playintegrity")
+            implementation("com.google.android.ump:user-messaging-platform:4.0.0")
+            // Zorla güncelleme (Force Update) için Google Play In-App Updates SDK'sı.
+            implementation("com.google.android.play:app-update:2.1.0")
             // Android-first commercial implementation. The common subscription contract
             // remains iOS-safe through an explicit no-op actual implementation.
             implementation(libs.revenuecat.purchases)
@@ -90,6 +98,7 @@ kotlin {
             implementation(libs.gitlive.firebase.firestore)
             implementation(libs.gitlive.firebase.storage)
             implementation(libs.gitlive.firebase.config)
+            implementation(libs.gitlive.firebase.analytics)
             implementation(libs.gitlive.firebase.functions)
             implementation(libs.kotlinx.datetime)
             implementation(libs.coil.compose)

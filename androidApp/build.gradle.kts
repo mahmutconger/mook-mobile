@@ -25,6 +25,9 @@ dependencies {
     // transitive dependency from the shared KMP module.
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-auth")
+    // RevenueCatWebhookService (FirebaseMessagingService) bu modülde yaşıyor; shared'daki
+    // firebase-messaging `implementation` olduğu için buraya geçişli olarak gelmez.
+    implementation("com.google.firebase:firebase-messaging")
     // RevenueCat bundles Google Play Billing. Keeping it in the Android app module
     // makes the iOS target deliberately billing-free until its launch is scoped.
     implementation(libs.revenuecat.purchases)
@@ -41,8 +44,8 @@ android {
         applicationId = "com.mcclabs.mook"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 9
-        versionName = "1.3.3"
+        versionCode = 11
+        versionName = "2.0.0"
 
         // This is RevenueCat's Android *public* SDK key, which is intentionally
         // shipped in the app binary. Secret API keys never belong in a client build.
