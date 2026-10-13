@@ -114,9 +114,15 @@ describe("public_profiles", () => {
         await assertFails(deleteDoc(doc(db, "public_profiles", BOB)));
     });
 
-    test("App Check jetonu olmayan istek profili okuyamaz", async () => {
-        // Emülatör `request.app` sağlayamaz; App Check'li olumlu yol üretimde/manuel test edilir.
+    test("oturum açmış kullanıcı incognito olmayan tekil profili okuyabilir", async () => {
+        // App Check Firestore ürün katmanında Enforce edilir; Security Rules kullanıcı ve
+        // belge yetkisini denetler. Emülatörde burada kimlik/veri koşulu doğrulanır.
         await seed("public_profiles", BOB, profile);
+        await assertSucceeds(getDoc(doc(authed(ALICE), "public_profiles", BOB)));
+    });
+
+    test("incognito profil visibleTo dışındaki kullanıcıya kapalıdır", async () => {
+        await seed("public_profiles", BOB, { ...profile, incognito: true, visibleTo: [] });
         await assertFails(getDoc(doc(authed(ALICE), "public_profiles", BOB)));
     });
 

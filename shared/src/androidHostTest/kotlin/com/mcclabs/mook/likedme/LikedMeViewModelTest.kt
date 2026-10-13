@@ -12,14 +12,19 @@ import com.mcclabs.mook.domain.model.LikedMePage
 import com.mcclabs.mook.domain.repository.LikedMeRepository
 import com.mcclabs.mook.domain.repository.LikedMeUnlockResult
 import com.mcclabs.mook.feature.likedme.LikedMeListItem
+import com.mcclabs.mook.feature.likedme.LikedMeEvent
 import com.mcclabs.mook.feature.likedme.LikedMeViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.async
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -79,19 +84,21 @@ class LikedMeViewModelTest {
     }
 
     @Test
-    @DisplayName("Hak yoksa limit sayfası açılır; ödül doğrulanınca kilit açma otomatik tekrarlanır")
-    fun rewardedUnlockRetriesPendingEntry() {
+    @DisplayName("Hak yoksa limit sayfası açılır; ödül doğrulanınca kilit açılır ve profile gidilir")
+    fun rewardedUnlockRetriesPendingEntry() = runTest {
         coEvery { repository.unlock("token_1") } returnsMany listOf(
             LikedMeUnlockResult.DailyLimitReached,
-            LikedMeUnlockResult.Unlocked(alreadyUnlocked = false),
+            LikedMeUnlockResult.Unlocked(alreadyUnlocked = false, profileUid = "profile_1"),
         )
         val viewModel = LikedMeViewModel(repository, subscriptions, connectivity, analytics)
 
         viewModel.onUnlockClicked(entry(1))
         assertEquals(LimitReason.LIKED_ME_UNLOCKS, viewModel.state.value.limitReason)
 
+        val navigation = async(start = CoroutineStart.UNDISPATCHED) { viewModel.events.first() }
         viewModel.onRewardedUnlockConfirmed()
         assertNull(viewModel.state.value.limitReason)
+        assertEquals(LikedMeEvent.NavigateToProfile("profile_1"), navigation.await())
         coVerify(exactly = 2) { repository.unlock("token_1") }
         // Başarılı kilit açmadan sonra liste yeniden yüklenir (açık profil sunucudan gelir).
         coVerify(exactly = 2) { repository.load() }

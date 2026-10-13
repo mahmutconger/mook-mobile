@@ -128,8 +128,9 @@ service cloud.firestore {
     //   - `isMookActive == true` ve `incognito == false`,
     //   - `languageCode == <kullanıcının aktif odası>` — Premium (freeRoam) hariç,
     //   - sayfa boyutu en fazla 20.
-    // `request.app != null`: yalnızca geçerli App Check (Play Integrity) jetonu taşıyan
-    // istemciler okuyabilir; konsolda Firestore için App Check "Enforce" da açılmalıdır.
+    // App Check Firestore Security Rules içinde bir `request.app` alanıyla doğrulanmaz.
+    // Geçerli Play Integrity jetonu şartı Firebase Console > App Check > Cloud Firestore
+    // üzerinden Enforce edilmelidir; buradaki kurallar kullanıcı/veri yetkisini denetler.
     // ---------------------------------------------------------------------
     function callerUserDoc() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
@@ -151,10 +152,10 @@ service cloud.firestore {
     }
 
     match /public_profiles/{uid} {
-      allow get: if signedIn() && request.app != null
+      allow get: if signedIn()
         && (resource.data.incognito != true || request.auth.uid in resource.data.get("visibleTo", []));
 
-      allow list: if signedIn() && request.app != null
+      allow list: if signedIn()
         && request.query.limit <= 20
         && resource.data.isMookActive == true
         && resource.data.incognito == false

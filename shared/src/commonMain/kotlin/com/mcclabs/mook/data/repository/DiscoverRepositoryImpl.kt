@@ -252,19 +252,21 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             val currentUid = Firebase.auth.currentUser?.uid
             // The account owner still reads their private document; every other profile
             // is resolved through the sanitised projection.
-            val collection = if (profileId == currentUid) "users" else "public_profiles"
-            val document = appFirestore.collection(collection).document(profileId).get()
+            val profileCollection = if (profileId == currentUid) "users" else "public_profiles"
+            val profilePath = "$profileCollection/$profileId"
+            val document = appFirestore.collection(profileCollection).document(profileId).get()
             if (document.exists) {
                 val profile = mapToProfile(document)
-                Log.d("Profil yüklendi: $profileId (fotoğraf=${profile.photoUrls.size}, yaş=${profile.age}, ülke=${profile.country?.code}, dil=${profile.language?.code})")
+                Log.d("Profil yüklendi: $profilePath (fotoğraf=${profile.photoUrls.size}, yaş=${profile.age}, ülke=${profile.country?.code}, dil=${profile.language?.code})")
                 profile
             } else {
                 // Not the same as a failure: the document genuinely is not there.
-                Log.d("Profil bulunamadı: users/$profileId dokümanı yok")
+                Log.d("Profil bulunamadı: $profilePath dokümanı yok")
                 null
             }
         } catch (e: Exception) {
-            Log.e("Profil okunamadı: users/$profileId", e)
+            val profileCollection = if (profileId == Firebase.auth.currentUser?.uid) "users" else "public_profiles"
+            Log.e("Profil okunamadı: $profileCollection/$profileId", e)
             null
         }
     }

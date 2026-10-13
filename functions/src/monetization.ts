@@ -594,7 +594,9 @@ export const unlockLikedMe = onCall({ region: "us-central1", enforceAppCheck: tr
         const [unlockSnapshot, likeSnapshot, usageSnapshot] = await Promise.all([
             transaction.get(unlockRef), transaction.get(likeRef), transaction.get(usageRef),
         ]);
-        if (unlockSnapshot.exists) return { unlocked: true, alreadyUnlocked: true };
+        // Profil kimliği yalnızca kilit açma yetkisi doğrulandıktan sonra döner. Kilitli
+        // listede uid hâlâ opak kalır; istemci başarılı sonuçta doğrudan profile gidebilir.
+        if (unlockSnapshot.exists) return { unlocked: true, alreadyUnlocked: true, profileUid };
         if (likeSnapshot.data()?.type !== "like") {
             throw new HttpsError("failed-precondition", "not-liked-by-profile");
         }
@@ -615,7 +617,7 @@ export const unlockLikedMe = onCall({ region: "us-central1", enforceAppCheck: tr
         usage.likedMeUnlocks = Number(usage.likedMeUnlocks ?? 0) + 1;
         transaction.set(usageRef, usage, { merge: true });
         transaction.set(unlockRef, { uid, profileUid, unlockedAt: Date.now() });
-        return { unlocked: true, alreadyUnlocked: false };
+        return { unlocked: true, alreadyUnlocked: false, profileUid };
     });
 });
 

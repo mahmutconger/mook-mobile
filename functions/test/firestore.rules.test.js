@@ -139,14 +139,28 @@ test("public_profiles: başka odanın sorgusu reddedilir", async () => {
         where("languageCode", "==", "FR"), limit(20))));
 });
 
+test("public_profiles: oturum açmış kullanıcı incognito olmayan tekil profili okuyabilir", async () => {
+    await seed("public_profiles", "bob", { isMookActive: true, incognito: false, visibleTo: [] });
+    await assertSucceeds(getDoc(doc(aliceDb(), "public_profiles", "bob")));
+});
+
+test("public_profiles: incognito profil yalnızca visibleTo içindeki kullanıcıya açılır", async () => {
+    await seed("public_profiles", "bob", { isMookActive: true, incognito: true, visibleTo: [ALICE] });
+    await assertSucceeds(getDoc(doc(aliceDb(), "public_profiles", "bob")));
+
+    await seed("public_profiles", "charlie", { isMookActive: true, incognito: true, visibleTo: [] });
+    await assertFails(getDoc(doc(aliceDb(), "public_profiles", "charlie")));
+});
+
 test("public_profiles: istemci yazamaz", async () => {
     await assertFails(setDoc(doc(aliceDb(), "public_profiles", ALICE), { verified: true }));
 });
 
-test("kural dosyası kısıtlı list koşullarını içerir (App Check'li olumlu yol emülatörde test edilemez)", () => {
+test("kural dosyası kısıtlı list koşullarını içerir", () => {
     const rules = fs.readFileSync(path.join(__dirname, "..", "..", "firestore.rules"), "utf8");
     assert.match(rules, /request\.query\.limit <= 20/);
     assert.match(rules, /resource\.data\.languageCode == callerActiveRoom\(\) \|\| callerHasFreeRoam\(\)/);
+    assert.doesNotMatch(rules, /allow (?:get|list): if [^\n]*request\.app/);
 });
 
 

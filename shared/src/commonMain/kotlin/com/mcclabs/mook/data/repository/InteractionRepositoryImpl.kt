@@ -68,7 +68,12 @@ class InteractionRepositoryImpl(
         val response = appHttpsCallable("unlockLikedMe")
             .invoke(LikedMeUnlockRequest(profileUid))
             .data<LikedMeUnlockResponse>()
-        LikedMeUnlockResult.Unlocked(alreadyUnlocked = response.alreadyUnlocked)
+        LikedMeUnlockResult.Unlocked(
+            alreadyUnlocked = response.alreadyUnlocked,
+            // Eski sunucu yanıtında alan yoksa bu akış profili zaten uid ile çağırdığı için
+            // güvenli geri dönüş olarak istek değerini kullanabilir.
+            profileUid = response.profileUid ?: profileUid,
+        )
     } catch (cancelled: kotlinx.coroutines.CancellationException) {
         throw cancelled
     } catch (error: Exception) {
@@ -109,7 +114,11 @@ private data class BoostResponse(val boostUntil: Long)
 private data class LikedMeUnlockRequest(val profileUid: String)
 
 @Serializable
-private data class LikedMeUnlockResponse(val unlocked: Boolean = false, val alreadyUnlocked: Boolean = false)
+private data class LikedMeUnlockResponse(
+    val unlocked: Boolean = false,
+    val alreadyUnlocked: Boolean = false,
+    val profileUid: String? = null,
+)
 
 /** `unlockLikedMe` sunucu hata kodlarını alan sonucuna çevirir (saf; birim testli). */
 internal fun mapLikedMeUnlockFailure(message: String?): LikedMeUnlockResult {

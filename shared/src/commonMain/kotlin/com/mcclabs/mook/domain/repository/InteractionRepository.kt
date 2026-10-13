@@ -21,7 +21,14 @@ data class BoostSummary(val viewsGained: Int, val boostUntilMillis: Long?)
  * açılırsa hak düşülmez).
  */
 sealed interface LikedMeUnlockResult {
-    data class Unlocked(val alreadyUnlocked: Boolean) : LikedMeUnlockResult
+    /**
+     * Kilit başarıyla açıldı. [profileUid], opak giriş jetonunu çözen sunucudan yalnızca
+     * yetkilendirme tamamlandıktan sonra gelir ve istemcinin profili doğrudan açmasını sağlar.
+     */
+    data class Unlocked(
+        val alreadyUnlocked: Boolean,
+        val profileUid: String? = null,
+    ) : LikedMeUnlockResult
 
     /**
      * Günlük açma hakkı doldu. Ücretsiz/Ekonomik kullanıcıya limit sayfasında

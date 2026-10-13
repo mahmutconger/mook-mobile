@@ -136,6 +136,9 @@ class LikedMeViewModel(
                 is LikedMeUnlockResult.Unlocked -> {
                     pendingUnlockToken = null
                     load()
+                    result.profileUid?.let { profileUid ->
+                        mutableEvents.emit(LikedMeEvent.NavigateToProfile(profileUid))
+                    }
                 }
                 LikedMeUnlockResult.DailyLimitReached, LikedMeUnlockResult.UpgradeRequired -> {
                     pendingUnlockToken = entryToken

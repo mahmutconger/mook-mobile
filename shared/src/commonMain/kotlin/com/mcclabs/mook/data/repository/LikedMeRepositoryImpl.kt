@@ -26,7 +26,10 @@ class LikedMeRepositoryImpl : LikedMeRepository {
         val response = appHttpsCallable("unlockLikedMe")
             .invoke(UnlockRequest(entryToken))
             .data<UnlockResponse>()
-        LikedMeUnlockResult.Unlocked(alreadyUnlocked = response.alreadyUnlocked)
+        LikedMeUnlockResult.Unlocked(
+            alreadyUnlocked = response.alreadyUnlocked,
+            profileUid = response.profileUid,
+        )
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (error: Exception) {
@@ -39,7 +42,11 @@ class LikedMeRepositoryImpl : LikedMeRepository {
 private data class UnlockRequest(val entryToken: String)
 
 @Serializable
-private data class UnlockResponse(val unlocked: Boolean = false, val alreadyUnlocked: Boolean = false)
+private data class UnlockResponse(
+    val unlocked: Boolean = false,
+    val alreadyUnlocked: Boolean = false,
+    val profileUid: String? = null,
+)
 
 @Serializable
 private data class LikedMeResponse(
