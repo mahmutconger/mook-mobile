@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.discover
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import com.mcclabs.mook.ui.components.PremiumBadge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.countryCodeToFlagEmoji
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.discover_block_user
@@ -60,7 +60,8 @@ import org.jetbrains.compose.resources.stringResource
 private const val CARD_ASPECT_RATIO = 0.74f
 
 /** Scrim behind the overlay icon buttons, so they stay legible against any photo. */
-private val IconScrim = Color.Black.copy(alpha = 0.35f)
+private val IconScrim: Color
+    @Composable get() = LocalAppColors.current.photoScrim.copy(alpha = 0.55f)
 
 /**
  * One person in the Discovery grid: their photo, name and age, whether they are online, and
@@ -87,7 +88,7 @@ fun ProfileGridCard(
             .fillMaxWidth()
             .aspectRatio(CARD_ASPECT_RATIO)
             .clip(shape)
-            .background(NeonColors.Card)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(onClick = onClick)
     ) {
         val photo = profile.photoUrls.firstOrNull()
@@ -107,7 +108,7 @@ fun ProfileGridCard(
             ) {
                 Text(
                     text = profile.name.take(1).uppercase(),
-                    color = Color.White,
+                    color = LocalAppColors.current.onGradient,
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -122,7 +123,7 @@ fun ProfileGridCard(
                 .align(Alignment.BottomCenter)
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f))
+                        colors = listOf(Color.Transparent, LocalAppColors.current.photoScrim.copy(alpha = 0.85f))
                     )
             )
         )
@@ -130,14 +131,14 @@ fun ProfileGridCard(
         if (isLiked) {
             Text(
                 text = stringResource(Res.string.discover_card_liked),
-                color = Color.White,
+                color = LocalAppColors.current.onGradient,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(8.dp)
                     .clip(RoundedCornerShape(50))
-                    .background(Color(0xFFE84D78).copy(alpha = 0.94f))
+                    .background(LocalAppColors.current.gradientStart)
                     .padding(horizontal = 9.dp, vertical = 5.dp)
             )
         }
@@ -155,7 +156,7 @@ fun ProfileGridCard(
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = stringResource(Res.string.discover_card_more_cd),
-                    tint = Color.White,
+                    tint = LocalAppColors.current.onPhoto,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -167,7 +168,7 @@ fun ProfileGridCard(
                     text = {
                         Text(
                             stringResource(Res.string.discover_report_profile),
-                            color = NeonColors.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     },
                     onClick = {
@@ -179,7 +180,7 @@ fun ProfileGridCard(
                     text = {
                         Text(
                             stringResource(Res.string.discover_block_user),
-                            color = NeonColors.Error
+                            color = MaterialTheme.colorScheme.error
                         )
                     },
                     onClick = {
@@ -205,7 +206,7 @@ fun ProfileGridCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = profile.age?.let { "${profile.name}, $it" } ?: profile.name,
-                        color = Color.White,
+                        color = LocalAppColors.current.onPhoto,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -242,7 +243,7 @@ fun ProfileGridCard(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(Res.string.discover_card_pass_cd),
-                        tint = Color.White,
+                        tint = LocalAppColors.current.onPhoto,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -251,7 +252,7 @@ fun ProfileGridCard(
                         .size(38.dp)
                         .clip(CircleShape)
                         .background(
-                            if (isLiked) Brush.linearGradient(listOf(Color(0xFFE84D78), Color(0xFFC93666)))
+                            if (isLiked) Brush.linearGradient(listOf(LocalAppColors.current.gradientStart, LocalAppColors.current.gradientEnd))
                             else BrandGradient
                         )
                         .clickable(enabled = !isLiked, onClick = onLike),
@@ -262,7 +263,7 @@ fun ProfileGridCard(
                         contentDescription = stringResource(
                             if (isLiked) Res.string.discover_card_liked else Res.string.discover_card_like_cd
                         ),
-                        tint = Color.White,
+                        tint = LocalAppColors.current.onGradient,
                         modifier = Modifier.size(19.dp)
                     )
                 }
@@ -279,12 +280,12 @@ private fun OnlineBadge() {
             modifier = Modifier
                 .size(7.dp)
                 .clip(CircleShape)
-                .background(NeonColors.Success)
+                .background(LocalAppColors.current.success)
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = stringResource(Res.string.discover_online),
-            color = NeonColors.Success,
+            color = LocalAppColors.current.success,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1
@@ -299,7 +300,7 @@ private fun CountryBadge(code: String, name: String) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
-            .background(Color.Black.copy(alpha = 0.4f))
+            .background(LocalAppColors.current.photoScrim.copy(alpha = 0.4f))
             .padding(horizontal = 6.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -309,7 +310,7 @@ private fun CountryBadge(code: String, name: String) {
         }
         Text(
             text = name,
-            color = Color.White,
+            color = LocalAppColors.current.onPhoto,
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

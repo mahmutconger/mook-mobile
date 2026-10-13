@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -15,13 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 
 /**
  * Horizontal row of dots indicating multi-step progress.
  *
- * The active dot is larger (10 dp) and uses [NeonColors.Primary],
- * while inactive dots are smaller (8 dp) and use [NeonColors.TextTertiary].
+ * The active dot is larger (10 dp) and uses [MaterialTheme.colorScheme.primary],
+ * while inactive dots are smaller (8 dp) and use [MaterialTheme.colorScheme.onSurfaceVariant].
  * Size and color transitions are smoothly animated.
  *
  * @param totalSteps  Total number of steps.
@@ -49,7 +49,7 @@ fun StepIndicator(
             )
 
             val dotColor by animateColorAsState(
-                targetValue = if (isActive) NeonColors.Primary else NeonColors.TextTertiary,
+                targetValue = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 animationSpec = tween(durationMillis = 300),
                 label = "stepDotColor",
             )

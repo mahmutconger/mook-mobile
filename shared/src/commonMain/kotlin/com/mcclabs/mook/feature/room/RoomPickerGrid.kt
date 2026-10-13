@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.room
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.model.Language
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 
 /**
  * A grid of language rooms, each shown as a flag + name card. The currently selected
@@ -65,8 +65,8 @@ private fun RoomCard(
                     Modifier.background(BrandGradient)
                 } else {
                     Modifier
-                        .background(NeonColors.Card)
-                        .border(1.dp, NeonColors.CardBorder, shape)
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
                 }
             )
             .clickable(onClick = onClick)
@@ -79,7 +79,7 @@ private fun RoomCard(
             text = language.name,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) androidx.compose.ui.graphics.Color.White else NeonColors.TextPrimary,
+            color = if (isSelected) LocalAppColors.current.onGradient else MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
     }

@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.profile
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import com.mcclabs.mook.ui.components.PremiumBadge
 import androidx.compose.foundation.background
@@ -32,7 +33,6 @@ import com.mcclabs.mook.ui.components.NeonChip
 import com.mcclabs.mook.ui.components.ReportBottomSheet
 import com.mcclabs.mook.ui.components.WalkTalkRedirectDialog
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.coroutines.launch
 import mook.shared.generated.resources.*
 import androidx.compose.material.icons.Icons
@@ -44,7 +44,8 @@ import org.koin.core.parameter.parametersOf
 
 /** Translucent gray-black scrim behind the photo-overlay icon buttons, so they stay legible
  *  against any photo. */
-private val IconScrim = Color.Black.copy(alpha = 0.35f)
+private val IconScrim: Color
+    @Composable get() = LocalAppColors.current.photoScrim.copy(alpha = 0.55f)
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -114,12 +115,12 @@ fun ProfileDetailsScreen(
     if (state.showBlockConfirmDialog) {
         AlertDialog(
             onDismissRequest = viewModel::onBlockDismiss,
-            containerColor = NeonColors.Card,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             title = {
                 Text(
                     text = stringResource(Res.string.profile_block_user_title),
                     style = MaterialTheme.typography.titleMedium,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -127,20 +128,20 @@ fun ProfileDetailsScreen(
                 Text(
                     text = stringResource(Res.string.profile_block_user_message),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             confirmButton = {
                 Button(
                     onClick = viewModel::confirmBlock,
-                    colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Error)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)
                 ) {
-                    Text(stringResource(Res.string.profile_block_confirm), color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.profile_block_confirm), color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onBlockDismiss) {
-                    Text(stringResource(Res.string.profile_block_cancel), color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.profile_block_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         )
@@ -162,10 +163,10 @@ fun ProfileDetailsScreen(
     when {
         state.isLoading -> {
             Box(
-                modifier = Modifier.fillMaxSize().background(NeonColors.Background),
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = NeonColors.Primary)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -183,10 +184,10 @@ fun ProfileDetailsScreen(
                 scaffoldState = scaffoldState,
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 sheetPeekHeight = 148.dp,
-                sheetContainerColor = NeonColors.Background,
-                sheetContentColor = NeonColors.TextPrimary,
+                sheetContainerColor = MaterialTheme.colorScheme.background,
+                sheetContentColor = MaterialTheme.colorScheme.onSurface,
                 sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                containerColor = NeonColors.Background,
+                containerColor = MaterialTheme.colorScheme.background,
                 sheetContent = {
                     ProfileSheetContent(
                         profile = profile,
@@ -237,7 +238,7 @@ fun ProfileDetailsScreen(
                         Icon(
                             painter = painterResource(Res.drawable.back_svgrepo_com),
                             contentDescription = stringResource(Res.string.common_back),
-                            tint = Color.White,
+                            tint = LocalAppColors.current.onPhoto,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -254,7 +255,7 @@ fun ProfileDetailsScreen(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = stringResource(Res.string.profile_edit_cd),
-                                tint = Color.White,
+                                tint = LocalAppColors.current.onPhoto,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -277,7 +278,7 @@ fun ProfileDetailsScreen(
                                 else Res.drawable.flag_svgrepo_com
                             ),
                             contentDescription = if (state.isOwnProfile) stringResource(Res.string.profile_settings_cd) else stringResource(Res.string.profile_report_cd),
-                            tint = Color.White,
+                            tint = LocalAppColors.current.onPhoto,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -287,12 +288,12 @@ fun ProfileDetailsScreen(
 
         else -> {
             Box(
-                modifier = Modifier.fillMaxSize().background(NeonColors.Background),
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = state.error ?: stringResource(Res.string.profile_error_loading),
-                    color = NeonColors.Error
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         }
@@ -333,7 +334,7 @@ private fun ProfileSheetContent(
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
-                    .background(NeonColors.Card)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
@@ -341,7 +342,7 @@ private fun ProfileSheetContent(
                     // Age is omitted rather than guessed when no birth date was given.
                     text = profile.age?.let { "${profile.name}, $it" } ?: profile.name,
                     style = MaterialTheme.typography.headlineSmall,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
                 if (profile.isPremium) {
@@ -352,7 +353,7 @@ private fun ProfileSheetContent(
                     Text(
                         text = it.name,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = NeonColors.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -363,7 +364,7 @@ private fun ProfileSheetContent(
         Text(
             text = stringResource(Res.string.profile_details_title),
             style = MaterialTheme.typography.titleMedium,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -388,14 +389,14 @@ private fun ProfileSheetContent(
         Text(
             text = stringResource(Res.string.profile_about_me),
             style = MaterialTheme.typography.titleMedium,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = profile.bio.ifBlank { stringResource(Res.string.profile_no_description) },
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -403,7 +404,7 @@ private fun ProfileSheetContent(
         Text(
             text = stringResource(Res.string.profile_interests),
             style = MaterialTheme.typography.titleMedium,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -452,7 +453,7 @@ private fun ProfileSheetContent(
                 ) {
                     Text(
                         text = stringResource(Res.string.profile_send_message),
-                        color = Color.White,
+                        color = LocalAppColors.current.onGradient,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -468,11 +469,11 @@ private fun ProfileSheetContent(
                     .fillMaxWidth()
                     .height(48.dp),
                 shape = RoundedCornerShape(24.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, NeonColors.Error)
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
             ) {
                 Text(
                     text = stringResource(Res.string.profile_block_user),
-                    color = NeonColors.Error,
+                    color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -490,11 +491,11 @@ private fun ProfileSheetContent(
                     .fillMaxWidth()
                     .height(48.dp),
                 shape = RoundedCornerShape(24.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, NeonColors.Error)
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
             ) {
                 Text(
                     text = stringResource(Res.string.profile_block_user),
-                    color = NeonColors.Error,
+                    color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -514,7 +515,7 @@ fun InfoCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = NeonColors.Card)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Column(
             modifier = Modifier
@@ -524,13 +525,13 @@ fun InfoCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -556,8 +557,8 @@ private fun LikePassRow(
             enabled = enabled,
             modifier = Modifier.weight(1f).height(56.dp),
             shape = RoundedCornerShape(28.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, NeonColors.CardBorder),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonColors.TextSecondary)
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
         ) {
             Text(
                 text = stringResource(Res.string.profile_pass),
@@ -586,7 +587,7 @@ private fun LikePassRow(
             ) {
                 Text(
                     text = stringResource(Res.string.profile_like),
-                    color = Color.White,
+                    color = LocalAppColors.current.onGradient,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall
                 )

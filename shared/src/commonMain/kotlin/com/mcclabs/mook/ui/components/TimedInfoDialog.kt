@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,25 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-/**
- * A branded, one-time informational dialog the user must read before dismissing.
- *
- * The dialog cannot be dismissed (no back-press, no tap-outside) until a
- * [countdownSeconds]-second timer elapses; while it runs the action button is
- * disabled and shows the remaining seconds, then becomes tappable with
- * [confirmText]. Fully theme-aware via [NeonColors].
- *
- * @param icon            Drawable shown inside the gradient badge.
- * @param title           Dialog heading.
- * @param body            Explanatory text.
- * @param confirmText     Label shown on the button once the countdown finishes.
- * @param onConfirm       Invoked when the user taps the (now-enabled) button.
- * @param countdownSeconds Seconds the user must wait before dismissing (default 5).
+/** Bir kez gösterilen bilgilendirme iletişim kutusu.
+ * [countdownSeconds] süresi dolmadan kapatılamaz; düğme kalan süreyi gösterir.
+ * Süre dolunca [confirmText] ile etkinleşir. Renkler Material rollerinden alınır.
  */
 @Composable
 fun TimedInfoDialog(
@@ -77,7 +66,7 @@ fun TimedInfoDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(28.dp))
-                .background(NeonColors.Background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -91,7 +80,7 @@ fun TimedInfoDialog(
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = LocalAppColors.current.onGradient,
                     modifier = Modifier.size(32.dp),
                 )
             }
@@ -101,7 +90,7 @@ fun TimedInfoDialog(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
@@ -111,7 +100,7 @@ fun TimedInfoDialog(
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
 

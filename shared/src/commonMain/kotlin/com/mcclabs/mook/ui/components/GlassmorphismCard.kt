@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -10,7 +11,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 
 /**
  * A glassmorphism-styled card with a translucent dark background,
@@ -31,9 +31,9 @@ fun GlassmorphismCard(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = NeonColors.GlassBackground,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
-        border = BorderStroke(1.dp, NeonColors.CardBorder),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column(
             modifier = Modifier.padding(24.dp),

@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -39,21 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.DiscoverProfile
-import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.coroutines.launch
 import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
-
-// Card palette, aligned to the MOOK light tokens.
-private val CardSurface = Color.White
-private val CardName = NeonColors.TextPrimary
-private val CardSubtitle = NeonColors.TextSecondary
-private val CardBio = NeonColors.TextSecondary
-private val ChipBackground = NeonColors.Surface
-private val ChipText = NeonColors.TextSecondary
-private val VerifiedBadge = NeonColors.Primary
 
 @Composable
 fun SwipeableProfileCard(
@@ -105,7 +96,7 @@ fun SwipeableProfileCard(
             .graphicsLayer { rotationZ = offsetX.value / 20f }
             .then(dragModifier),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black)
+        colors = CardDefaults.cardColors(containerColor = LocalAppColors.current.photoScrim)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             PhotoCarousel(
@@ -122,7 +113,7 @@ fun SwipeableProfileCard(
                     .align(Alignment.BottomCenter)
                     .background(
                         brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f))
+                            colors = listOf(Color.Transparent, LocalAppColors.current.photoScrim.copy(alpha = 0.9f))
                         )
                     )
             )
@@ -146,7 +137,7 @@ fun SwipeableProfileCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = profile.age?.let { "${profile.name}, $it" } ?: profile.name,
-                            color = Color.White,
+                            color = LocalAppColors.current.onPhoto,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge // Increased size
                         )
@@ -155,7 +146,7 @@ fun SwipeableProfileCard(
                             Icon(
                                 painter = painterResource(Res.drawable.ic_check_circle),
                                 contentDescription = stringResource(Res.string.card_verified_cd),
-                                tint = VerifiedBadge,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -167,12 +158,12 @@ fun SwipeableProfileCard(
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = stringResource(Res.string.swipeable_card_liked_me),
-                                color = Color.White,
+                                color = LocalAppColors.current.onPhoto,
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(NeonColors.Primary.copy(alpha = 0.4f))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
@@ -184,7 +175,7 @@ fun SwipeableProfileCard(
                     if (subtitle.isNotBlank()) {
                         Text(
                             text = subtitle,
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = LocalAppColors.current.onPhoto.copy(alpha = 0.8f),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -196,23 +187,23 @@ fun SwipeableProfileCard(
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = stringResource(Res.string.card_options_cd),
-                            tint = Color.White
+                            tint = LocalAppColors.current.onPhoto
                         )
                     }
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
-                        modifier = Modifier.background(NeonColors.Card)
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.swipeable_card_report_profile), color = NeonColors.TextPrimary) },
+                            text = { Text(stringResource(Res.string.swipeable_card_report_profile), color = MaterialTheme.colorScheme.onSurface) },
                             onClick = {
                                 expanded = false
                                 onReportClick()
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.swipeable_card_block_user), color = NeonColors.Error) },
+                            text = { Text(stringResource(Res.string.swipeable_card_block_user), color = MaterialTheme.colorScheme.error) },
                             onClick = {
                                 expanded = false
                                 onBlockClick()
@@ -227,7 +218,7 @@ fun SwipeableProfileCard(
                     Spacer(Modifier.height(10.dp))
                     Text(
                         text = profile.bio,
-                        color = Color.White,
+                        color = LocalAppColors.current.onPhoto,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 3
                     )
@@ -245,8 +236,8 @@ fun SwipeableProfileCard(
                         profile.interests.forEach { 
                             InterestChip(
                                 text = interestLabel(it),
-                                textColor = Color.White,
-                                backgroundColor = Color.White.copy(alpha = 0.2f)
+                                textColor = LocalAppColors.current.onPhoto,
+                                backgroundColor = LocalAppColors.current.onPhoto.copy(alpha = 0.2f)
                             ) 
                         }
                     }
@@ -262,7 +253,7 @@ fun SwipeableProfileCard(
                 ) {
                     CircleActionButton(
                         enabled = interactive,
-                        containerColor = Color.White.copy(alpha = 0.2f),
+                        containerColor = LocalAppColors.current.onPhoto.copy(alpha = 0.2f),
                         onClick = {
                             coroutineScope.launch {
                                 offsetX.animateTo(-2000f)
@@ -270,11 +261,11 @@ fun SwipeableProfileCard(
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.card_pass_cd), tint = Color.White, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.card_pass_cd), tint = LocalAppColors.current.onPhoto, modifier = Modifier.size(28.dp))
                     }
                     CircleActionButton(
                         enabled = interactive,
-                        containerColor = Color.White,
+                        containerColor = LocalAppColors.current.photoControl,
                         onClick = {
                             coroutineScope.launch {
                                 offsetX.animateTo(2000f)
@@ -282,7 +273,7 @@ fun SwipeableProfileCard(
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Favorite, contentDescription = stringResource(Res.string.card_like_cd), tint = NeonColors.Accent, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Default.Favorite, contentDescription = stringResource(Res.string.card_like_cd), tint = LocalAppColors.current.onPhotoControl, modifier = Modifier.size(28.dp))
                     }
                 }
             }
@@ -322,7 +313,7 @@ private fun PhotoCarousel(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(NeonColors.Card)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
     ) {
         if (count == 0) {
             Column(
@@ -333,7 +324,7 @@ private fun PhotoCarousel(
                 Icon(
                     painter = painterResource(Res.drawable.ic_user),
                     contentDescription = null,
-                    tint = NeonColors.TextTertiary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(64.dp)
                 )
             }
@@ -387,14 +378,14 @@ private fun SegmentBar(fill: Float, modifier: Modifier = Modifier) {
         modifier = modifier
             .height(3.dp)
             .clip(RoundedCornerShape(50))
-            .background(Color.White.copy(alpha = 0.4f))
+            .background(LocalAppColors.current.onPhoto.copy(alpha = 0.4f))
     ) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(fill.coerceIn(0f, 1f))
                 .clip(RoundedCornerShape(50))
-                .background(NeonColors.Primary)
+                .background(MaterialTheme.colorScheme.primary)
         )
     }
 }
@@ -402,14 +393,14 @@ private fun SegmentBar(fill: Float, modifier: Modifier = Modifier) {
 @Composable
 private fun Avatar(photoUrl: String?, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier.size(44.dp).clip(CircleShape).background(ChipBackground),
+        modifier = modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerLow),
         contentAlignment = Alignment.Center
     ) {
         if (photoUrl.isNullOrBlank()) {
             Icon(
                 painter = painterResource(Res.drawable.ic_user),
                 contentDescription = null,
-                tint = CardSubtitle,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         } else {
@@ -426,8 +417,8 @@ private fun Avatar(photoUrl: String?, modifier: Modifier = Modifier) {
 @Composable
 private fun InterestChip(
     text: String, 
-    textColor: Color = ChipText,
-    backgroundColor: Color = ChipBackground
+    textColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLow
 ) {
     Text(
         text = text,
@@ -444,7 +435,7 @@ private fun InterestChip(
 private fun CircleActionButton(
     onClick: () -> Unit,
     enabled: Boolean = true,
-    containerColor: Color = ChipBackground,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     content: @Composable () -> Unit
 ) {
     Box(

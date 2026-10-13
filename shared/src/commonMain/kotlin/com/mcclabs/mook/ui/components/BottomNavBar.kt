@@ -1,8 +1,12 @@
 package com.mcclabs.mook.ui.components
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -15,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.app_logo_transparent
 import mook.shared.generated.resources.ic_crown
@@ -31,23 +34,22 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-/**
- * The main bottom navigation bar.
- *
- * @param enabledRoutes Routes that have a destination. Tabs outside this set are dimmed
- *   and cannot be tapped, so the bar never offers a button that leads nowhere.
- */
+/** Alt gezinme, henüz tüketilmemiş yatay ve alt güvenli alanı etkileşimli öğelerden ayırır. */
 @Composable
 fun BottomNavBar(
     currentRoute: String,
     onNavigate: (String) -> Unit,
-    enabledRoutes: Set<String> = setOf("discover", "liked", "chats", "paywall", "profile")
+    enabledRoutes: Set<String> = setOf("discover", "liked", "chats", "paywall", "profile"),
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
+            .testTag("bottomNavigationBar")
             .fillMaxWidth()
-            .background(NeonColors.Background)
-            .border(width = 1.dp, color = NeonColors.CardBorder)
+            .background(MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(windowInsets)
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
             .padding(vertical = 10.dp, horizontal = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
@@ -59,7 +61,7 @@ fun BottomNavBar(
             currentRoute = currentRoute,
             isEnabled = "discover" in enabledRoutes,
             onNavigate = onNavigate,
-            // The app logo carries its own colours, so it must not be tinted like a glyph.
+            // Logonun kendi renkleri korunur.
             tintIcon = false
         )
         BottomNavItem(
@@ -98,7 +100,7 @@ fun BottomNavBar(
 }
 
 @Composable
-private fun BottomNavItem(
+private fun RowScope.BottomNavItem(
     icon: DrawableResource,
     label: String,
     route: String,
@@ -109,14 +111,13 @@ private fun BottomNavItem(
 ) {
     val isSelected = currentRoute == route
     val contentColor = when {
-        !isEnabled -> NeonColors.TextTertiary.copy(alpha = 0.4f)
-        isSelected -> Color.White
-        else -> NeonColors.TextTertiary
+        !isEnabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+        isSelected -> LocalAppColors.current.onGradient
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    // On the active gradient pill everything (even the multi-colour logo) turns white
-    // for contrast; off the pill the logo keeps its own colours.
+    // Seçili sekmede simgeler degrade içerik rengini kullanır.
     val iconTint = when {
-        isSelected -> Color.White
+        isSelected -> LocalAppColors.current.onGradient
         tintIcon -> contentColor
         else -> Color.Unspecified
     }
@@ -124,10 +125,13 @@ private fun BottomNavItem(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .weight(1f)
+            .testTag("bottomNavItem$route")
+            .heightIn(min = 48.dp)
             .clip(RoundedCornerShape(50))
             .then(if (isSelected) Modifier.background(BrandGradient) else Modifier)
-            .clickable(enabled = isEnabled) { onNavigate(route) }
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .selectable(selected = isSelected, enabled = isEnabled, role = Role.Tab) { onNavigate(route) }
+            .padding(horizontal = 8.dp, vertical = 8.dp)
     ) {
         Icon(
             painter = painterResource(icon),
@@ -139,7 +143,9 @@ private fun BottomNavItem(
         Text(
             text = label,
             color = contentColor,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

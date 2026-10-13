@@ -12,7 +12,6 @@ data class SettingsUiState(
     val isIncognitoUpdating: Boolean = false,
     /** Gizli mod güncellenemediğinde gösterilecek tek seferlik metin. */
     val incognitoMessage: String? = null,
-    val isDarkMode: Boolean = false,
     val ageRangeStart: Int = 18,
     val ageRangeEnd: Int = 35,
     val isLoading: Boolean = true,

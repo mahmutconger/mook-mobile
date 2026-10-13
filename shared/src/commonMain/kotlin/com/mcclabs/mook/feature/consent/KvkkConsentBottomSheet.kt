@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.consent_accept_all
 import mook.shared.generated.resources.consent_cross_border_body
@@ -107,7 +106,7 @@ fun KvkkConsentBottomSheet(
     ModalBottomSheet(
         onDismissRequest = { if (!isMandatory) onDismiss() },
         sheetState = sheetState,
-        containerColor = NeonColors.Card,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         Column(
             modifier = Modifier
@@ -121,13 +120,13 @@ fun KvkkConsentBottomSheet(
                 text = stringResource(Res.string.consent_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(Res.string.consent_intro),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(16.dp))
             ConsentOptionRow(
@@ -144,7 +143,7 @@ fun KvkkConsentBottomSheet(
                 onCheckedChange = onPersonalizedAdsToggled,
             )
             TextButton(onClick = onReadNotice, modifier = Modifier.padding(top = 4.dp)) {
-                Text(stringResource(Res.string.consent_read_notice), color = NeonColors.Primary)
+                Text(stringResource(Res.string.consent_read_notice), color = MaterialTheme.colorScheme.primary)
             }
             Spacer(Modifier.height(8.dp))
             Button(
@@ -152,8 +151,8 @@ fun KvkkConsentBottomSheet(
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = NeonColors.TextPrimary,
-                    contentColor = NeonColors.Background,
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
                 ),
             ) { Text(stringResource(Res.string.consent_accept_all), fontWeight = FontWeight.Bold) }
             Spacer(Modifier.height(10.dp))
@@ -162,9 +161,9 @@ fun KvkkConsentBottomSheet(
                 onClick = onRejectAll,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(18.dp),
-            ) { Text(stringResource(Res.string.consent_reject_all), color = NeonColors.TextPrimary, fontWeight = FontWeight.Bold) }
+            ) { Text(stringResource(Res.string.consent_reject_all), color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) }
             TextButton(onClick = onSaveChoices, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
-                Text(stringResource(Res.string.consent_save_choices), color = NeonColors.TextSecondary)
+                Text(stringResource(Res.string.consent_save_choices), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -179,15 +178,15 @@ private fun ConsentOptionRow(
 ) {
     Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceBetween) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = NeonColors.TextPrimary)
+            Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Spacer(Modifier.height(4.dp))
-            Text(body, style = MaterialTheme.typography.bodySmall, color = NeonColors.TextSecondary)
+            Text(body, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.width(12.dp))
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(checkedTrackColor = NeonColors.Primary),
+            colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary),
         )
     }
 }

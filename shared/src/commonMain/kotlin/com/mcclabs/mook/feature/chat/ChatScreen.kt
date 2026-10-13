@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.chat
 
+import com.mcclabs.mook.ui.layout.scaffoldPadding
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import mook.shared.generated.resources.chat_read_receipt_seen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -65,7 +67,6 @@ import com.mcclabs.mook.domain.model.ChatMessage
 import com.mcclabs.mook.domain.model.ChatSendError
 import com.mcclabs.mook.domain.model.MessageStatus
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.formatClockTime
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.chat_action_cancel
@@ -162,7 +163,7 @@ fun ChatScreen(
     }
 
     Scaffold(
-        containerColor = NeonColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             ChatTopBar(
@@ -175,11 +176,11 @@ fun ChatScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(NeonColors.Background)
+                    .background(MaterialTheme.colorScheme.background)
                     .navigationBarsPadding()
                     .imePadding(),
             ) {
-                HorizontalDivider(color = NeonColors.DividerColor)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 // Gereksinim 1.7: oda kapatıldığında sohbet erişilebilir kalır ama
                 // salt-okunur olur — kompozer yerine bir bilgi şeridi gösterilir.
                 // Yalnızca Çeviri Kotası: çeviri kotası bitse bile kompozer KAPANMAZ — mesajlar
@@ -199,21 +200,21 @@ fun ChatScreen(
         when {
             state.isLoading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(padding),
+                    modifier = Modifier.fillMaxSize().scaffoldPadding(padding),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = NeonColors.Primary)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             }
 
             state.messages.isEmpty() -> {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(padding),
+                    modifier = Modifier.fillMaxSize().scaffoldPadding(padding),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = stringResource(Res.string.chat_empty),
-                        color = NeonColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -222,7 +223,7 @@ fun ChatScreen(
             else -> {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize().padding(padding),
+                    modifier = Modifier.fillMaxSize().scaffoldPadding(padding),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
@@ -240,7 +241,7 @@ fun ChatScreen(
                                     Text(
                                         text = stringResource(Res.string.chat_read_receipt_seen),
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = NeonColors.TextTertiary,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         textAlign = TextAlign.End,
                                         modifier = Modifier.fillMaxWidth().padding(top = 2.dp, end = 4.dp),
                                     )
@@ -272,12 +273,12 @@ private fun ChatTopBar(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
-                        .background(NeonColors.Card),
+                        .background(MaterialTheme.colorScheme.surfaceContainer),
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
                     text = peerName ?: stringResource(Res.string.chat_title_fallback),
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -289,11 +290,11 @@ private fun ChatTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(Res.string.common_back),
-                    tint = NeonColors.TextPrimary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
     )
 }
 
@@ -313,7 +314,7 @@ private fun SystemMessageRow(message: ChatMessage) {
         Text(
             text = message.text,
             style = MaterialTheme.typography.bodySmall,
-            color = NeonColors.TextTertiary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontStyle = FontStyle.Italic,
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 280.dp).padding(vertical = 4.dp),
@@ -329,9 +330,9 @@ private fun MessageBubble(message: ChatMessage, onLongPress: () -> Unit) {
     val isMe = message.isMine
     val failed = message.status == MessageStatus.FAILED
     val bubbleColor = when {
-        failed -> NeonColors.Error.copy(alpha = 0.12f)
-        isMe -> NeonColors.Primary.copy(alpha = 0.10f)
-        else -> NeonColors.Card
+        failed -> MaterialTheme.colorScheme.error.copy(alpha = 0.12f)
+        isMe -> MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+        else -> MaterialTheme.colorScheme.surfaceContainer
     }
     val bubbleShape = RoundedCornerShape(
         topStart = 16.dp,
@@ -359,7 +360,7 @@ private fun MessageBubble(message: ChatMessage, onLongPress: () -> Unit) {
                 Text(
                     text = stringResource(Res.string.chat_message_deleted),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
                 )
             } else {
@@ -368,7 +369,7 @@ private fun MessageBubble(message: ChatMessage, onLongPress: () -> Unit) {
                     Text(
                         text = translated,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = NeonColors.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Medium,
                     )
                     Spacer(Modifier.height(4.dp))
@@ -383,9 +384,9 @@ private fun MessageBubble(message: ChatMessage, onLongPress: () -> Unit) {
                         MaterialTheme.typography.bodyLarge
                     },
                     color = if (message.translatedText != null) {
-                        NeonColors.TextTertiary
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     } else {
-                        NeonColors.TextPrimary
+                        MaterialTheme.colorScheme.onSurface
                     },
                 )
             }
@@ -409,14 +410,14 @@ private fun MessageFooter(message: ChatMessage, modifier: Modifier = Modifier) {
         MessageStatus.SENDING -> Text(
             text = stringResource(Res.string.chat_status_sending),
             style = MaterialTheme.typography.labelSmall,
-            color = NeonColors.TextTertiary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = modifier,
         )
 
         MessageStatus.FAILED -> Text(
             text = stringResource(Res.string.chat_status_failed),
             style = MaterialTheme.typography.labelSmall,
-            color = NeonColors.Error,
+            color = MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.Medium,
             modifier = modifier,
         )
@@ -429,7 +430,7 @@ private fun MessageFooter(message: ChatMessage, modifier: Modifier = Modifier) {
                 Text(
                     text = clock,
                     style = MaterialTheme.typography.labelSmall,
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = modifier,
                 )
             }
@@ -460,7 +461,7 @@ private fun MessageActionSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(),
-        containerColor = NeonColors.Card,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         Column(
             modifier = Modifier
@@ -496,7 +497,7 @@ private fun SheetAction(
     Text(
         text = stringResource(label),
         style = MaterialTheme.typography.bodyLarge,
-        color = if (destructive) NeonColors.Error else NeonColors.TextPrimary,
+        color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickableCompat(onClick)
@@ -534,11 +535,11 @@ private fun ReportReasonDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = NeonColors.Card,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         title = {
             Text(
                 text = stringResource(Res.string.chat_report_title),
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
             )
         },
@@ -546,7 +547,7 @@ private fun ReportReasonDialog(
             Column {
                 Text(
                     text = stringResource(Res.string.chat_report_subtitle),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(Modifier.height(8.dp))
@@ -554,7 +555,7 @@ private fun ReportReasonDialog(
                     Text(
                         text = stringResource(label),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = NeonColors.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .fillMaxWidth()
                             // The stored reason is the language-independent key, not
@@ -568,7 +569,7 @@ private fun ReportReasonDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.chat_action_cancel), color = NeonColors.TextSecondary)
+                Text(stringResource(Res.string.chat_action_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
     )
@@ -599,7 +600,7 @@ private fun ReadOnlyRoomBanner() {
         Text(
             text = stringResource(Res.string.chat_room_closed_read_only),
             style = MaterialTheme.typography.bodySmall,
-            color = NeonColors.TextTertiary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
     }
@@ -627,19 +628,19 @@ private fun ChatComposer(
             placeholder = {
                 Text(
                     text = stringResource(Res.string.chat_composer_placeholder),
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             shape = RoundedCornerShape(20.dp),
             maxLines = 4,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = NeonColors.TextPrimary,
-                unfocusedTextColor = NeonColors.TextPrimary,
-                focusedBorderColor = NeonColors.Primary,
-                unfocusedBorderColor = NeonColors.CardBorder,
-                cursorColor = NeonColors.Primary,
-                focusedContainerColor = NeonColors.InputBackground,
-                unfocusedContainerColor = NeonColors.InputBackground,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
             ),
         )
 
@@ -650,14 +651,14 @@ private fun ChatComposer(
                 .padding(bottom = 4.dp)
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(if (canSend) BrandGradient else SolidColor(NeonColors.InputBackground)),
+                .background(if (canSend) BrandGradient else SolidColor(MaterialTheme.colorScheme.surfaceContainerHighest)),
             contentAlignment = Alignment.Center,
         ) {
             IconButton(onClick = onSend, enabled = canSend) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = stringResource(Res.string.chat_send_cd),
-                    tint = if (canSend) Color.White else NeonColors.TextTertiary,
+                    tint = if (canSend) LocalAppColors.current.onGradient else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

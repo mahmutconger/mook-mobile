@@ -30,7 +30,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mcclabs.mook.domain.billing.LimitReason
 import com.mcclabs.mook.ui.components.LimitSheet
 import com.mcclabs.mook.ui.components.TimedInfoDialog
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.back_svgrepo_com
 import mook.shared.generated.resources.ic_info_circle
@@ -109,7 +108,7 @@ fun RoomSwitchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp)
@@ -122,21 +121,21 @@ fun RoomSwitchScreen(
                 Icon(
                     painter = painterResource(Res.drawable.back_svgrepo_com),
                     contentDescription = stringResource(Res.string.room_switch_back_cd),
-                    tint = NeonColors.TextPrimary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Text(
                 text = stringResource(Res.string.room_switch_title),
                 style = MaterialTheme.typography.titleLarge,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
             )
         }
 
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = NeonColors.Primary)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             RoomPickerGrid(
@@ -155,7 +154,7 @@ fun RoomSwitchScreen(
                             RoomSelectionError.DAILY_LIMIT -> Res.string.room_error_daily_limit
                         },
                     ),
-                    color = NeonColors.Error,
+                    color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                 )
@@ -179,11 +178,11 @@ private fun RoomDowngradeDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = NeonColors.Card,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         title = {
             Text(
                 text = stringResource(Res.string.room_downgrade_title),
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
             )
         },
@@ -191,7 +190,7 @@ private fun RoomDowngradeDialog(
             Column {
                 Text(
                     text = stringResource(Res.string.room_downgrade_body, prompt.allowedSlots),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Column(modifier = Modifier.padding(top = 12.dp)) {
                     prompt.openRooms.forEach { language ->
@@ -207,7 +206,7 @@ private fun RoomDowngradeDialog(
                             )
                             Text(
                                 text = "${language.flagEmoji} ${language.name}",
-                                color = NeonColors.TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
@@ -216,12 +215,12 @@ private fun RoomDowngradeDialog(
         },
         confirmButton = {
             TextButton(onClick = onConfirm, enabled = prompt.canConfirm) {
-                Text(stringResource(Res.string.room_downgrade_confirm), color = NeonColors.Primary)
+                Text(stringResource(Res.string.room_downgrade_confirm), color = MaterialTheme.colorScheme.primary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.room_downgrade_later), color = NeonColors.TextSecondary)
+                Text(stringResource(Res.string.room_downgrade_later), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
     )

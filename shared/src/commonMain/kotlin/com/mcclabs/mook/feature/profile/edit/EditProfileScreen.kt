@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.profile.edit
 
+import com.mcclabs.mook.ui.layout.scaffoldPadding
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +49,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.rememberGalleryPicker
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.edit_profile_title
@@ -130,13 +131,13 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.edit_profile_title), color = NeonColors.TextPrimary) },
+                title = { Text(stringResource(Res.string.edit_profile_title), color = MaterialTheme.colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(Res.string.common_back),
-                            tint = NeonColors.TextPrimary
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -144,27 +145,27 @@ fun EditProfileScreen(
                     if (state.hasUnsavedChanges && !state.isSaving) {
                         Button(
                             onClick = viewModel::saveChanges,
-                            colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Primary),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                             modifier = Modifier.padding(end = 8.dp)
                         ) {
-                            Text(stringResource(Res.string.common_save), color = NeonColors.Background, fontWeight = FontWeight.Bold)
+                            Text(stringResource(Res.string.common_save), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                         }
                     } else if (state.isSaving) {
                         CircularProgressIndicator(
                             modifier = Modifier.padding(end = 16.dp).size(24.dp),
-                            color = NeonColors.Primary,
+                            color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 2.dp
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = NeonColors.Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = NeonColors.Primary)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             LazyVerticalGrid(
@@ -174,7 +175,7 @@ fun EditProfileScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
+                    .scaffoldPadding(padding)
             ) {
                 // ---- Basic info form (spans the full grid width) -------------
                 item(span = { GridItemSpan(maxLineSpan) }) {
@@ -182,7 +183,7 @@ fun EditProfileScreen(
                         Text(
                             text = stringResource(Res.string.edit_profile_basic_info_title),
                             style = MaterialTheme.typography.titleMedium,
-                            color = NeonColors.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         CustomAuthTextField(
@@ -206,14 +207,14 @@ fun EditProfileScreen(
                             Text(
                                 text = stringResource(Res.string.edit_profile_birthdate_label),
                                 style = MaterialTheme.typography.labelMedium,
-                                color = NeonColors.TextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(NeonColors.InputBackground)
+                                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                                     .clickable { showDatePicker = true }
                                     .padding(horizontal = 16.dp, vertical = 16.dp)
                             ) {
@@ -221,7 +222,7 @@ fun EditProfileScreen(
                                     text = state.birthDateMillis?.let { formatBirthDate(it) }
                                         ?: stringResource(Res.string.edit_profile_birthdate_placeholder),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (state.birthDateMillis != null) NeonColors.TextPrimary else NeonColors.TextTertiary
+                                    color = if (state.birthDateMillis != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -245,12 +246,12 @@ fun EditProfileScreen(
                         Text(
                             text = stringResource(Res.string.edit_profile_photos_title),
                             style = MaterialTheme.typography.titleMedium,
-                            color = NeonColors.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = stringResource(Res.string.edit_profile_photos_hint),
                             style = MaterialTheme.typography.bodySmall,
-                            color = NeonColors.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -277,7 +278,7 @@ fun EditProfileScreen(
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         Text(
                             text = state.error!!,
-                            color = NeonColors.Error,
+                            color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -301,7 +302,7 @@ fun PhotoEditCard(
         modifier = Modifier
             .aspectRatio(3f/4f)
             .clip(RoundedCornerShape(8.dp))
-            .background(NeonColors.CardBorder)
+            .background(MaterialTheme.colorScheme.outlineVariant)
     ) {
         AsyncImage(
             model = url,
@@ -317,12 +318,12 @@ fun PhotoEditCard(
                 .align(Alignment.TopEnd)
                 .padding(4.dp)
                 .size(24.dp)
-                .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                .background(LocalAppColors.current.photoScrim.copy(alpha = 0.5f), CircleShape)
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(Res.string.common_delete),
-                tint = Color.White,
+                tint = LocalAppColors.current.onPhoto,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -332,7 +333,7 @@ fun PhotoEditCard(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(Color.Black.copy(alpha = 0.5f))
+                .background(LocalAppColors.current.photoScrim.copy(alpha = 0.5f))
                 .padding(vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -340,7 +341,7 @@ fun PhotoEditCard(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(Res.string.edit_profile_move_left_cd),
-                    tint = Color.White,
+                    tint = LocalAppColors.current.onPhoto,
                     modifier = Modifier
                         .size(20.dp)
                         .clickable { onMoveLeft() }
@@ -353,7 +354,7 @@ fun PhotoEditCard(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = stringResource(Res.string.edit_profile_move_right_cd),
-                    tint = Color.White,
+                    tint = LocalAppColors.current.onPhoto,
                     modifier = Modifier
                         .size(20.dp)
                         .clickable { onMoveRight() }
@@ -375,7 +376,7 @@ fun AddPhotoCard(onClick: () -> Unit) {
         modifier = Modifier
             .aspectRatio(3f/4f)
             .clip(RoundedCornerShape(8.dp))
-            .background(NeonColors.Card)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -383,12 +384,12 @@ fun AddPhotoCard(onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(Res.string.common_add),
-                tint = NeonColors.Primary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(32.dp)
             )
             Text(
                 text = stringResource(Res.string.common_add),
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium
             )

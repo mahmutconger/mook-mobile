@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.chat_round_line_svgrepo_com
 import mook.shared.generated.resources.walktalk_dialog_back
@@ -41,16 +41,8 @@ import mook.shared.generated.resources.walktalk_dialog_title_named
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-/**
- * A branded confirmation pop-up shown before sending the user from Mook to the
- * companion WalkTalk app. It explains *why* they're being taken there (smoother
- * chat, voice, instant translation) so the redirect never feels abrupt.
- *
- * Fully theme-aware via [NeonColors]; the primary CTA carries the brand gradient.
- *
- * @param userName  Matched person's name, used to personalize the copy. Optional.
- * @param onConfirm Invoked when the user chooses to continue to WalkTalk.
- * @param onDismiss Invoked on "Geri" or when the dialog is dismissed.
+/** WalkTalk'a geçişten önce sohbet, ses ve çeviri özelliklerini açıklayan onay iletişim kutusu.
+ * Tema renkleri Material rollerinden, ana eylemin renkleri marka degradesinden alınır.
  */
 @Composable
 fun WalkTalkRedirectDialog(
@@ -63,7 +55,7 @@ fun WalkTalkRedirectDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(28.dp))
-                .background(NeonColors.Background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -78,7 +70,7 @@ fun WalkTalkRedirectDialog(
                 Icon(
                     painter = painterResource(Res.drawable.chat_round_line_svgrepo_com),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = LocalAppColors.current.onGradient,
                     modifier = Modifier.size(32.dp),
                 )
             }
@@ -92,7 +84,7 @@ fun WalkTalkRedirectDialog(
                     stringResource(Res.string.walktalk_dialog_title_named, userName)
                 },
                 style = MaterialTheme.typography.titleLarge,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
@@ -102,7 +94,7 @@ fun WalkTalkRedirectDialog(
             Text(
                 text = stringResource(Res.string.walktalk_dialog_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
 
@@ -113,7 +105,7 @@ fun WalkTalkRedirectDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(NeonColors.InputBackground)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -132,11 +124,11 @@ fun WalkTalkRedirectDialog(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f).height(56.dp),
                     shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, NeonColors.CardBorder),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 ) {
                     Text(
                         text = stringResource(Res.string.walktalk_dialog_back),
-                        color = NeonColors.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold,
                     )
                 }
@@ -159,7 +151,7 @@ private fun FeatureRow(emoji: String, text: String) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

@@ -61,7 +61,6 @@ import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.NeonToggle
 import com.mcclabs.mook.ui.components.SegmentedPicker
 import com.mcclabs.mook.ui.components.StepIndicator
-import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.rememberGalleryPicker
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -118,11 +117,11 @@ fun RegistrationScreen(
                 TextButton(onClick = {
                     viewModel.onBirthDateChange(datePickerState.selectedDateMillis)
                     showDatePicker = false
-                }) { Text(stringResource(Res.string.registration_date_picker_ok), color = NeonColors.Primary) }
+                }) { Text(stringResource(Res.string.registration_date_picker_ok), color = MaterialTheme.colorScheme.primary) }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text(stringResource(Res.string.registration_date_picker_cancel), color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.registration_date_picker_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         ) {
@@ -134,7 +133,7 @@ fun RegistrationScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NeonColors.Background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -142,7 +141,7 @@ fun RegistrationScreen(
             Text(
                 text = stringResource(Res.string.registration_age_blocked_error),
                 style = MaterialTheme.typography.headlineMedium,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
         }
@@ -152,7 +151,7 @@ fun RegistrationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp),
@@ -171,7 +170,7 @@ fun RegistrationScreen(
                 Icon(
                     painter = painterResource(Res.drawable.back_svgrepo_com),
                     contentDescription = "Back",
-                    tint = NeonColors.TextPrimary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -193,7 +192,7 @@ fun RegistrationScreen(
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium,
-            color = NeonColors.Primary,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -201,7 +200,7 @@ fun RegistrationScreen(
         Text(
             text = subtitle,
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
@@ -227,7 +226,7 @@ fun RegistrationScreen(
             Text(
                 text = state.generalError!!,
                 style = MaterialTheme.typography.bodySmall,
-                color = NeonColors.Error,
+                color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -260,7 +259,7 @@ private fun ColumnScope.StepAgeGate(
     Text(
         text = stringResource(Res.string.registration_date_of_birth_label),
         style = MaterialTheme.typography.labelMedium,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -268,7 +267,7 @@ private fun ColumnScope.StepAgeGate(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(NeonColors.InputBackground)
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .clickable(onClick = onOpenDatePicker)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -276,13 +275,13 @@ private fun ColumnScope.StepAgeGate(
         Text(
             text = state.birthDateMillis?.let { formatBirthDate(it) } ?: stringResource(Res.string.registration_select_birth_date),
             style = MaterialTheme.typography.bodyLarge,
-            color = if (state.birthDateMillis != null) NeonColors.TextPrimary else NeonColors.TextTertiary,
+            color = if (state.birthDateMillis != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
         Icon(
             painter = painterResource(Res.drawable.calendar_svgrepo_com),
             contentDescription = "Pick date",
-            tint = NeonColors.Primary,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
         )
     }
@@ -339,7 +338,7 @@ private fun ColumnScope.StepAboutYou(
     Text(
         text = stringResource(Res.string.registration_gender_label),
         style = MaterialTheme.typography.labelMedium,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -420,7 +419,7 @@ private fun ColumnScope.StepAccount(
     Text(
         text = stringResource(Res.string.registration_discovery_photos_label),
         style = MaterialTheme.typography.labelSmall,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -437,18 +436,18 @@ private fun ColumnScope.StepAccount(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(NeonColors.Surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
             )
         }
         Box(
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(NeonColors.CardBorder)
+                .background(MaterialTheme.colorScheme.outlineVariant)
                 .clickable(onClick = onPickDiscoveryPhoto),
             contentAlignment = Alignment.Center
         ) {
-            Text("+", color = NeonColors.Primary, style = MaterialTheme.typography.headlineMedium)
+            Text("+", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.headlineMedium)
         }
     }
 
@@ -473,7 +472,7 @@ private fun ColumnScope.StepAccount(
     Text(
         text = stringResource(Res.string.registration_interests_label),
         style = MaterialTheme.typography.labelMedium,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -502,12 +501,12 @@ private fun ColumnScope.StepAccount(
             Text(
                 text = stringResource(Res.string.registration_show_in_discover_title),
                 style = MaterialTheme.typography.bodyLarge,
-                color = NeonColors.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = stringResource(Res.string.registration_show_in_discover_subtitle),
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Spacer(modifier = Modifier.width(12.dp))
@@ -524,13 +523,13 @@ private fun ColumnScope.StepAccount(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(NeonColors.Surface)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(16.dp)
     ) {
         Text(
             text = stringResource(Res.string.legal_consent_paragraph),
             style = MaterialTheme.typography.bodySmall,
-            color = NeonColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(12.dp))
         Row(
@@ -543,16 +542,16 @@ private fun ColumnScope.StepAccount(
                 checked = state.termsAccepted,
                 onCheckedChange = viewModel::onTermsAcceptedChange,
                 colors = CheckboxDefaults.colors(
-                    checkedColor = NeonColors.Primary,
-                    uncheckedColor = NeonColors.CardBorder,
-                    checkmarkColor = NeonColors.Background
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.outlineVariant,
+                    checkmarkColor = MaterialTheme.colorScheme.background
                 )
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = stringResource(Res.string.legal_accept_terms),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -571,9 +570,9 @@ private fun ColumnScope.StepAccount(
             checked = state.acceptedEula,
             onCheckedChange = viewModel::onEulaToggle,
             colors = CheckboxDefaults.colors(
-                checkedColor = NeonColors.Primary,
-                uncheckedColor = NeonColors.CardBorder,
-                checkmarkColor = NeonColors.Background
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.outlineVariant,
+                checkmarkColor = MaterialTheme.colorScheme.background
             )
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -581,12 +580,12 @@ private fun ColumnScope.StepAccount(
             Text(
                 text = stringResource(Res.string.legal_accept_eula),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = stringResource(Res.string.legal_zero_tolerance),
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -602,7 +601,7 @@ private fun ColumnScope.StepAccount(
         Text(
             text = stringResource(Res.string.registration_read_privacy_policy),
             style = MaterialTheme.typography.labelMedium,
-            color = NeonColors.Primary
+            color = MaterialTheme.colorScheme.primary
         )
     }
 
@@ -617,7 +616,7 @@ private fun ColumnScope.FieldError(message: String?) {
         Text(
             text = message,
             style = MaterialTheme.typography.labelSmall,
-            color = NeonColors.Error,
+            color = MaterialTheme.colorScheme.error,
             modifier = Modifier.fillMaxWidth()
         )
     }

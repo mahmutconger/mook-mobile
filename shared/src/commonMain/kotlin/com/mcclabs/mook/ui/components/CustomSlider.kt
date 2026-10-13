@@ -1,10 +1,10 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.mcclabs.mook.ui.theme.NeonColors
 
 @Composable
 fun CustomSlider(
@@ -19,9 +19,9 @@ fun CustomSlider(
         valueRange = valueRange,
         modifier = modifier,
         colors = SliderDefaults.colors(
-            thumbColor = NeonColors.Primary,
-            activeTrackColor = NeonColors.Primary,
-            inactiveTrackColor = NeonColors.CardBorder
+            thumbColor = MaterialTheme.colorScheme.primary,
+            activeTrackColor = MaterialTheme.colorScheme.primary,
+            inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant
         )
     )
 }

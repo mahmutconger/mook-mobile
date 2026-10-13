@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.walktalkdemo
 
+import com.mcclabs.mook.ui.layout.scaffoldPadding
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,7 +67,6 @@ import com.mcclabs.mook.domain.translation.DemoLanguages
 import com.mcclabs.mook.domain.translation.TranslationError
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.rememberWalkTalkChatOpener
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.wtdemo_back_cd
@@ -158,13 +159,13 @@ fun WalkTalkDemoContent(
     }
 
     Scaffold(
-        containerColor = NeonColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = stringResource(Res.string.wtdemo_title),
-                        color = NeonColors.Primary,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                     )
                 },
@@ -173,22 +174,22 @@ fun WalkTalkDemoContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(Res.string.wtdemo_back_cd),
-                            tint = NeonColors.TextPrimary,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
         bottomBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(NeonColors.Background)
+                    .background(MaterialTheme.colorScheme.background)
                     .navigationBarsPadding()
                     .imePadding(),
             ) {
-                HorizontalDivider(color = NeonColors.DividerColor)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 PreviewStrip(
                     preview = state.preview,
                     targetLanguage = state.targetLanguage,
@@ -209,7 +210,7 @@ fun WalkTalkDemoContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .scaffoldPadding(padding),
         ) {
             Pitch()
             ParticipantRow(
@@ -251,7 +252,7 @@ private fun Pitch() {
     Text(
         text = stringResource(Res.string.wtdemo_pitch),
         style = MaterialTheme.typography.bodyMedium,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
     )
 }
@@ -282,7 +283,7 @@ private fun ParticipantRow(
             Icon(
                 imageVector = Icons.Filled.SwapHoriz,
                 contentDescription = stringResource(Res.string.wtdemo_swap_cd),
-                tint = NeonColors.Primary,
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
 
@@ -318,7 +319,7 @@ private fun ParticipantChip(
     Row(
         modifier = modifier
             .clip(shape)
-            .background(if (isActive) NeonColors.Primary.copy(alpha = 0.12f) else NeonColors.Card)
+            .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceContainer)
             .padding(start = 10.dp, end = 2.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -331,12 +332,12 @@ private fun ParticipantChip(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = if (isActive) NeonColors.Primary else NeonColors.TextTertiary,
+                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = "${language.flagEmoji} ${language.name}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
             )
         }
@@ -349,14 +350,14 @@ private fun ParticipantChip(
                 Icon(
                     imageVector = Icons.Filled.ExpandMore,
                     contentDescription = menuCd,
-                    tint = NeonColors.TextSecondary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp),
                 )
             }
             DropdownMenu(
                 expanded = menuOpen,
                 onDismissRequest = { menuOpen = false },
-                modifier = Modifier.background(NeonColors.Surface),
+                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow),
             ) {
                 DemoLanguages.OPTIONS.forEach { option ->
                     DropdownMenuItem(
@@ -364,9 +365,9 @@ private fun ParticipantChip(
                             Text(
                                 text = "${option.flagEmoji} ${option.name}",
                                 color = if (option.code == language.code) {
-                                    NeonColors.Primary
+                                    MaterialTheme.colorScheme.primary
                                 } else {
-                                    NeonColors.TextPrimary
+                                    MaterialTheme.colorScheme.onSurface
                                 },
                             )
                         },
@@ -403,25 +404,25 @@ private fun PreviewStrip(
                     "${targetLanguage.flagEmoji} ${targetLanguage.name}",
                 ),
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonColors.TextTertiary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             when (preview) {
                 is LivePreview.InFlight -> Text(
                     text = stringResource(Res.string.wtdemo_translating),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 is LivePreview.Ready -> Text(
                     text = preview.text,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 is LivePreview.Failed -> Text(
                     text = preview.error.displayText(),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.Error,
+                    color = MaterialTheme.colorScheme.error,
                 )
 
                 LivePreview.Idle -> Unit
@@ -433,13 +434,13 @@ private fun PreviewStrip(
                 Icon(
                     imageVector = Icons.Filled.Refresh,
                     contentDescription = null,
-                    tint = NeonColors.Primary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(16.dp),
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
                     text = stringResource(Res.string.wtdemo_retry),
-                    color = NeonColors.Primary,
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge,
                 )
             }
@@ -469,7 +470,7 @@ private fun Composer(
             placeholder = {
                 Text(
                     text = stringResource(Res.string.wtdemo_composer_hint, activeLanguage.name),
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             isError = isOverLimit,
@@ -480,7 +481,7 @@ private fun Composer(
                             Res.string.wtdemo_error_invalid_input,
                             DemoLanguages.MAX_INPUT_CHARS,
                         ),
-                        color = NeonColors.Error,
+                        color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }
@@ -490,15 +491,15 @@ private fun Composer(
             shape = RoundedCornerShape(20.dp),
             maxLines = 4,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = NeonColors.TextPrimary,
-                unfocusedTextColor = NeonColors.TextPrimary,
-                focusedBorderColor = NeonColors.Primary,
-                unfocusedBorderColor = NeonColors.CardBorder,
-                errorBorderColor = NeonColors.Error,
-                cursorColor = NeonColors.Primary,
-                focusedContainerColor = NeonColors.InputBackground,
-                unfocusedContainerColor = NeonColors.InputBackground,
-                errorContainerColor = NeonColors.InputBackground,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                errorContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
             ),
         )
 
@@ -509,14 +510,14 @@ private fun Composer(
                 .padding(bottom = 4.dp)
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(if (canSend) BrandGradient else SolidColor(NeonColors.InputBackground)),
+                .background(if (canSend) BrandGradient else SolidColor(MaterialTheme.colorScheme.surfaceContainerHighest)),
             contentAlignment = Alignment.Center,
         ) {
             IconButton(onClick = onSend, enabled = canSend) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = stringResource(Res.string.wtdemo_send_cd),
-                    tint = if (canSend) Color.White else NeonColors.TextTertiary,
+                    tint = if (canSend) LocalAppColors.current.onGradient else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -533,7 +534,7 @@ private fun CtaBar(onOpenWalkTalk: () -> Unit) {
         Text(
             text = stringResource(Res.string.wtdemo_cta_caption),
             style = MaterialTheme.typography.labelSmall,
-            color = NeonColors.TextTertiary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 8.dp),
         )

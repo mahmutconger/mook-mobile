@@ -17,6 +17,7 @@ import coil3.request.NullRequestDataException
 import coil3.request.crossfade
 import com.mcclabs.mook.di.appModule
 import com.mcclabs.mook.navigation.AppNavGraph
+import com.mcclabs.mook.ui.layout.AppScaffold
 import com.mcclabs.mook.ui.theme.MookTheme
 import com.mcclabs.mook.util.Log
 import org.koin.compose.KoinApplication
@@ -66,12 +67,6 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
         modules(appModule)
     }) {
         val settingsRepository = koinInject<SettingsRepository>()
-        val isDark by settingsRepository.observeIsDarkMode().collectAsState(initial = false)
-
-        LaunchedEffect(isDark) {
-            onDarkModeChange(isDark)
-        }
-
         // Prime the stored language so it applies on startup, not just after the user
         // opens Settings.
         LaunchedEffect(Unit) {
@@ -104,6 +99,18 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
         val signedInUid by Firebase.auth.authStateChanged
             .map { it?.uid }
             .collectAsState(initial = null)
+        val themeRepository = koinInject<com.mcclabs.mook.domain.repository.ThemeRepository>()
+        LaunchedEffect(signedInUid) {
+            if (signedInUid != null) {
+                try {
+                    themeRepository.migrateLegacyPreference()
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    throw cancelled
+                } catch (error: Exception) {
+                    Log.e("Eski tema tercihi taşınamadı", error)
+                }
+            }
+        }
         LaunchedEffect(signedInUid) {
             if (signedInUid != null) pushTokenRepository.registerCurrentDevice()
         }
@@ -162,24 +169,6 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
             }
         }
         val uriHandler = LocalUriHandler.current
-        pendingConflict?.let { conflict ->
-            AccountConflictDialog(
-                conflict = conflict,
-                onTransferConfirmed = {
-                    val uid = conflictUserId
-                    pendingConflict = null
-                    conflictUserId = null
-                    if (uid != null) {
-                        coroutineScope.launch { accountMergeUseCase.proceedWithTransfer(uid) }
-                    }
-                },
-                onContactSupport = {
-                    pendingConflict = null
-                    conflictUserId = null
-                    uriHandler.openUri("mailto:destek@walktalkk.com")
-                },
-            )
-        }
         val appLanguage by settingsRepository.observeAppLanguage().collectAsState(initial = "en")
 
         // Override the platform locale before the keyed subtree composes, so every
@@ -210,20 +199,41 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
         }
 
         key(appLanguage) {
-            MookTheme {
-                when {
-                    isBanned -> AccountSuspendedScreen()
-                    updateState == UpdateState.ForceUpdateRequired -> ForceUpdateScreen(
-                        onUpdateNowClicked = {
-                            coroutineScope.launch { forceUpdateUseCase.startImmediateUpdate() }
-                        },
-                    )
-                    else -> {
-                        AppNavGraph()
-                        // KVKK: politika sürümü için karar verilmediyse onay ekranı zorunlu olarak
-                        // açılır (Android'de UMP formu çözüldükten SONRA). Analytics ve kişisel
-                        // reklamlar karar verilene kadar kapalıdır.
-                        PrivacyConsentHost(promptWhenRequired = true)
+            MookTheme(onDarkModeChange = onDarkModeChange) {
+                AppScaffold {
+                    pendingConflict?.let { conflict ->
+                        AccountConflictDialog(
+                            conflict = conflict,
+                            onTransferConfirmed = {
+                                val uid = conflictUserId
+                                pendingConflict = null
+                                conflictUserId = null
+                                if (uid != null) {
+                                    coroutineScope.launch { accountMergeUseCase.proceedWithTransfer(uid) }
+                                }
+                            },
+                            onContactSupport = {
+                                pendingConflict = null
+                                conflictUserId = null
+                                uriHandler.openUri("mailto:destek@walktalkk.com")
+                            },
+                        )
+                    }
+
+                    when {
+                        isBanned -> AccountSuspendedScreen()
+                        updateState == UpdateState.ForceUpdateRequired -> ForceUpdateScreen(
+                            onUpdateNowClicked = {
+                                coroutineScope.launch { forceUpdateUseCase.startImmediateUpdate() }
+                            },
+                        )
+                        else -> {
+                            AppNavGraph()
+                            // KVKK: politika sürümü için karar verilmediyse onay ekranı zorunlu olarak
+                            // açılır (Android'de UMP formu çözüldükten SONRA). Analytics ve kişisel
+                            // reklamlar karar verilene kadar kapalıdır.
+                            PrivacyConsentHost(promptWhenRequired = true)
+                        }
                     }
                 }
             }

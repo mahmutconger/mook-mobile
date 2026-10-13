@@ -34,7 +34,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mcclabs.mook.ui.components.CustomAuthTextField
 import com.mcclabs.mook.ui.components.GlassmorphismCard
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.painterResource
@@ -68,7 +67,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
@@ -82,7 +81,7 @@ fun LoginScreen(
         Text(
             text = stringResource(Res.string.login_app_name),
             style = MaterialTheme.typography.headlineLarge,
-            color = NeonColors.Primary,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -93,7 +92,7 @@ fun LoginScreen(
         Text(
             text = stringResource(Res.string.login_subtitle),
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
@@ -144,7 +143,7 @@ fun LoginScreen(
                             } else {
                                 stringResource(Res.string.login_show_password_cd)
                             },
-                            tint = NeonColors.TextTertiary,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -161,7 +160,7 @@ fun LoginScreen(
                 Text(
                     text = stringResource(Res.string.login_forgot_password),
                     style = MaterialTheme.typography.bodySmall,
-                    color = NeonColors.Primary,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
@@ -189,7 +188,7 @@ fun LoginScreen(
             Text(
                 text = state.generalError!!,
                 style = MaterialTheme.typography.bodySmall,
-                color = NeonColors.Error,
+                color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -206,12 +205,12 @@ fun LoginScreen(
             Text(
                 text = stringResource(Res.string.login_dont_have_account),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = stringResource(Res.string.login_sign_up),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable(
                     indication = null,

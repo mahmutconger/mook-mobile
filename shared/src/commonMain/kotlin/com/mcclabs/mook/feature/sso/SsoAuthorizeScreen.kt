@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.sso_allow
 import mook.shared.generated.resources.sso_blocked_body
@@ -70,7 +69,7 @@ fun SsoAuthorizeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -78,7 +77,7 @@ fun SsoAuthorizeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(NeonColors.Surface)
+                .background(MaterialTheme.colorScheme.surfaceContainerLow)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -101,12 +100,12 @@ fun SsoAuthorizeScreen(
 
 @Composable
 private fun ColumnScope.VerifyingContent() {
-    CircularProgressIndicator(color = NeonColors.Primary, modifier = Modifier.size(40.dp))
+    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
     Spacer(Modifier.height(16.dp))
     Text(
         text = stringResource(Res.string.sso_verifying),
         style = MaterialTheme.typography.bodyMedium,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 
@@ -119,7 +118,7 @@ private fun ConsentContent(
     Text(
         text = stringResource(Res.string.sso_title),
         style = MaterialTheme.typography.titleLarge,
-        color = NeonColors.TextPrimary,
+        color = MaterialTheme.colorScheme.onSurface,
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(16.dp))
@@ -127,7 +126,7 @@ private fun ConsentContent(
         // İstemci adı istekten değil beyaz listeden gelir.
         text = stringResource(Res.string.sso_body, state.clientName),
         style = MaterialTheme.typography.bodyLarge,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
     )
     state.accountEmail?.let { email ->
@@ -135,7 +134,7 @@ private fun ConsentContent(
         Text(
             text = email,
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.Primary,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
@@ -151,14 +150,14 @@ private fun ConsentContent(
                     stringResource(Res.string.sso_error_client_unavailable, state.clientName)
             },
             style = MaterialTheme.typography.bodySmall,
-            color = NeonColors.Error,
+            color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(16.dp))
     }
 
     if (state.isAuthorizing) {
-        CircularProgressIndicator(color = NeonColors.Primary, modifier = Modifier.size(48.dp))
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(48.dp))
     } else {
         PrimaryButton(
             // Hata sonrası aynı düğme "Tekrar dene" olur; kullanıcı akıştan çıkmak zorunda kalmaz.
@@ -179,7 +178,7 @@ private fun BlockedContent(reason: SsoBlockReason, onClose: () -> Unit) {
     Text(
         text = stringResource(title),
         style = MaterialTheme.typography.titleLarge,
-        color = NeonColors.TextPrimary,
+        color = MaterialTheme.colorScheme.onSurface,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
     )
@@ -187,7 +186,7 @@ private fun BlockedContent(reason: SsoBlockReason, onClose: () -> Unit) {
     Text(
         text = stringResource(body),
         style = MaterialTheme.typography.bodyMedium,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
     )
     Spacer(Modifier.height(24.dp))
@@ -199,10 +198,10 @@ private fun PrimaryButton(text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(52.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Primary),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RoundedCornerShape(12.dp),
     ) {
-        Text(text, color = NeonColors.Background, fontWeight = FontWeight.Bold)
+        Text(text, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -214,6 +213,6 @@ private fun SecondaryButton(text: String, onClick: () -> Unit) {
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(12.dp),
     ) {
-        Text(text, color = NeonColors.TextSecondary, fontWeight = FontWeight.Bold)
+        Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
     }
 }

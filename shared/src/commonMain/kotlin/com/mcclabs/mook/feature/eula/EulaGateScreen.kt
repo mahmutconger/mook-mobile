@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.eula_gate_accept
 import mook.shared.generated.resources.eula_gate_continue
@@ -65,10 +64,10 @@ fun EulaGateScreen(
 
     if (state.isChecking) {
         Box(
-            modifier = Modifier.fillMaxSize().background(NeonColors.Background),
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = NeonColors.Primary)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
         return
     }
@@ -76,7 +75,7 @@ fun EulaGateScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp)
@@ -85,14 +84,14 @@ fun EulaGateScreen(
         Text(
             text = stringResource(Res.string.eula_gate_welcome),
             style = MaterialTheme.typography.headlineMedium,
-            color = NeonColors.Primary,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = stringResource(Res.string.eula_gate_subtitle),
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Column(
@@ -105,7 +104,7 @@ fun EulaGateScreen(
             Text(
                 text = stringResource(Res.string.legal_eula_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -119,16 +118,16 @@ fun EulaGateScreen(
                 checked = state.accepted,
                 onCheckedChange = viewModel::onAcceptedChange,
                 colors = CheckboxDefaults.colors(
-                    checkedColor = NeonColors.Primary,
-                    uncheckedColor = NeonColors.CardBorder,
-                    checkmarkColor = NeonColors.Background
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.outlineVariant,
+                    checkmarkColor = MaterialTheme.colorScheme.background
                 )
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 text = stringResource(Res.string.eula_gate_accept),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -145,7 +144,7 @@ fun EulaGateScreen(
             onClick = viewModel::logout,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text(stringResource(Res.string.eula_gate_logout), color = NeonColors.TextSecondary)
+            Text(stringResource(Res.string.eula_gate_logout), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.height(12.dp))
     }

@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 
 @Composable
 fun ActionButtons(
@@ -33,15 +33,15 @@ fun ActionButtons(
             modifier = Modifier
                 .size(60.dp)
                 .clip(CircleShape)
-                .background(NeonColors.Card)
-                .border(1.dp, NeonColors.CardBorder, CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
                 .clickable { onPass() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Pass",
-                tint = NeonColors.TextPrimary,
+                contentDescription = "Geç",
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -49,16 +49,16 @@ fun ActionButtons(
         Box(
             modifier = Modifier
                 .size(80.dp)
-                .shadow(elevation = 16.dp, shape = CircleShape, spotColor = NeonColors.Primary)
+                .shadow(elevation = 16.dp, shape = CircleShape, spotColor = MaterialTheme.colorScheme.primary)
                 .clip(CircleShape)
-                .background(NeonColors.PrimaryDark)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable { onLike() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = "Like",
-                tint = Color.White,
+                contentDescription = "Beğen",
+                tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(40.dp)
             )
         }

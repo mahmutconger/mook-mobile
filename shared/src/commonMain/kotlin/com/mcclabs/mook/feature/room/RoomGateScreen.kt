@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.room_gate_subtitle
 import mook.shared.generated.resources.room_gate_title
@@ -53,10 +52,10 @@ fun RoomGateScreen(
 
     if (state.isChecking) {
         Box(
-            modifier = Modifier.fillMaxSize().background(NeonColors.Background),
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = NeonColors.Primary)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
         return
     }
@@ -64,7 +63,7 @@ fun RoomGateScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp)
@@ -73,14 +72,14 @@ fun RoomGateScreen(
         Text(
             text = stringResource(Res.string.room_gate_title),
             style = MaterialTheme.typography.headlineMedium,
-            color = NeonColors.Primary,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = stringResource(Res.string.room_gate_subtitle),
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(20.dp))
         RoomPickerGrid(
@@ -99,7 +98,7 @@ fun RoomGateScreen(
                         RoomSelectionError.DAILY_LIMIT -> Res.string.room_error_daily_limit
                     },
                 ),
-                color = NeonColors.Error,
+                color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             )

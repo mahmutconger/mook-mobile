@@ -37,7 +37,6 @@ import com.mcclabs.mook.ui.components.GlassmorphismCard
 import com.mcclabs.mook.ui.components.LanguageDropdown
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.StepIndicator
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -63,7 +62,7 @@ fun OnboardingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
@@ -85,7 +84,7 @@ fun OnboardingScreen(
             style = MaterialTheme.typography.labelMedium.copy(
                 letterSpacing = 3.sp
             ),
-            color = NeonColors.TextTertiary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -94,7 +93,7 @@ fun OnboardingScreen(
         Text(
             text = stringResource(Res.string.onboarding_title),
             style = MaterialTheme.typography.headlineLarge,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -105,7 +104,7 @@ fun OnboardingScreen(
         Text(
             text = stringResource(Res.string.onboarding_subtitle),
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -120,7 +119,7 @@ fun OnboardingScreen(
             Text(
                 text = stringResource(Res.string.onboarding_native_language_label),
                 style = MaterialTheme.typography.labelLarge,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -144,13 +143,13 @@ fun OnboardingScreen(
                 Card(
                     shape = CircleShape,
                     colors = CardDefaults.cardColors(
-                        containerColor = NeonColors.Surface
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
                     )
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.sort_from_top_to_bottom_svgrepo_com),
                         contentDescription = stringResource(Res.string.onboarding_swap_languages_cd),
-                        tint = NeonColors.Primary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .size(40.dp)
                             .padding(8.dp)
@@ -164,7 +163,7 @@ fun OnboardingScreen(
             Text(
                 text = stringResource(Res.string.onboarding_target_language_label),
                 style = MaterialTheme.typography.labelLarge,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -182,14 +181,14 @@ fun OnboardingScreen(
             Text(
                 text = stringResource(Res.string.onboarding_target_level_label),
                 style = MaterialTheme.typography.labelLarge,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
             Text(
                 text = state.proficiencyLevel.displayName,
                 style = MaterialTheme.typography.bodyLarge,
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -204,11 +203,11 @@ fun OnboardingScreen(
                 valueRange = 0f..2f,
                 steps = 1,
                 colors = SliderDefaults.colors(
-                    thumbColor = NeonColors.TextPrimary,
-                    activeTrackColor = NeonColors.Primary,
-                    inactiveTrackColor = NeonColors.Surface,
-                    activeTickColor = NeonColors.Primary,
-                    inactiveTickColor = NeonColors.Surface
+                    thumbColor = MaterialTheme.colorScheme.onSurface,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    activeTickColor = MaterialTheme.colorScheme.primary,
+                    inactiveTickColor = MaterialTheme.colorScheme.surfaceContainerLow
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -223,9 +222,9 @@ fun OnboardingScreen(
                         text = level.displayName,
                         style = MaterialTheme.typography.labelSmall,
                         color = if (level == state.proficiencyLevel) {
-                            NeonColors.Primary
+                            MaterialTheme.colorScheme.primary
                         } else {
-                            NeonColors.TextTertiary
+                            MaterialTheme.colorScheme.onSurfaceVariant
                         }
                     )
                 }

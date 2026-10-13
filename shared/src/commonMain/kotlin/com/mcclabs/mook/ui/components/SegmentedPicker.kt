@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 
 /**
  * A neon-styled segmented control that lets the user pick one option from a
@@ -41,16 +40,16 @@ fun <T> SegmentedPicker(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(NeonColors.InputBackground)
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .padding(4.dp),
     ) {
         options.forEach { (value, label) ->
             val selected = value == selectedValue
             val bg by animateColorAsState(
-                if (selected) NeonColors.Primary else Color.Transparent
+                if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
             )
             val textColor by animateColorAsState(
-                if (selected) NeonColors.Background else NeonColors.TextSecondary
+                if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
             )
             Box(
                 modifier = Modifier

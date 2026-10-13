@@ -8,7 +8,6 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import com.mcclabs.mook.domain.billing.MidnightCountdown
-import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.getCurrentTimeMillis
 import kotlinx.coroutines.delay
 import kotlinx.datetime.TimeZone
@@ -36,7 +35,7 @@ fun MidnightCountdownText(modifier: Modifier = Modifier) {
         text = stringResource(Res.string.limit_sheet_resets_in, MidnightCountdown.format(remaining)),
         style = MaterialTheme.typography.bodyMedium,
         fontWeight = FontWeight.SemiBold,
-        color = NeonColors.TextPrimary,
+        color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier,
     )
 }

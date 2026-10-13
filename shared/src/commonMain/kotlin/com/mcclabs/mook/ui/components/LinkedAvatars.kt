@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -19,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.ic_user
 import org.jetbrains.compose.resources.painterResource
@@ -52,7 +52,7 @@ fun LinkedAvatars(
         Icon(
             imageVector = Icons.Default.Favorite, // glowing cyan icon in the middle
             contentDescription = null,
-            tint = NeonColors.Primary,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .offset(x = (-10).dp)
                 .zIndex(2f)
@@ -71,15 +71,15 @@ private fun AvatarCircle(
         modifier = modifier
             .size(100.dp)
             .clip(CircleShape)
-            .background(NeonColors.Card)
-            .border(2.dp, NeonColors.Primary, CircleShape),
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
         contentAlignment = Alignment.Center
     ) {
         if (photoUrl.isNullOrBlank()) {
             Icon(
                 painter = painterResource(Res.drawable.ic_user),
                 contentDescription = contentDescription,
-                tint = NeonColors.TextTertiary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(48.dp)
             )
         } else {

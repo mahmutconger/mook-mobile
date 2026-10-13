@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.model.Language
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.discover_age_chip_value
 import mook.shared.generated.resources.discover_chip_age
@@ -86,15 +85,15 @@ private fun FilterChip(
     Row(
         modifier = Modifier
             .clip(shape)
-            .background(NeonColors.Card)
-            .border(1.dp, NeonColors.CardBorder, shape)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
             .clickable(onClick = onClick)
             .padding(start = 14.dp, end = 8.dp, top = 9.dp, bottom = 9.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
@@ -104,7 +103,7 @@ private fun FilterChip(
         Icon(
             imageVector = Icons.Default.KeyboardArrowDown,
             contentDescription = null,
-            tint = NeonColors.TextSecondary,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(18.dp)
         )
     }

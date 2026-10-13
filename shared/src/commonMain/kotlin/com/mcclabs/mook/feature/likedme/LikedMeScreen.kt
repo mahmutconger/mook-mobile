@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.likedme
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.layout.scaffoldPadding
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -60,7 +62,6 @@ import com.mcclabs.mook.ads.NativeAdFeedCard
 import com.mcclabs.mook.domain.billing.Tier
 import com.mcclabs.mook.domain.model.LikedMeEntry
 import com.mcclabs.mook.ui.components.LimitSheet
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.liked_me_all_revealed
 import mook.shared.generated.resources.liked_me_counter
@@ -117,25 +118,25 @@ fun LikedMeScreen(
     }
 
     Scaffold(
-        containerColor = NeonColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(Res.string.liked_me_title), color = NeonColors.Primary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.liked_me_title), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = NeonColors.TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
+        Box(Modifier.fillMaxSize().scaffoldPadding(padding)) {
             when {
-                state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center), color = NeonColors.Primary)
+                state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.primary)
                 state.errorMessage != null -> ErrorState(state.errorMessage!!, onRetry = viewModel::load)
                 else -> LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -184,18 +185,18 @@ private fun CounterHeader(state: LikedMeUiState, onGoPremium: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(NeonColors.Card)
-            .border(1.dp, NeonColors.CardBorder, RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(Icons.Filled.Favorite, contentDescription = null, tint = NeonColors.Primary, modifier = Modifier.size(32.dp))
+        Icon(Icons.Filled.Favorite, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
         Spacer(Modifier.size(8.dp))
         Text(
             text = stringResource(Res.string.liked_me_counter, state.counterLabel),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.size(4.dp))
@@ -207,14 +208,14 @@ private fun CounterHeader(state: LikedMeUiState, onGoPremium: () -> Unit) {
                 else -> stringResource(Res.string.liked_me_unlocks_none)
             },
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         if (!state.revealAll && state.entitlement.tier != Tier.PREMIUM && state.totalCount > 0) {
             Spacer(Modifier.size(12.dp))
             Button(
                 onClick = onGoPremium,
-                colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Primary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) { Text(stringResource(Res.string.liked_me_go_premium)) }
         }
     }
@@ -227,7 +228,7 @@ private fun LikerRow(entry: LikedMeEntry, isUnlocking: Boolean, onClick: () -> U
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(NeonColors.Card)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(enabled = !isUnlocking, onClick = onClick)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -243,23 +244,23 @@ private fun LikerRow(entry: LikedMeEntry, isUnlocking: Boolean, onClick: () -> U
                 },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = stringResource(Res.string.liked_me_liked_you),
                 style = MaterialTheme.typography.bodySmall,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Spacer(Modifier.width(8.dp))
         when {
-            isUnlocking -> CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp, color = NeonColors.Primary)
+            isUnlocking -> CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
             entry.isUnlocked -> OutlinedButton(onClick = onClick) { Text(stringResource(Res.string.liked_me_view_profile)) }
             else -> Button(
                 onClick = onClick,
-                colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Primary),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) {
                 Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
@@ -283,7 +284,7 @@ private fun LikerPhoto(photoUrl: String?, locked: Boolean) {
             .build()
     }
     Box(
-        modifier = Modifier.size(64.dp).clip(CircleShape).background(NeonColors.InputBackground),
+        modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest),
         contentAlignment = Alignment.Center,
     ) {
         AsyncImage(
@@ -295,7 +296,11 @@ private fun LikerPhoto(photoUrl: String?, locked: Boolean) {
                 .then(if (locked) Modifier.blur(16.dp, BlurredEdgeTreatment(CircleShape)) else Modifier),
         )
         if (locked) {
-            Icon(Icons.Filled.Lock, contentDescription = null, tint = NeonColors.Background, modifier = Modifier.size(20.dp))
+            Icon(
+                Icons.Filled.Lock, contentDescription = null, tint = LocalAppColors.current.onPhoto,
+                modifier = Modifier.clip(CircleShape).background(LocalAppColors.current.photoScrim.copy(alpha = 0.55f))
+                    .padding(6.dp).size(20.dp),
+            )
         }
     }
 }
@@ -309,14 +314,14 @@ private fun EmptyState() {
         Text(
             stringResource(Res.string.liked_me_empty_title),
             style = MaterialTheme.typography.titleMedium,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.size(8.dp))
         Text(
             stringResource(Res.string.liked_me_empty_body),
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
     }
@@ -329,8 +334,8 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(message, color = NeonColors.TextSecondary, textAlign = TextAlign.Center)
+        Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         Spacer(Modifier.size(12.dp))
-        TextButton(onClick = onRetry) { Text(stringResource(Res.string.liked_me_retry), color = NeonColors.Primary) }
+        TextButton(onClick = onRetry) { Text(stringResource(Res.string.liked_me_retry), color = MaterialTheme.colorScheme.primary) }
     }
 }

@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.filters
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +24,6 @@ import com.mcclabs.mook.domain.model.Country
 import com.mcclabs.mook.ui.components.CustomRangeSlider
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.calendar_svgrepo_com
 import mook.shared.generated.resources.flag_svgrepo_com
@@ -58,7 +58,7 @@ fun FiltersScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 20.dp)
             .padding(top = 40.dp, bottom = 16.dp)
     ) {
@@ -77,7 +77,7 @@ fun FiltersScreen(
                 Icon(
                     painter = painterResource(Res.drawable.ic_settings_minimalistic),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = LocalAppColors.current.onGradient,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -85,13 +85,13 @@ fun FiltersScreen(
             Column {
                 Text(
                     text = stringResource(Res.string.filters_title),
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = stringResource(Res.string.filters_subtitle),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -102,7 +102,7 @@ fun FiltersScreen(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = NeonColors.Primary)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             // ---- Scrollable content --------------------------------------
@@ -126,12 +126,12 @@ fun FiltersScreen(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(NeonColors.Primary.copy(alpha = 0.12f))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
                                 text = "${state.settings.ageRangeStart} – ${state.settings.ageRangeEnd}",
-                                color = NeonColors.Primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Bold
                             )
@@ -149,8 +149,8 @@ fun FiltersScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("18", color = NeonColors.TextTertiary, style = MaterialTheme.typography.bodySmall)
-                        Text("100", color = NeonColors.TextTertiary, style = MaterialTheme.typography.bodySmall)
+                        Text("18", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                        Text("100", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -164,8 +164,8 @@ fun FiltersScreen(
                     onClick = { viewModel.onReset() },
                     modifier = Modifier.weight(1f).height(56.dp),
                     shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, NeonColors.CardBorder),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = NeonColors.TextPrimary)
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
                 ) {
                     Text(stringResource(Res.string.filters_reset), fontWeight = FontWeight.SemiBold)
                 }
@@ -231,7 +231,7 @@ private fun CountrySection(
             if (results.isEmpty()) {
                 Text(
                     text = stringResource(Res.string.filters_no_countries),
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -252,11 +252,7 @@ private fun CountrySection(
     }
 }
 
-/**
- * A titled card grouping one filter control, styled to match the Mook design
- * language (rounded surface, hairline border, icon-led header). Theme-aware via
- * [NeonColors] tokens.
- */
+/** Filtreyi başlık, simge ve yuvarlatılmış yüzeyle gruplar; Material renk rollerini kullanır. */
 @Composable
 private fun FilterSection(
     icon: DrawableResource,
@@ -269,8 +265,8 @@ private fun FilterSection(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(NeonColors.Card)
-            .border(1.dp, NeonColors.CardBorder, RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
             .padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -278,21 +274,21 @@ private fun FilterSection(
             Icon(
                 painter = painterResource(icon),
                 contentDescription = null,
-                tint = NeonColors.Primary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )
                 if (subtitle != null) {
                     Text(
                         text = subtitle,
-                        color = NeonColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -314,14 +310,14 @@ private fun SearchField(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(NeonColors.InputBackground)
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(Res.drawable.search_normal_1_svgrepo_com),
             contentDescription = null,
-            tint = NeonColors.TextSecondary,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(18.dp)
         )
         Spacer(modifier = Modifier.width(10.dp))
@@ -329,7 +325,7 @@ private fun SearchField(
             if (value.isEmpty()) {
                 Text(
                     text = placeholder,
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -337,8 +333,8 @@ private fun SearchField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
-                textStyle = MaterialTheme.typography.bodyMedium.copy(color = NeonColors.TextPrimary),
-                cursorBrush = SolidColor(NeonColors.Primary),
+                textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -361,13 +357,13 @@ private fun ResultRow(
     ) {
         Text(
             text = text,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f)
         )
         Text(
             text = "+",
-            color = NeonColors.Primary,
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -391,14 +387,14 @@ private fun RemovableChip(
     ) {
         Text(
             text = text,
-            color = Color.White,
+            color = LocalAppColors.current.onGradient,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = "×",
-            color = Color.White,
+            color = LocalAppColors.current.onGradient,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )

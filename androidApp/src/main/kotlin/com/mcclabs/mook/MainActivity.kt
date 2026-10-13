@@ -2,11 +2,9 @@ package com.mcclabs.mook
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -66,17 +64,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         AdMobActivityHolder.activity = this
 
-        // Apply the initial theme immediately (before first frame) to avoid a flash.
-        applySystemBarStyle(isDark = false)
+        // İlk yerel tercih okunurken cihazın sistem görünümü kullanılır.
+        enableEdgeToEdge()
         askForNotificationPermission()
         AdMobConsentManager.requestConsent(this)
 
         setContent {
-            App(
-                onDarkModeChange = { isDark ->
-                    applySystemBarStyle(isDark)
-                }
-            )
+            App()
         }
     }
 
@@ -92,23 +86,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * Switches system bar icon tint between dark (for light backgrounds) and
-     * light (for dark backgrounds) so icons always remain legible.
-     */
-    private fun applySystemBarStyle(isDark: Boolean) {
-        if (isDark) {
-            enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-                navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-            )
-        } else {
-            enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
-                navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
-            )
-        }
-    }
+
 }
 
 @Preview

@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.model.Country
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.dropdown_select
 import mook.shared.generated.resources.dropdown_expand_cd
@@ -67,7 +66,7 @@ fun CountryDropdown(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -76,7 +75,7 @@ fun CountryDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(NeonColors.InputBackground)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                 .clickable { expanded = true }
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -84,13 +83,13 @@ fun CountryDropdown(
             Text(
                 text = selectedCountry?.name ?: stringResource(Res.string.dropdown_select),
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (selectedCountry != null) NeonColors.TextPrimary else NeonColors.TextTertiary,
+                color = if (selectedCountry != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
                 contentDescription = stringResource(Res.string.dropdown_expand_cd),
-                tint = NeonColors.TextSecondary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -101,7 +100,7 @@ fun CountryDropdown(
                 query = ""
             },
             modifier = Modifier
-                .background(NeonColors.InputBackground)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                 .heightIn(max = 360.dp),
         ) {
             // Search box at the top of the menu.
@@ -121,7 +120,7 @@ fun CountryDropdown(
                         Text(
                             text = country.name,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = NeonColors.TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     },
                     onClick = {

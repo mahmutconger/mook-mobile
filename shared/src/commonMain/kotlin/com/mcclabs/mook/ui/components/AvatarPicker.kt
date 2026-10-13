@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.add_photo_svgrepo_com
 import mook.shared.generated.resources.ic_user
@@ -29,7 +29,7 @@ import org.jetbrains.compose.resources.stringResource
  * Circular avatar picker with a placeholder icon and an "add" overlay button.
  *
  * When [avatarUri] is `null` a generic person icon is shown on a
- * [NeonColors.Card] background. A small cyan "+" button is positioned
+ * [MaterialTheme.colorScheme.surfaceContainer] background. A small cyan "+" button is positioned
  * at the bottom-right corner to initiate avatar selection.
  *
  * @param avatarUri   URI of the selected avatar image, or `null` for default.
@@ -51,7 +51,7 @@ fun AvatarPicker(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(NeonColors.Card)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .clickable(onClick = onPickAvatar),
             contentAlignment = Alignment.Center,
         ) {
@@ -60,7 +60,7 @@ fun AvatarPicker(
                 Icon(
                     painter = painterResource(Res.drawable.ic_user),
                     contentDescription = stringResource(Res.string.avatar_default_cd),
-                    tint = NeonColors.TextTertiary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(48.dp),
                 )
             } else {
@@ -80,14 +80,14 @@ fun AvatarPicker(
                 .align(Alignment.BottomEnd)
                 .offset(x = (-2).dp, y = (-2).dp)
                 .clip(CircleShape)
-                .background(NeonColors.Primary)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable(onClick = onPickAvatar),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painter = painterResource(Res.drawable.add_photo_svgrepo_com),
                 contentDescription = stringResource(Res.string.avatar_pick_cd),
-                tint = NeonColors.Background,
+                tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(16.dp),
             )
         }

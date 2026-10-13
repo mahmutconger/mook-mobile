@@ -111,6 +111,10 @@ kotlin {
             implementation(project.dependencies.platform(libs.junit5.bom))
             implementation(libs.junit5.jupiter)
             implementation(libs.mockk)
+            // Android arayüz testleri, emülatör gerektirmeden gerçek Compose ağacını çalıştırır.
+            implementation("org.robolectric:robolectric:4.16")
+            implementation("org.jetbrains.compose.ui:ui-test-junit4:1.11.1")
+            implementation("androidx.compose.ui:ui-test-manifest:1.11.2")
             runtimeOnly(libs.junit5.vintage.engine)
             runtimeOnly(libs.junit5.platform.launcher)
         }

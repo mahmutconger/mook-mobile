@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -14,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 import kotlin.random.Random
 
 @Composable
@@ -40,10 +40,10 @@ fun ParticleBackground(modifier: Modifier = Modifier) {
         }
     }
 
+    val color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
     Canvas(modifier = modifier.fillMaxSize()) {
-        val color = NeonColors.Primary.copy(alpha = 0.3f)
         particles.forEach { particle ->
-            // Move upwards
+            // Parçacıklar yukarı doğru hareket eder.
             val yOffset = (particle.yProgress - progress * particle.speedMultiplier) % 1f
             val y = if (yOffset < 0f) yOffset + 1f else yOffset
             val x = particle.xProgress * size.width

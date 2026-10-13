@@ -1,77 +1,54 @@
 package com.mcclabs.mook.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
-import com.mcclabs.mook.domain.repository.SettingsRepository
-import org.koin.compose.koinInject
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mcclabs.mook.domain.theme.ThemePreference
+import com.mcclabs.mook.feature.theme.ThemeViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
-/**
- * Builds the Material 3 color scheme from the current [NeonColors] token values.
- *
- * Called inside the composition so the scheme always reflects the active theme
- * (light or dark) without a one-frame flash.
- */
-@Composable
-private fun buildColorScheme(isDark: Boolean) = if (isDark) {
-    darkColorScheme(
-        background = NeonColors.Background,
-        surface = NeonColors.Surface,
-        primary = NeonColors.Primary,
-        onPrimary = Color.White,
-        onBackground = NeonColors.TextPrimary,
-        onSurface = NeonColors.TextPrimary,
-        onSurfaceVariant = NeonColors.TextSecondary,
-        error = NeonColors.Error,
-        onError = Color.White,
-        surfaceVariant = NeonColors.Card,
-        outline = NeonColors.CardBorder,
-    )
-} else {
-    lightColorScheme(
-        background = NeonColors.Background,
-        surface = NeonColors.Surface,
-        primary = NeonColors.Primary,
-        onPrimary = Color.White,
-        onBackground = NeonColors.TextPrimary,
-        onSurface = NeonColors.TextPrimary,
-        onSurfaceVariant = NeonColors.TextSecondary,
-        error = NeonColors.Error,
-        onError = Color.White,
-        surfaceVariant = NeonColors.Card,
-        outline = NeonColors.CardBorder,
-    )
-}
+private val LocalThemeScope = staticCompositionLocalOf { false }
 
-/**
- * Root theme composable for the Mook app.
- *
- * Observes the user's dark-mode preference from [SettingsRepository] and:
- * 1. Updates [NeonColors] tokens synchronously (no LaunchedEffect delay) so
- *    custom components that read NeonColors directly stay in sync.
- * 2. Builds the correct Material 3 color scheme for the same frame so
- *    M3 components are also themed correctly without a one-frame flash.
- *
- * @param content The composable content to be themed.
- */
+/** Yerel tercih yüklenmeden uygulama ağacı çizilmez; başlangıçta yanlış palet gösterilmez. */
 @Composable
 fun MookTheme(
-    settingsRepository: SettingsRepository = koinInject(),
-    content: @Composable () -> Unit
+    viewModel: ThemeViewModel = koinViewModel(),
+    onDarkModeChange: (Boolean) -> Unit = {},
+    content: @Composable () -> Unit,
 ) {
-    val isDark by settingsRepository.observeIsDarkMode().collectAsState(initial = false)
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    if (state.isLoading) return
+    AppTheme(state.preference, onDarkModeChange = onDarkModeChange, content = content)
+}
 
-    // Update NeonColors synchronously during composition so there is no frame
-    // where the scheme and NeonColors tokens are out of step.
-    NeonColors.updateTheme(isDark)
-
-    MaterialTheme(
-        colorScheme = buildColorScheme(isDark),
-        typography = MookTypography,
-        content = content,
-    )
+/** Sistem görünümü, Material renkleri ve özel roller aynı tercih üzerinden hesaplanır. */
+@Composable
+fun AppTheme(
+    preference: ThemePreference,
+    systemDark: Boolean = isSystemInDarkTheme(),
+    onDarkModeChange: (Boolean) -> Unit = {},
+    content: @Composable () -> Unit,
+) {
+    val palette = remember(preference, systemDark) { themePalette(preference, systemDark) }
+    val isRoot = !LocalThemeScope.current
+    if (isRoot) {
+        ApplyPlatformTheme(preference, preference.isDark(systemDark), palette.scheme.background)
+        SideEffect { onDarkModeChange(preference.isDark(systemDark)) }
+    }
+    MaterialTheme(colorScheme = palette.scheme, typography = MookTypography) {
+        CompositionLocalProvider(LocalAppColors provides palette.colors, LocalThemeScope provides true) {
+            Surface(Modifier.fillMaxSize(), color = palette.scheme.background, contentColor = palette.scheme.onBackground) {
+                content()
+            }
+        }
+    }
 }

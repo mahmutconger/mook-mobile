@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 
 /**
  * A selectable neon-styled chip, typically used for interest / tag selection.
@@ -33,13 +32,13 @@ fun NeonChip(
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor = if (isSelected) {
-        NeonColors.Primary.copy(alpha = 0.15f)
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
     } else {
-        NeonColors.Background
+        MaterialTheme.colorScheme.background
     }
 
-    val borderColor = if (isSelected) NeonColors.Primary else NeonColors.CardBorder
-    val textColor = if (isSelected) NeonColors.Primary else NeonColors.TextSecondary
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    val textColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
     Surface(
         modifier = if (onToggle != null) modifier.clickable(onClick = onToggle) else modifier,

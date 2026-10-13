@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.components.CustomRangeSlider
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.discover_age_chip_value
 import mook.shared.generated.resources.filters_age_range
@@ -52,7 +51,7 @@ fun AgeRangeSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = NeonColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         Column(
             modifier = Modifier
@@ -69,13 +68,13 @@ fun AgeRangeSheet(
             ) {
                 Text(
                     text = stringResource(Res.string.filters_age_range),
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = stringResource(Res.string.discover_age_chip_value, start, end),
-                    color = NeonColors.Primary,
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -100,12 +99,12 @@ fun AgeRangeSheet(
             ) {
                 Text(
                     text = MIN_AGE.roundToInt().toString(),
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
                     text = MAX_AGE.roundToInt().toString(),
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

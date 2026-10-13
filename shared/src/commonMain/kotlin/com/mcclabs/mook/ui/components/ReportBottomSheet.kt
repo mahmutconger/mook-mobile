@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.report_title
 import mook.shared.generated.resources.report_subtitle
@@ -82,7 +81,7 @@ fun ReportBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = NeonColors.Background,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         Column(
             modifier = Modifier
@@ -95,13 +94,13 @@ fun ReportBottomSheet(
                 text = stringResource(Res.string.report_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = stringResource(Res.string.report_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(12.dp))
 
@@ -116,10 +115,10 @@ fun ReportBottomSheet(
                     RadioButton(
                         selected = selectedReason == reason,
                         onClick = { onReasonSelected(reason) },
-                        colors = RadioButtonDefaults.colors(selectedColor = NeonColors.Primary),
+                        colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary),
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(reasonLabel(reason)), color = NeonColors.TextPrimary)
+                    Text(stringResource(reasonLabel(reason)), color = MaterialTheme.colorScheme.onSurface)
                 }
             }
 

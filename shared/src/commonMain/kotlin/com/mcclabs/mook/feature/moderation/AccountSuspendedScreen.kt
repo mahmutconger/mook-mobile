@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.moderation_suspended_contact_support
 import mook.shared.generated.resources.moderation_suspended_message
@@ -55,14 +54,14 @@ fun AccountSuspendedScreen() {
                 .fillMaxWidth()
                 .padding(24.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(NeonColors.GlassBackground)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(Res.string.moderation_suspended_title),
                 style = MaterialTheme.typography.headlineMedium,
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
@@ -72,7 +71,7 @@ fun AccountSuspendedScreen() {
             Text(
                 text = stringResource(Res.string.moderation_suspended_message),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
 

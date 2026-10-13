@@ -1,5 +1,7 @@
 package com.mcclabs.mook.ui.components
 
+import coil3.compose.AsyncImage
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,8 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.ic_user
 import mook.shared.generated.resources.carousel_no_photos
@@ -46,7 +46,7 @@ fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(NeonColors.Surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
             )
         }
 
@@ -62,7 +62,7 @@ fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
                     // Translucent gray-black pill so the indicator stays visible over
                     // light photos.
                     .clip(RoundedCornerShape(50))
-                    .background(Color.Black.copy(alpha = 0.3f))
+                    .background(LocalAppColors.current.photoScrim.copy(alpha = 0.55f))
                     .padding(horizontal = 10.dp, vertical = 6.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -76,7 +76,7 @@ fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
                             .width(dotWidth)
                             .clip(RoundedCornerShape(4.dp))
                             .background(
-                                if (isSelected) Color.White else Color.White.copy(alpha = 0.4f)
+                                if (isSelected) LocalAppColors.current.onPhoto else LocalAppColors.current.onPhoto.copy(alpha = 0.4f)
                             )
                     )
                 }
@@ -88,21 +88,21 @@ fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
 @Composable
 private fun EmptyPhotoPlaceholder(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier.background(NeonColors.Card),
+        modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainer),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 painter = painterResource(Res.drawable.ic_user),
                 contentDescription = null,
-                tint = NeonColors.TextTertiary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(64.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(Res.string.carousel_no_photos),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextTertiary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

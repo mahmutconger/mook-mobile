@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,7 +30,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.chat_round_line_svgrepo_com
 import mook.shared.generated.resources.wtdemo_promo_body
@@ -57,8 +57,8 @@ fun WalkTalkDemoPromoCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(NeonColors.Card)
-            .border(1.dp, NeonColors.CardBorder, shape)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
             .clickable(onClick = onClick)
             .semantics { contentDescription = description }
             .padding(14.dp),
@@ -75,7 +75,7 @@ fun WalkTalkDemoPromoCard(
             Icon(
                 painter = painterResource(Res.drawable.chat_round_line_svgrepo_com),
                 contentDescription = null,
-                tint = Color.White,
+                tint = LocalAppColors.current.onGradient,
                 modifier = Modifier.size(22.dp),
             )
         }
@@ -84,14 +84,14 @@ fun WalkTalkDemoPromoCard(
             Text(
                 text = stringResource(Res.string.wtdemo_promo_title),
                 style = MaterialTheme.typography.titleMedium,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = stringResource(Res.string.wtdemo_promo_body),
                 style = MaterialTheme.typography.bodySmall,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -100,7 +100,7 @@ fun WalkTalkDemoPromoCard(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = null,
-            tint = NeonColors.Primary,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(20.dp),
         )
     }

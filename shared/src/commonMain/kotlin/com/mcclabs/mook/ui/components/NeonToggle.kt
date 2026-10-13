@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -9,7 +10,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.mcclabs.mook.ui.theme.NeonColors
 
 @Composable
 fun NeonToggle(
@@ -27,18 +27,18 @@ fun NeonToggle(
                     imageVector = Icons.Default.Check,
                     contentDescription = null,
                     modifier = Modifier.size(SwitchDefaults.IconSize),
-                    tint = NeonColors.Accent
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
         } else {
             null
         },
         colors = SwitchDefaults.colors(
-            checkedThumbColor = Color.White,
-            checkedTrackColor = NeonColors.Accent,
-            uncheckedThumbColor = Color.White,
-            uncheckedTrackColor = NeonColors.CardBorder,
-            uncheckedBorderColor = NeonColors.CardBorder
+            checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+            checkedTrackColor = MaterialTheme.colorScheme.secondary,
+            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            uncheckedTrackColor = MaterialTheme.colorScheme.outlineVariant,
+            uncheckedBorderColor = MaterialTheme.colorScheme.outlineVariant
         )
     )
 }

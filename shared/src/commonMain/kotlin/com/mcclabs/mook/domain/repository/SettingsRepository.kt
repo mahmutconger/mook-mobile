@@ -25,15 +25,6 @@ interface SettingsRepository {
      */
     suspend fun setIncognito(enabled: Boolean): IncognitoUpdateResult
 
-    /** Gets whether dark mode is enabled. */
-    suspend fun getIsDarkMode(): Boolean
-
-    /** Persists the dark mode preference. */
-    suspend fun setIsDarkMode(isDark: Boolean)
-
-    /** Emits the current dark mode setting and every subsequent save. */
-    fun observeIsDarkMode(): Flow<Boolean>
-
     /** Gets the currently selected app language (e.g. "en", "tr"). */
     suspend fun getAppLanguage(): String
 

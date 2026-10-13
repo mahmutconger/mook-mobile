@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.update_now
 import mook.shared.generated.resources.update_required_body
@@ -52,14 +51,14 @@ fun ForceUpdateScreen(onUpdateNowClicked: () -> Unit) {
                 .fillMaxWidth()
                 .padding(24.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(NeonColors.GlassBackground)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(Res.string.update_required_title),
                 style = MaterialTheme.typography.headlineMedium,
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
@@ -69,7 +68,7 @@ fun ForceUpdateScreen(onUpdateNowClicked: () -> Unit) {
             Text(
                 text = stringResource(Res.string.update_required_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
 

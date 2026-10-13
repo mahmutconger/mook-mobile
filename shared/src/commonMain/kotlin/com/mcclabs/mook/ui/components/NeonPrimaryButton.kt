@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,21 +22,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 
-/**
- * Full-width primary action button with an electric-cyan horizontal gradient.
- *
- * The button displays the supplied [text] as-is. While [isLoading] is `true`
- * the text is replaced by a cyan [CircularProgressIndicator] and interaction
- * is disabled.
- *
- * @param text   Button label.
- * @param onClick Callback invoked on click.
- * @param modifier Optional [Modifier] applied to the outer container.
- * @param isLoading When `true`, shows a progress spinner instead of text.
- * @param enabled  Controls the enabled / disabled visual state.
- */
+/** Marka degradeli ana eylem; yükleme sırasında aynı içerik rolüyle ilerleme gösterir. */
 @Composable
 fun NeonPrimaryButton(
     text: String,
@@ -63,7 +51,7 @@ fun NeonPrimaryButton(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = Color.White,
+                color = LocalAppColors.current.onGradient,
                 strokeWidth = 2.dp,
                 modifier = Modifier.size(24.dp),
             )
@@ -72,7 +60,7 @@ fun NeonPrimaryButton(
                 Text(
                     text = text,
                     style = MaterialTheme.typography.labelLarge,
-                    color = Color.White,
+                    color = LocalAppColors.current.onGradient,
                 )
             }
         }

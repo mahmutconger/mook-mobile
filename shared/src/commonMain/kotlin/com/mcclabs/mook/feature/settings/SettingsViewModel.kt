@@ -91,14 +91,12 @@ class SettingsViewModel(
             val settings = settingsRepository.getSettings()
             val visible = settingsRepository.getDiscoverVisible()
             val incognito = settingsRepository.getIncognito()
-            val isDark = settingsRepository.getIsDarkMode()
             val lang = settingsRepository.getAppLanguage()
             _state.update {
                 it.copy(
                     email = authRepository.currentUserEmail().orEmpty(),
                     discoverVisible = visible,
                     incognitoEnabled = incognito,
-                    isDarkMode = isDark,
                     appLanguage = lang,
                     ageRangeStart = settings.ageRangeStart,
                     ageRangeEnd = settings.ageRangeEnd,
@@ -147,13 +145,6 @@ class SettingsViewModel(
         }
     }
 
-    fun onThemeChange(isDark: Boolean) {
-        _state.update { it.copy(isDarkMode = isDark) }
-        viewModelScope.launch {
-            settingsRepository.setIsDarkMode(isDark)
-        }
-    }
-
     fun onLanguageClick() {
         _state.update { it.copy(showLanguageDialog = true) }
     }
@@ -167,13 +158,6 @@ class SettingsViewModel(
         viewModelScope.launch {
             settingsRepository.setAppLanguage(language)
             // Note: Dynamic UI locale change implementation depends on platform / resources logic
-        }
-    }
-
-    fun onDarkModeChange(isDark: Boolean) {
-        _state.update { it.copy(isDarkMode = isDark) }
-        viewModelScope.launch {
-            settingsRepository.setIsDarkMode(isDark)
         }
     }
 

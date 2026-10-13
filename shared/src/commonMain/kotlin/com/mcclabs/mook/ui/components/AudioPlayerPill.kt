@@ -14,14 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 
 @Composable
 fun AudioPlayerPill(durationSec: Int, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .background(
-                color = NeonColors.GlassBackground,
+                color = MaterialTheme.colorScheme.surfaceContainer,
                 shape = RoundedCornerShape(percent = 50)
             )
             .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -30,13 +29,13 @@ fun AudioPlayerPill(durationSec: Int, modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .size(24.dp)
-                .background(NeonColors.Primary, CircleShape),
+                .background(MaterialTheme.colorScheme.primary, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
                 contentDescription = "Play",
-                tint = NeonColors.TextPrimary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -49,7 +48,7 @@ fun AudioPlayerPill(durationSec: Int, modifier: Modifier = Modifier) {
         
         Text(
             text = timeString,
-            color = NeonColors.Primary,
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelLarge
         )
     }

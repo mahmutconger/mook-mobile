@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.paywall
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import mook.shared.generated.resources.error_offline
 import mook.shared.generated.resources.paywall_retry
 import mook.shared.generated.resources.paywall_load_error
@@ -58,7 +59,6 @@ import com.mcclabs.mook.domain.billing.SubscriptionChange
 import com.mcclabs.mook.domain.billing.SubscriptionChangePolicy
 import com.mcclabs.mook.domain.billing.SubscriptionChangeType
 import com.mcclabs.mook.domain.billing.Tier
-import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -188,15 +188,15 @@ fun PaywallScreen(
     if (state.purchaseComplete) {
         AlertDialog(
             onDismissRequest = viewModel::dismissPurchaseComplete,
-            containerColor = NeonColors.Card,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             title = {
                 Text(
                     stringResource(Res.string.paywall_purchase_success_title),
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
             },
-            text = { Text(stringResource(Res.string.paywall_purchase_success_text), color = NeonColors.TextSecondary) },
+            text = { Text(stringResource(Res.string.paywall_purchase_success_text), color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
                 Button(onClick = viewModel::dismissPurchaseComplete) {
                     Text(stringResource(Res.string.paywall_done))
@@ -208,7 +208,7 @@ fun PaywallScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding(),
     ) {
@@ -227,24 +227,24 @@ fun PaywallScreen(
                 Text(
                     text = stringResource(Res.string.paywall_title),
                     style = MaterialTheme.typography.titleMedium,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
                 TextButton(onClick = onClose) {
-                    Text(stringResource(Res.string.paywall_close), color = NeonColors.Primary)
+                    Text(stringResource(Res.string.paywall_close), color = MaterialTheme.colorScheme.primary)
                 }
             }
 
             Text(
                 text = stringResource(PaywallHeadline.titleFor(state.limitReason ?: limitReason)),
                 style = MaterialTheme.typography.headlineLarge,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.ExtraBold,
             )
             Text(
                 text = stringResource(Res.string.paywall_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 6.dp, bottom = 22.dp),
             )
 
@@ -276,14 +276,14 @@ fun PaywallScreen(
                 when (val loadState = state.loadState) {
                     PaywallLoadState.Loading -> {
                         Box(Modifier.fillMaxWidth().padding(vertical = 30.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = NeonColors.Primary)
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         }
                     }
                     is PaywallLoadState.Error -> PlansLoadError(offline = loadState.offline, onRetry = { viewModel.load() })
                     PaywallLoadState.Ready -> Text(
                         text = stringResource(Res.string.paywall_not_ready),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = NeonColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(vertical = 20.dp),
                     )
                 }
@@ -291,7 +291,7 @@ fun PaywallScreen(
                 Text(
                     text = stringResource(Res.string.paywall_plan_options),
                     style = MaterialTheme.typography.titleMedium,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 10.dp),
                 )
@@ -312,7 +312,7 @@ fun PaywallScreen(
             state.message?.let { message ->
                 Text(
                     text = message,
-                    color = if (state.purchaseComplete) NeonColors.Success else NeonColors.TextSecondary,
+                    color = if (state.purchaseComplete) LocalAppColors.current.success else MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 14.dp, bottom = 6.dp),
                 )
@@ -323,7 +323,7 @@ fun PaywallScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(NeonColors.Background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 22.dp)
                 .padding(top = 12.dp, bottom = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -347,7 +347,7 @@ fun PaywallScreen(
                         billingPeriod,
                     ),
                     style = MaterialTheme.typography.labelSmall,
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                 )
@@ -369,12 +369,12 @@ fun PaywallScreen(
                     Checkbox(
                         checked = state.distanceSellingContractAccepted,
                         onCheckedChange = viewModel::setDistanceSellingContractAccepted,
-                        colors = CheckboxDefaults.colors(checkedColor = NeonColors.Primary),
+                        colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary),
                     )
                     Text(
                         text = stringResource(Res.string.paywall_distance_selling_contract_waiver),
                         style = MaterialTheme.typography.labelSmall,
-                        color = NeonColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -392,13 +392,13 @@ fun PaywallScreen(
                 modifier = Modifier.fillMaxWidth().height(58.dp),
                 shape = RoundedCornerShape(22.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = NeonColors.TextPrimary,
-                    contentColor = NeonColors.Background,
-                    disabledContainerColor = NeonColors.TextTertiary.copy(alpha = 0.3f),
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
                 ),
             ) {
                 if (state.isPurchasing) {
-                    CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+                    CircularProgressIndicator(modifier = Modifier.size(22.dp), color = MaterialTheme.colorScheme.inverseOnSurface, strokeWidth = 2.dp)
                 } else {
                     Text(
                         text = when {
@@ -433,16 +433,16 @@ fun PaywallScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextButton(onClick = viewModel::restore, enabled = !state.isPurchasing) {
-                    Text(stringResource(Res.string.paywall_restore), color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.paywall_restore), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (state.entitlement.tier != Tier.FREE) {
                     TextButton(onClick = { uriHandler.openUri(PLAY_STORE_SUBSCRIPTIONS_URL) }) {
-                        Text(stringResource(Res.string.paywall_manage_google_play), color = NeonColors.Primary)
+                        Text(stringResource(Res.string.paywall_manage_google_play), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
             TextButton(onClick = { uriHandler.openUri(LEGAL_URL) }) {
-                Text(stringResource(Res.string.paywall_terms_privacy), color = NeonColors.TextTertiary)
+                Text(stringResource(Res.string.paywall_terms_privacy), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -460,7 +460,7 @@ private fun TierSelector(
     Row(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
-            .background(NeonColors.Surface)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -470,14 +470,14 @@ private fun TierSelector(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(if (selected) NeonColors.Background else Color.Transparent)
+                    .background(if (selected) MaterialTheme.colorScheme.background else Color.Transparent)
                     .clickable { onSelect(tier) }
                     .padding(horizontal = 4.dp, vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(tier.resource()),
-                    color = if (selected) NeonColors.TextPrimary else NeonColors.TextSecondary,
+                    color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                     maxLines = 1,
@@ -485,14 +485,14 @@ private fun TierSelector(
                 if (tier == popularTier) {
                     Text(
                         text = stringResource(Res.string.paywall_most_popular),
-                        color = NeonColors.Primary,
+                        color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1,
                     )
                 } else if (tier == currentTier) {
                     Text(
                         text = stringResource(Res.string.paywall_current_plan),
-                        color = NeonColors.Success,
+                        color = LocalAppColors.current.success,
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1,
                     )
@@ -515,10 +515,10 @@ private fun PlanOptionCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(if (selected) NeonColors.Primary.copy(alpha = 0.07f) else NeonColors.Surface)
+            .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.07f) else MaterialTheme.colorScheme.surfaceContainerLow)
             .border(
                 width = if (selected) 2.dp else 1.dp,
-                color = if (selected) NeonColors.Primary else NeonColors.CardBorder,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                 shape = shape,
             )
             .clickable(enabled = enabled, onClick = onClick)
@@ -529,11 +529,11 @@ private fun PlanOptionCard(
             modifier = Modifier
                 .size(22.dp)
                 .clip(CircleShape)
-                .border(2.dp, if (selected) NeonColors.Primary else NeonColors.TextTertiary, CircleShape),
+                .border(2.dp, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             if (selected) {
-                Box(Modifier.size(11.dp).clip(CircleShape).background(NeonColors.Primary))
+                Box(Modifier.size(11.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
             }
         }
         Spacer(Modifier.width(13.dp))
@@ -544,14 +544,14 @@ private fun PlanOptionCard(
                         if (plan.period == Period.MONTHLY) Res.string.paywall_period_monthly
                         else Res.string.paywall_period_yearly,
                     ),
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
                 if (recommended) {
                     Text(
                         text = stringResource(Res.string.paywall_most_popular),
-                        color = NeonColors.Primary,
+                        color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -562,14 +562,14 @@ private fun PlanOptionCard(
                     if (plan.period == Period.MONTHLY) Res.string.paywall_billed_monthly
                     else Res.string.paywall_billed_yearly,
                 ),
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
             )
         }
         Spacer(Modifier.width(8.dp))
         Text(
             text = plan.localizedPrice,
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -614,12 +614,12 @@ private fun IncludedFeaturesCard(tier: Tier, tierName: String) {
     Column(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(22.dp))
-            .background(Color(0xFF17171D))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(20.dp),
     ) {
         Text(
             text = stringResource(Res.string.paywall_included_title, tierName),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
         )
@@ -631,15 +631,15 @@ private fun IncludedFeaturesCard(tier: Tier, tierName: String) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(
-                        modifier = Modifier.size(24.dp).clip(CircleShape).background(Color.White),
+                        modifier = Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text("✓", color = Color(0xFF17171D), fontWeight = FontWeight.Bold)
+                        Text("✓", color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
                     }
                     Spacer(Modifier.width(12.dp))
                     Text(
                         text = stringResource(feature.textRes),
-                        color = Color(0xFFE5E7EB),
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -648,7 +648,7 @@ private fun IncludedFeaturesCard(tier: Tier, tierName: String) {
                     // taşıyan HER özelliğin hemen altında AÇIKÇA görünür olmalı.
                     Text(
                         text = stringResource(Res.string.paywall_fair_use_disclaimer),
-                        color = Color(0xFF9CA3AF),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.padding(start = 36.dp, top = 2.dp),
                     )
@@ -668,7 +668,7 @@ private fun ActivePlanCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = NeonColors.Primary.copy(alpha = 0.09f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.09f)),
         shape = RoundedCornerShape(20.dp),
     ) {
         Row(
@@ -676,16 +676,16 @@ private fun ActivePlanCard(
             verticalAlignment = Alignment.Top,
         ) {
             Box(
-                modifier = Modifier.size(34.dp).clip(CircleShape).background(NeonColors.Primary),
+                modifier = Modifier.size(34.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("✓", color = Color.White, fontWeight = FontWeight.Bold)
+                Text("✓", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     stringResource(Res.string.paywall_active_title, stringResource(tier.resource())),
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                 )
                 val detail = when {
@@ -713,7 +713,7 @@ private fun ActivePlanCard(
                     else -> null
                 }
                 detail?.let {
-                    Text(it, color = NeonColors.TextSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -746,7 +746,7 @@ private fun PlansLoadError(offline: Boolean, onRetry: () -> Unit) {
         Text(
             text = stringResource(if (offline) Res.string.error_offline else Res.string.paywall_load_error),
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
         Spacer(Modifier.height(12.dp))

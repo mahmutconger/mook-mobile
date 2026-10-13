@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.discover
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.layout.scaffoldPadding
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
@@ -45,7 +47,6 @@ import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.LimitSheet
 import com.mcclabs.mook.ui.components.ReportBottomSheet
-import com.mcclabs.mook.ui.theme.NeonColors
 import com.mcclabs.mook.util.getCurrentTimeMillis
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
@@ -131,8 +132,8 @@ fun DiscoverScreen(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = NeonColors.Background,
-                drawerContentColor = NeonColors.TextPrimary
+                drawerContainerColor = MaterialTheme.colorScheme.background,
+                drawerContentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 FiltersScreen(
                     onNavigateBack = {
@@ -157,7 +158,7 @@ fun DiscoverScreen(
                     title = {
                         Text(
                             text = stringResource(Res.string.discover_title),
-                            color = NeonColors.TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                     },
@@ -168,13 +169,13 @@ fun DiscoverScreen(
                             Icon(
                                 painter = painterResource(Res.drawable.ic_settings_minimalistic),
                                 contentDescription = stringResource(Res.string.discover_filters_cd),
-                                tint = NeonColors.TextPrimary,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = NeonColors.Background
+                        containerColor = MaterialTheme.colorScheme.background
                     )
                 )
             },
@@ -194,12 +195,12 @@ fun DiscoverScreen(
                     }
                 )
             },
-            containerColor = NeonColors.Background
+            containerColor = MaterialTheme.colorScheme.background
         ) { padding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
+                    .scaffoldPadding(padding)
             ) {
                 DiscoveryFilterBar(
                     roomLanguage = state.roomLanguage,
@@ -231,7 +232,7 @@ fun DiscoverScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(color = NeonColors.Primary)
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         }
 
                         state.error != null -> ErrorState(
@@ -343,21 +344,21 @@ fun DiscoverScreen(
         if (state.showBlockConfirmDialog) {
             AlertDialog(
                 onDismissRequest = { viewModel.onBlockDismiss() },
-                title = { Text(stringResource(Res.string.discover_block_user), color = NeonColors.Error) },
+                title = { Text(stringResource(Res.string.discover_block_user), color = MaterialTheme.colorScheme.error) },
                 text = {
-                    Text(stringResource(Res.string.discover_block_user_message), color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.discover_block_user_message), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 },
                 confirmButton = {
                     TextButton(onClick = { viewModel.confirmBlock() }) {
-                        Text(stringResource(Res.string.discover_block_confirm), color = NeonColors.Error)
+                        Text(stringResource(Res.string.discover_block_confirm), color = MaterialTheme.colorScheme.error)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.onBlockDismiss() }) {
-                        Text(stringResource(Res.string.discover_block_cancel), color = NeonColors.TextSecondary)
+                        Text(stringResource(Res.string.discover_block_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
-                containerColor = NeonColors.Card
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
         }
     }
@@ -402,7 +403,7 @@ private fun DiscoverMonetizationControls(
                 onClick = onBoost,
                 enabled = canBoost && !isBoostActive,
                 modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = NeonColors.PrimaryDark),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) {
                 Text(
                     text = if (boostRemainingMillis != null) {
@@ -435,23 +436,23 @@ private fun formatCountdown(remainingMillis: Long): String {
 private fun BoostCompletionDialog(viewsGained: Int, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = NeonColors.Card,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         title = {
             Text(
                 text = stringResource(Res.string.discover_boost_summary_title),
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
             )
         },
         text = {
             Text(
                 text = stringResource(Res.string.discover_boost_summary_body, viewsGained),
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.limit_sheet_ok_button), color = NeonColors.Primary)
+                Text(stringResource(Res.string.limit_sheet_ok_button), color = MaterialTheme.colorScheme.primary)
             }
         },
     )
@@ -468,14 +469,14 @@ private fun GridFooter(isLoading: Boolean) {
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(28.dp),
                 strokeWidth = 3.dp
             )
         } else {
             Text(
                 text = stringResource(Res.string.discover_no_more_profiles),
-                color = NeonColors.TextTertiary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -492,20 +493,20 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
         Icon(
             painter = painterResource(Res.drawable.ic_warning),
             contentDescription = null,
-            tint = NeonColors.Error,
+            tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(48.dp)
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = stringResource(Res.string.discover_error_couldnt_load_profiles),
-            color = NeonColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = message,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
@@ -528,13 +529,13 @@ private fun EmptyRoomState(onSwitchRoom: () -> Unit) {
         Icon(
             painter = painterResource(Res.drawable.ic_info_circle),
             contentDescription = null,
-            tint = NeonColors.TextTertiary,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(48.dp)
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = stringResource(Res.string.discover_empty_room_message),
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
@@ -553,13 +554,13 @@ private fun LikedMeOverlay(onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f))
+            .background(LocalAppColors.current.photoScrim.copy(alpha = 0.5f))
             .pointerInput(Unit) { detectTapGestures { } }, // intercept taps
         contentAlignment = Alignment.Center
     ) {
         Card(
             modifier = Modifier.padding(32.dp),
-            colors = CardDefaults.cardColors(containerColor = NeonColors.Card),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -568,7 +569,7 @@ private fun LikedMeOverlay(onDismiss: () -> Unit) {
             ) {
                 Text(
                     text = stringResource(Res.string.discover_liked_me_title),
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -576,7 +577,7 @@ private fun LikedMeOverlay(onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(Res.string.discover_liked_me_body),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )

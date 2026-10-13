@@ -1,132 +1,132 @@
 package com.mcclabs.mook.ui.theme
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.mcclabs.mook.domain.theme.ThemePreference
 
-/**
- * MOOK brand color palette — now supports both light and dark themes.
- *
- * Built on pure white (or deep purple) with a subtle purple-gray tint for surfaces, a Deep Purple
- * primary, a Vibrant Pink accent, and the pink→purple brand gradient
- * ([BrandGradient]) reserved for primary CTAs and active emphasis.
- */
-object NeonColors {
-    /** Primary app background. */
-    var Background by mutableStateOf(Color(0xFFFFFFFF))
-        internal set
+/** Material rollerine sığmayan renkler, eşleşen içerik renkleriyle birlikte tanımlanır. */
+@Immutable
+data class AppColors(
+    val gradientStart: Color,
+    val gradientEnd: Color,
+    val onGradient: Color,
+    val success: Color,
+    val onSuccess: Color,
+    val premiumStart: Color,
+    val premiumEnd: Color,
+    val onPremium: Color,
+    val photoScrim: Color,
+    val onPhoto: Color,
+    val photoControl: Color,
+    val onPhotoControl: Color,
+    val shimmerHighlight: Color,
+)
 
-    /** Elevated / secondary surface. */
-    var Surface by mutableStateOf(Color(0xFFF4F4F9))
-        internal set
+@Immutable
+data class ThemePalette(val scheme: ColorScheme, val colors: AppColors)
 
-    /** Card / container fill. */
-    var Card by mutableStateOf(Color(0xFFF4F4F9))
-        internal set
-
-    /** Light hairline border for cards and dividers. */
-    var CardBorder by mutableStateOf(Color(0xFFE8E8EF))
-        internal set
-
-    /** Deep Purple — primary: secondary buttons, important borders, headings. */
-    var Primary by mutableStateOf(Color(0xFF7218B3))
-        internal set
-
-    /** Darker purple for pressed / gradient-endpoint solid states. */
-    var PrimaryDark by mutableStateOf(Color(0xFF5A0F8F))
-        internal set
-
-    /** Vibrant Pink accent — badges, active toggles, error states. */
-    var Accent by mutableStateOf(Color(0xFFFF3562))
-        internal set
-
-    /** Brand gradient start (Vibrant Pink). */
-    var GradientStart by mutableStateOf(Color(0xFFFF3562))
-        internal set
-
-    /** Brand gradient end (Deep Purple). */
-    var GradientEnd by mutableStateOf(Color(0xFF7218B3))
-        internal set
-
-    /** Primary text. */
-    var TextPrimary by mutableStateOf(Color(0xFF111827))
-        internal set
-
-    /** Secondary text / placeholders. */
-    var TextSecondary by mutableStateOf(Color(0xFF6B7280))
-        internal set
-
-    /** Tertiary text — dimmed gray. */
-    var TextTertiary by mutableStateOf(Color(0xFF9CA3AF))
-        internal set
-
-    /** Error / destructive. */
-    var Error by mutableStateOf(Color(0xFFFF3562))
-        internal set
-
-    /** Success / positive action color. */
-    var Success by mutableStateOf(Color(0xFF22C55E))
-        internal set
-
-    /** Glassmorphism / elevated card fill. */
-    var GlassBackground by mutableStateOf(Color(0xFFF4F4F9))
-        internal set
-
-    /** Text-field / input background fill. */
-    var InputBackground by mutableStateOf(Color(0xFFE5E5EF))
-        internal set
-
-    /** Divider / separator color. */
-    var DividerColor by mutableStateOf(Color(0xFFE8E8EF))
-        internal set
-
-    fun updateTheme(isDark: Boolean) {
-        if (isDark) {
-            Background = Color(0xFF0B0714)
-            Surface = Color(0xFF1A1423)
-            Card = Color(0xFF1A1423)
-            CardBorder = Color(0x1AFFFFFF) // subtle white/10
-            Primary = Color(0xFF7218B3)
-            PrimaryDark = Color(0xFF5A0F8F)
-            Accent = Color(0xFFFF3562)
-            GradientStart = Color(0xFFFF3562)
-            GradientEnd = Color(0xFF7218B3)
-            TextPrimary = Color(0xFFF8F8F8)
-            TextSecondary = Color(0xFFA09AB0)
-            TextTertiary = Color(0xFF6B7280) // darker gray
-            Error = Color(0xFFFF3562)
-            Success = Color(0xFF22C55E)
-            GlassBackground = Color(0xFF1A1423)
-            InputBackground = Color(0xFF1E1E1E)
-            DividerColor = Color(0x1AFFFFFF)
-        } else {
-            Background = Color(0xFFFFFFFF)
-            Surface = Color(0xFFF4F4F9)
-            Card = Color(0xFFF4F4F9)
-            CardBorder = Color(0xFFE8E8EF)
-            Primary = Color(0xFF7218B3)
-            PrimaryDark = Color(0xFF5A0F8F)
-            Accent = Color(0xFFFF3562)
-            GradientStart = Color(0xFFFF3562)
-            GradientEnd = Color(0xFF7218B3)
-            TextPrimary = Color(0xFF111827)
-            TextSecondary = Color(0xFF6B7280)
-            TextTertiary = Color(0xFF9CA3AF)
-            Error = Color(0xFFFF3562)
-            Success = Color(0xFF22C55E)
-            GlassBackground = Color(0xFFF4F4F9)
-            InputBackground = Color(0xFFE5E5EF)
-            DividerColor = Color(0xFFE8E8EF)
-        }
+/** Yeni özel temalar bu fabrikaya eklenir; bileşenler yalnızca semantik rolleri okur. */
+fun themePalette(preference: ThemePreference, systemDark: Boolean): ThemePalette {
+    val dark = preference.isDark(systemDark)
+    val ocean = preference == ThemePreference.Ocean
+    val primary = when {
+        ocean && dark -> Color(0xFF8CD2E5)
+        ocean -> Color(0xFF00677D)
+        dark -> Color(0xFFD9AEFF)
+        else -> Color(0xFF7218B3)
     }
+    val onPrimary = when {
+        ocean && dark -> Color(0xFF003642)
+        dark -> Color(0xFF39005C)
+        else -> Color.White
+    }
+    val primaryContainer = when {
+        ocean && dark -> Color(0xFF004E5F)
+        ocean -> Color(0xFFB5EBF8)
+        dark -> Color(0xFF552075)
+        else -> Color(0xFFF0DCFF)
+    }
+    val onPrimaryContainer = when {
+        ocean && dark -> Color(0xFFB5EBF8)
+        ocean -> Color(0xFF001F28)
+        dark -> Color(0xFFF0DCFF)
+        else -> Color(0xFF290044)
+    }
+    val background = if (dark) Color(0xFF0F1018) else Color(0xFFFEFBFF)
+    val surface = if (dark) Color(0xFF171721) else Color(0xFFFEFBFF)
+    val onSurface = if (dark) Color(0xFFEAE1EE) else Color(0xFF201A24)
+    val container = if (dark) Color(0xFF24232F) else Color(0xFFF3EDF6)
+    val variant = if (dark) Color(0xFF484350) else Color(0xFFE9E0ED)
+    val onVariant = if (dark) Color(0xFFCDC2D3) else Color(0xFF4D4355)
+    val secondary = if (dark) Color(0xFFFFB1C3) else Color(0xFFAD1645)
+    val onSecondary = if (dark) Color(0xFF650022) else Color.White
+    val secondaryContainer = if (dark) Color(0xFF890B36) else Color(0xFFFFD9E2)
+    val onSecondaryContainer = if (dark) Color(0xFFFFD9E2) else Color(0xFF400014)
+    val error = if (dark) Color(0xFFFFB4AB) else Color(0xFFBA1A1A)
+    val onError = if (dark) Color(0xFF690005) else Color.White
+    val success = if (dark) Color(0xFF80DB9B) else Color(0xFF006D36)
+    val onSuccess = if (dark) Color(0xFF003919) else Color.White
+    val scheme = (if (dark) darkColorScheme() else lightColorScheme()).copy(
+        primary = primary, onPrimary = onPrimary,
+        primaryContainer = primaryContainer, onPrimaryContainer = onPrimaryContainer,
+        inversePrimary = when {
+            ocean && dark -> Color(0xFF00677D)
+            ocean -> Color(0xFF8CD2E5)
+            dark -> Color(0xFF7218B3)
+            else -> Color(0xFFD9AEFF)
+        },
+        primaryFixed = if (ocean) Color(0xFFB5EBF8) else Color(0xFFF0DCFF),
+        primaryFixedDim = if (ocean) Color(0xFF8CD2E5) else Color(0xFFD9AEFF),
+        onPrimaryFixed = if (ocean) Color(0xFF001F28) else Color(0xFF290044),
+        onPrimaryFixedVariant = if (ocean) Color(0xFF004E5F) else Color(0xFF552075),
+        secondaryFixed = Color(0xFFFFD9E2), secondaryFixedDim = Color(0xFFFFB1C3),
+        onSecondaryFixed = Color(0xFF400014), onSecondaryFixedVariant = Color(0xFF890B36),
+        tertiaryFixed = Color(0xFFA0F5B6), tertiaryFixedDim = Color(0xFF80DB9B),
+        onTertiaryFixed = Color(0xFF00210B), onTertiaryFixedVariant = Color(0xFF005227),
+        secondary = secondary, onSecondary = onSecondary,
+        secondaryContainer = secondaryContainer, onSecondaryContainer = onSecondaryContainer,
+        tertiary = success, onTertiary = onSuccess,
+        tertiaryContainer = if (dark) Color(0xFF005227) else Color(0xFFA0F5B6),
+        onTertiaryContainer = if (dark) Color(0xFFA0F5B6) else Color(0xFF00210B),
+        background = background, onBackground = onSurface,
+        surface = surface, onSurface = onSurface,
+        surfaceVariant = variant, onSurfaceVariant = onVariant,
+        surfaceTint = primary,
+        surfaceDim = if (dark) surface else Color(0xFFDDD5DF),
+        surfaceBright = if (dark) Color(0xFF393641) else surface,
+        surfaceContainerLowest = background,
+        surfaceContainerLow = if (dark) Color(0xFF1D1B26) else Color(0xFFF8F2FB),
+        surfaceContainer = container,
+        surfaceContainerHigh = if (dark) Color(0xFF2E2B37) else Color(0xFFEDE7F0),
+        surfaceContainerHighest = if (dark) Color(0xFF393641) else Color(0xFFE7E1EA),
+        inverseSurface = if (dark) Color(0xFFEAE1EE) else Color(0xFF352F39),
+        inverseOnSurface = if (dark) Color(0xFF352F39) else Color(0xFFF8F2FB),
+        outline = if (dark) Color(0xFF978C9E) else Color(0xFF7E7187),
+        outlineVariant = variant,
+        scrim = Color.Black,
+        error = error, onError = onError,
+        errorContainer = if (dark) Color(0xFF93000A) else Color(0xFFFFDAD6),
+        onErrorContainer = if (dark) Color(0xFFFFDAD6) else Color(0xFF410002),
+    )
+    return ThemePalette(scheme, AppColors(
+        gradientStart = if (ocean) Color(0xFF00677D) else Color(0xFFAD1645),
+        gradientEnd = if (ocean) Color(0xFF004B65) else Color(0xFF7218B3),
+        onGradient = Color.White,
+        success = success, onSuccess = onSuccess,
+        premiumStart = Color(0xFFF5B301), premiumEnd = Color(0xFFFF8A00), onPremium = Color(0xFF251500),
+        photoScrim = Color.Black, onPhoto = Color.White,
+        photoControl = Color.White, onPhotoControl = Color(0xFF201A24),
+        shimmerHighlight = onSurface.copy(alpha = if (dark) 0.12f else 0.08f),
+    ))
 }
 
-/**
- * The core MOOK brand gradient: Vibrant Pink → Deep Purple, left to right.
- */
+val LocalAppColors = staticCompositionLocalOf { themePalette(ThemePreference.System, false).colors }
+
 val BrandGradient: Brush
-    get() = Brush.horizontalGradient(
-        colors = listOf(NeonColors.GradientStart, NeonColors.GradientEnd),
-    )
+    @Composable get() = Brush.horizontalGradient(listOf(LocalAppColors.current.gradientStart, LocalAppColors.current.gradientEnd))

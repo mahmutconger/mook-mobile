@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 
 @Composable
 fun LocationChip(
@@ -29,9 +29,9 @@ fun LocationChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (isSelected) NeonColors.Primary.copy(alpha = 0.15f) else NeonColors.Card
-    val borderColor = if (isSelected) NeonColors.Primary else NeonColors.CardBorder
-    val contentColor = if (isSelected) NeonColors.Primary else NeonColors.TextSecondary
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceContainer
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

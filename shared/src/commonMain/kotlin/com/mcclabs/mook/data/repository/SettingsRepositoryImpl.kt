@@ -118,38 +118,6 @@ class SettingsRepositoryImpl : SettingsRepository {
         )
     }
 
-    private val isDarkModeFlow = MutableStateFlow(false)
-    private var darkModeLoadedForUid: String? = null
-
-    override fun observeIsDarkMode(): Flow<Boolean> = isDarkModeFlow.asStateFlow()
-
-    override suspend fun getIsDarkMode(): Boolean {
-        val userId = Firebase.auth.currentUser?.uid ?: return false
-        if (darkModeLoadedForUid == userId) return isDarkModeFlow.value
-
-        val isDark = try {
-            val document = appFirestore.collection("users").document(userId).get()
-            runCatching { document.get<Boolean>("isDarkMode") }.getOrNull() ?: false
-        } catch (e: Exception) {
-            Log.e("Koyu tema tercihi okunamadı, varsayılana dönülüyor", e)
-            false
-        }
-
-        isDarkModeFlow.value = isDark
-        darkModeLoadedForUid = userId
-        return isDark
-    }
-
-    override suspend fun setIsDarkMode(isDark: Boolean) {
-        val userId = Firebase.auth.currentUser?.uid ?: return
-        appFirestore.collection("users").document(userId).set(
-            mapOf("isDarkMode" to isDark),
-            merge = true
-        )
-        isDarkModeFlow.value = isDark
-        darkModeLoadedForUid = userId
-    }
-
     private val appLanguageFlow = MutableStateFlow("en")
     private var appLanguageLoadedForUid: String? = null
 

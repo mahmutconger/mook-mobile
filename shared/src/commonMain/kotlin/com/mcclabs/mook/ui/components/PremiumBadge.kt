@@ -1,5 +1,6 @@
 package com.mcclabs.mook.ui.components
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,10 +25,6 @@ import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.premium_badge
 import org.jetbrains.compose.resources.stringResource
 
-/** Altın tonlu Premium rozeti renkleri (tema renginden bağımsız, her iki modda okunaklı). */
-private val PremiumGold = Color(0xFFF5B301)
-private val PremiumAmber = Color(0xFFFF8A00)
-
 /**
  * Premium abonelerin profillerinde (Keşfet kartı, profil ayrıntısı) gösterilen rozet.
  * Kademe bilgisi sunucudan gelir (`public_profiles.subscriptionTier`); istemci tarafından
@@ -38,16 +35,16 @@ fun PremiumBadge(modifier: Modifier = Modifier, compact: Boolean = false) {
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(Brush.horizontalGradient(listOf(PremiumGold, PremiumAmber)))
+            .background(Brush.horizontalGradient(listOf(LocalAppColors.current.premiumStart, LocalAppColors.current.premiumEnd)))
             .padding(horizontal = if (compact) 6.dp else 8.dp, vertical = if (compact) 2.dp else 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Filled.Star, contentDescription = null, tint = Color.White, modifier = Modifier.size(if (compact) 12.dp else 14.dp))
+        Icon(Icons.Filled.Star, contentDescription = null, tint = LocalAppColors.current.onPremium, modifier = Modifier.size(if (compact) 12.dp else 14.dp))
         if (!compact) {
             Spacer(Modifier.width(4.dp))
             Text(
                 text = stringResource(Res.string.premium_badge),
-                color = Color.White,
+                color = LocalAppColors.current.onPremium,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.labelSmall,
             )

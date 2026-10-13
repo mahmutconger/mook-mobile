@@ -2,7 +2,9 @@ package com.mcclabs.mook.ads
 
 import androidx.compose.runtime.collectAsState
 import android.content.pm.ApplicationInfo
-import android.graphics.Color
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.toArgb
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
@@ -137,14 +139,18 @@ actual fun NativeAdFeedCard(isFree: Boolean, modifier: Modifier, placement: Stri
     }
 
     if (!nativeActive || !isFree || !canRequestAds || loadedAd == null) return
+    val colorScheme = MaterialTheme.colorScheme
     AndroidView(
         modifier = modifier.fillMaxWidth(),
-        factory = { createNativeAdView(context, loadedAd!!, sponsoredLabel) },
-        update = { bindNativeAd(it, loadedAd!!, sponsoredLabel) },
+        factory = { createNativeAdView(context, loadedAd!!, sponsoredLabel, colorScheme) },
+        update = {
+            bindNativeAd(it, loadedAd!!, sponsoredLabel)
+            applyNativeAdPalette(it, colorScheme)
+        },
     )
 }
 
-private fun createNativeAdView(context: android.content.Context, ad: NativeAd, sponsoredLabel: String): NativeAdView {
+private fun createNativeAdView(context: android.content.Context, ad: NativeAd, sponsoredLabel: String, colorScheme: ColorScheme): NativeAdView {
     val density = context.resources.displayMetrics.density
     fun dp(value: Int) = (value * density).toInt()
     val nativeView = NativeAdView(context)
@@ -152,15 +158,15 @@ private fun createNativeAdView(context: android.content.Context, ad: NativeAd, s
         orientation = LinearLayout.VERTICAL
         setPadding(dp(14), dp(12), dp(14), dp(12))
         background = GradientDrawable().apply {
-            setColor(Color.rgb(29, 29, 38))
+            setColor(colorScheme.surfaceContainer.toArgb())
             cornerRadius = dp(18).toFloat()
-            setStroke(dp(1), Color.rgb(70, 70, 84))
+            setStroke(dp(1), colorScheme.outlineVariant.toArgb())
         }
     }
     val attribution = TextView(context).apply {
         text = sponsoredLabel
         textSize = 11f
-        setTextColor(Color.rgb(190, 190, 202))
+        setTextColor(colorScheme.onSurfaceVariant.toArgb())
     }
     val header = LinearLayout(context).apply {
         orientation = LinearLayout.HORIZONTAL
@@ -175,12 +181,12 @@ private fun createNativeAdView(context: android.content.Context, ad: NativeAd, s
     val headline = TextView(context).apply {
         textSize = 15f
         typeface = Typeface.DEFAULT_BOLD
-        setTextColor(Color.WHITE)
+        setTextColor(colorScheme.onSurface.toArgb())
         maxLines = 2
     }
     val advertiser = TextView(context).apply {
         textSize = 12f
-        setTextColor(Color.rgb(186, 186, 199))
+        setTextColor(colorScheme.onSurfaceVariant.toArgb())
         maxLines = 1
     }
     textColumn.addView(headline)
@@ -189,14 +195,14 @@ private fun createNativeAdView(context: android.content.Context, ad: NativeAd, s
 
     val body = TextView(context).apply {
         textSize = 13f
-        setTextColor(Color.rgb(216, 216, 224))
+        setTextColor(colorScheme.onSurface.toArgb())
         maxLines = 3
         setPadding(0, dp(8), 0, dp(8))
     }
     val callToAction = Button(context).apply {
         isAllCaps = false
-        setTextColor(Color.WHITE)
-        setBackgroundColor(Color.rgb(104, 74, 255))
+        setTextColor(colorScheme.onPrimary.toArgb())
+        setBackgroundColor(colorScheme.primary.toArgb())
     }
     content.addView(attribution)
     content.addView(header, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
@@ -218,6 +224,23 @@ private fun createNativeAdView(context: android.content.Context, ad: NativeAd, s
     nativeView.callToActionView = callToAction
     bindNativeAd(nativeView, ad, sponsoredLabel)
     return nativeView
+}
+
+/** AndroidView yeniden oluşturulmadan mevcut reklamın bütün renkleri güncellenir. */
+private fun applyNativeAdPalette(view: NativeAdView, scheme: ColorScheme) {
+    val content = view.getChildAt(0) as LinearLayout
+    (content.background as GradientDrawable).apply {
+        setColor(scheme.surfaceContainer.toArgb())
+        setStroke((content.resources.displayMetrics.density).toInt(), scheme.outlineVariant.toArgb())
+    }
+    (content.getChildAt(0) as TextView).setTextColor(scheme.onSurfaceVariant.toArgb())
+    (view.headlineView as? TextView)?.setTextColor(scheme.onSurface.toArgb())
+    (view.advertiserView as? TextView)?.setTextColor(scheme.onSurfaceVariant.toArgb())
+    (view.bodyView as? TextView)?.setTextColor(scheme.onSurface.toArgb())
+    (view.callToActionView as? Button)?.apply {
+        setTextColor(scheme.onPrimary.toArgb())
+        backgroundTintList = android.content.res.ColorStateList.valueOf(scheme.primary.toArgb())
+    }
 }
 
 private fun bindNativeAd(view: NativeAdView, ad: NativeAd, sponsoredLabel: String) {

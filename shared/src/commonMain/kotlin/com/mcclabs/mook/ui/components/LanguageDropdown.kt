@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.model.Language
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.dropdown_select
 import mook.shared.generated.resources.dropdown_expand_cd
@@ -61,7 +60,7 @@ fun LanguageDropdown(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -71,7 +70,7 @@ fun LanguageDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(NeonColors.InputBackground)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                 .clickable { expanded = true }
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -85,14 +84,14 @@ fun LanguageDropdown(
                 Text(
                     text = selectedLanguage.name,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f),
                 )
             } else {
                 Text(
                     text = stringResource(Res.string.dropdown_select),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -100,7 +99,7 @@ fun LanguageDropdown(
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
                 contentDescription = stringResource(Res.string.dropdown_expand_cd),
-                tint = NeonColors.TextSecondary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -109,7 +108,7 @@ fun LanguageDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .background(NeonColors.InputBackground),
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest),
         ) {
             languages.forEach { language ->
                 DropdownMenuItem(
@@ -123,7 +122,7 @@ fun LanguageDropdown(
                             Text(
                                 text = language.name,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = NeonColors.TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     },

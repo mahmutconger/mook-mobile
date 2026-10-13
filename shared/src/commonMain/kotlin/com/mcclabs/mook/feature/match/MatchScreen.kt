@@ -16,7 +16,6 @@ import com.mcclabs.mook.ui.components.LinkedAvatars
 import com.mcclabs.mook.ui.components.WalkTalkRedirectDialog
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.ParticleBackground
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.painterResource
@@ -60,7 +59,7 @@ fun MatchScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         ParticleBackground()
         
@@ -71,7 +70,7 @@ fun MatchScreen(
         ) {
             Text(
                 text = stringResource(Res.string.match_title),
-                color = NeonColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.displayMedium,
@@ -81,7 +80,7 @@ fun MatchScreen(
             state.matchedUserName?.let { name ->
                 Text(
                     text = stringResource(Res.string.match_liked_each_other, name),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 32.dp)
                 )
@@ -105,7 +104,7 @@ fun MatchScreen(
             TextButton(onClick = onKeepSwiping) {
                 Text(
                     text = stringResource(Res.string.match_keep_swiping),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold
                 )
             }

@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.liked
 
+import com.mcclabs.mook.ui.layout.scaffoldPadding
 import mook.shared.generated.resources.liked_me_title
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +27,6 @@ import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.components.NeonChip
 import com.mcclabs.mook.ui.components.NeonPrimaryButton
 import com.mcclabs.mook.ui.components.WalkTalkDemoPromoCard
-import com.mcclabs.mook.ui.theme.NeonColors
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import mook.shared.generated.resources.Res
@@ -61,18 +61,18 @@ fun LikedScreen(
                 title = {
                     Text(
                         text = stringResource(Res.string.nav_liked),
-                        color = NeonColors.Primary,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 },
                 actions = {
                     TextButton(onClick = onNavigateToLikedMe) {
-                        Icon(Icons.Filled.Favorite, contentDescription = null, tint = NeonColors.Primary)
+                        Icon(Icons.Filled.Favorite, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.width(6.dp))
-                        Text(stringResource(Res.string.liked_me_title), color = NeonColors.Primary)
+                        Text(stringResource(Res.string.liked_me_title), color = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
         bottomBar = {
@@ -89,14 +89,14 @@ fun LikedScreen(
                 }
             )
         },
-        containerColor = NeonColors.Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().scaffoldPadding(padding),
             contentAlignment = Alignment.Center
         ) {
             when {
-                state.isLoading -> CircularProgressIndicator(color = NeonColors.Primary)
+                state.isLoading -> CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
 
                 state.error != null -> Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -104,14 +104,14 @@ fun LikedScreen(
                 ) {
                     Text(
                         text = stringResource(Res.string.liked_load_error_title),
-                        color = NeonColors.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = state.error.orEmpty(),
-                        color = NeonColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
@@ -125,7 +125,7 @@ fun LikedScreen(
 
                 state.liked.isEmpty() -> Text(
                     text = stringResource(Res.string.liked_empty),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -155,7 +155,7 @@ private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(NeonColors.Card)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(onClick = onClick)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -164,13 +164,13 @@ private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
         val photo = profile.photoUrls.firstOrNull()
         if (photo.isNullOrBlank()) {
             Box(
-                modifier = Modifier.size(56.dp).clip(CircleShape).background(NeonColors.Surface),
+                modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerLow),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_user),
                     contentDescription = null,
-                    tint = NeonColors.TextTertiary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -179,7 +179,7 @@ private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
                 model = photo,
                 contentDescription = profile.name,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(56.dp).clip(CircleShape).background(NeonColors.Surface)
+                modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerLow)
             )
         }
 
@@ -189,7 +189,7 @@ private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
             Text(
                 // Age is omitted rather than guessed when no birth date was given.
                 text = profile.age?.let { "${profile.name}, $it" } ?: profile.name,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -201,7 +201,7 @@ private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = subtitle,
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

@@ -123,7 +123,16 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+import com.mcclabs.mook.feature.theme.ThemeViewModel
+import com.mcclabs.mook.domain.repository.ThemeRepository
+import com.mcclabs.mook.data.repository.ThemeRepositoryImpl
+import com.mcclabs.mook.data.repository.FirebaseLegacyThemePreferenceSource
+
 val appModule = module {
+    single<ThemeRepository> {
+        ThemeRepositoryImpl(createLocalKeyValueStore("mook_theme"), FirebaseLegacyThemePreferenceSource())
+    }
+    viewModelOf(::ThemeViewModel)
     singleOf(::AuthRepositoryImpl) bind AuthRepository::class
     singleOf(::LanguageRepositoryImpl) bind LanguageRepository::class
     singleOf(::DiscoverRepositoryImpl) bind DiscoverRepository::class

@@ -1,5 +1,7 @@
 package com.mcclabs.mook.feature.chatlist
 
+import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.layout.scaffoldPadding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +39,6 @@ import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.ChatRoom
 import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.theme.BrandGradient
-import com.mcclabs.mook.ui.theme.NeonColors
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import com.mcclabs.mook.util.ChatTimestampLabel
@@ -73,11 +74,11 @@ fun ChatListScreen(
                 title = {
                     Text(
                         text = stringResource(Res.string.chat_list_title),
-                        color = NeonColors.Primary,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NeonColors.Background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
         bottomBar = {
@@ -94,26 +95,26 @@ fun ChatListScreen(
                 }
             )
         },
-        containerColor = NeonColors.Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         when {
             state.isLoading -> {
-                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = NeonColors.Primary)
+                Box(Modifier.fillMaxSize().scaffoldPadding(padding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             }
             state.rooms.isEmpty() -> {
-                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Box(Modifier.fillMaxSize().scaffoldPadding(padding), contentAlignment = Alignment.Center) {
                     Text(
                         text = stringResource(Res.string.chat_list_empty),
-                        color = NeonColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
             else -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(padding),
+                    modifier = Modifier.fillMaxSize().scaffoldPadding(padding),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -145,7 +146,7 @@ private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit)
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
-            .background(NeonColors.Card)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable(onClick = onClick)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -156,7 +157,7 @@ private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit)
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(NeonColors.Background)
+                .background(MaterialTheme.colorScheme.background)
         )
         
         Spacer(Modifier.width(12.dp))
@@ -165,7 +166,7 @@ private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit)
             Text(
                 text = room.peerName ?: stringResource(Res.string.chat_unknown_peer),
                 style = MaterialTheme.typography.titleMedium,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -173,7 +174,7 @@ private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit)
             Text(
                 text = prefix + messageText,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (room.unreadCount > 0) NeonColors.TextPrimary else NeonColors.TextSecondary,
+                color = if (room.unreadCount > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = if (room.unreadCount > 0) FontWeight.Bold else FontWeight.Normal,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -199,7 +200,7 @@ private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit)
                 Text(
                     text = labelText,
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (room.unreadCount > 0) NeonColors.Primary else NeonColors.TextTertiary,
+                    color = if (room.unreadCount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = if (room.unreadCount > 0) FontWeight.Bold else FontWeight.Normal,
                     maxLines = 1,
                 )
@@ -216,7 +217,7 @@ private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit)
                 ) {
                     Text(
                         text = room.unreadCount.toString(),
-                        color = NeonColors.Background,
+                        color = LocalAppColors.current.onGradient,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold
                     )

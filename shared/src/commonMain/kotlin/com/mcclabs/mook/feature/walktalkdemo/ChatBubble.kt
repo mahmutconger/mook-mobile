@@ -36,7 +36,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.translation.TranslationError
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.wtdemo_bubble_cd
 import mook.shared.generated.resources.wtdemo_retry
@@ -72,7 +71,7 @@ fun ChatBubble(
         bottomStart = if (isRight) 20.dp else 4.dp,
         bottomEnd = if (isRight) 4.dp else 20.dp,
     )
-    val fill = if (isRight) NeonColors.Primary.copy(alpha = 0.10f) else NeonColors.Card
+    val fill = if (isRight) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f) else MaterialTheme.colorScheme.surfaceContainer
     val translatingLabel = stringResource(Res.string.wtdemo_translating)
 
     // The translation and its original are one utterance to a screen reader, not two
@@ -96,7 +95,7 @@ fun ChatBubble(
                 .widthIn(max = 320.dp)
                 .clip(bubbleShape)
                 .background(fill)
-                .border(1.dp, NeonColors.CardBorder, bubbleShape)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, bubbleShape)
                 .padding(horizontal = 14.dp, vertical = 10.dp),
         ) {
             // Only the text is collapsed into one description; the retry button below
@@ -110,14 +109,14 @@ fun ChatBubble(
                     is BubbleTranslation.Done -> Text(
                         text = translation.text,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = NeonColors.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Medium,
                     )
 
                     is BubbleTranslation.Failed -> Text(
                         text = errorText(translation.error),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = NeonColors.Error,
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
 
@@ -127,13 +126,13 @@ fun ChatBubble(
                     Text(
                         text = message.sourceCode,
                         style = MaterialTheme.typography.labelSmall,
-                        color = NeonColors.TextTertiary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
                         text = message.originalText,
                         style = MaterialTheme.typography.bodySmall,
-                        color = NeonColors.TextTertiary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -146,14 +145,14 @@ fun ChatBubble(
                     Icon(
                         imageVector = Icons.Filled.Refresh,
                         contentDescription = null,
-                        tint = NeonColors.Primary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
                         text = stringResource(Res.string.wtdemo_retry),
                         style = MaterialTheme.typography.labelLarge,
-                        color = NeonColors.Primary,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -174,7 +173,7 @@ fun TypingIndicator(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(50))
-            .background(NeonColors.InputBackground)
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .padding(horizontal = 12.dp, vertical = 6.dp)
             .clearAndSetSemantics { },
         verticalAlignment = Alignment.CenterVertically,
@@ -199,7 +198,7 @@ private fun PulsingText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
-        color = NeonColors.TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.alpha(pulseAlpha),
     )
 }

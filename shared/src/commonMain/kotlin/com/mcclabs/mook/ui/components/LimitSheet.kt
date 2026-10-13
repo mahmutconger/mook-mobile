@@ -24,7 +24,6 @@ import com.mcclabs.mook.domain.billing.RewardType
 import com.mcclabs.mook.domain.billing.BillingConfig
 import com.mcclabs.mook.domain.billing.EntitlementState
 import com.mcclabs.mook.domain.billing.LimitReason
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.discover_block_cancel
 import mook.shared.generated.resources.discover_swipe_limit_body
@@ -114,11 +113,11 @@ fun LimitSheet(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = NeonColors.Card,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         title = {
             Text(
                 text = stringResource(titleRes),
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
             )
         },
@@ -126,7 +125,7 @@ fun LimitSheet(
             Column {
                 Text(
                     text = stringResource(bodyRes, limit),
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 if (offerRewardedAd && rewardType != null) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -141,7 +140,7 @@ fun LimitSheet(
                     OutlinedButton(onClick = onStartTrial, modifier = Modifier.fillMaxWidth()) {
                         Text(
                             text = stringResource(Res.string.limit_sheet_try_standard_trial, trialOffer.trialDays),
-                            color = NeonColors.Primary,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -152,7 +151,7 @@ fun LimitSheet(
                     Text(
                         text = stringResource(Res.string.limit_sheet_come_back_tomorrow),
                         style = MaterialTheme.typography.labelLarge,
-                        color = NeonColors.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     MidnightCountdownText()
                 }
@@ -163,7 +162,7 @@ fun LimitSheet(
                 isFairUseCap -> {
                     // Yükseltme bu limiti çözmeyeceğinden yükseltme CTA'sı hiç gösterilmez.
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(Res.string.limit_sheet_ok_button), color = NeonColors.Primary)
+                        Text(stringResource(Res.string.limit_sheet_ok_button), color = MaterialTheme.colorScheme.primary)
                     }
                 }
                 // Gereksinim 1.10: aktif bir denemedeyken genel "Yükselt" teşviki bastırılır.
@@ -173,12 +172,12 @@ fun LimitSheet(
                 // kullanıcı zaten bir kademeyi deniyorken tekrar "yükselt" göstermek gürültüdür.
                 entitlement.inTrial -> {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(Res.string.limit_sheet_ok_button), color = NeonColors.Primary)
+                        Text(stringResource(Res.string.limit_sheet_ok_button), color = MaterialTheme.colorScheme.primary)
                     }
                 }
                 else -> {
                     TextButton(onClick = onUpgrade) {
-                        Text(stringResource(Res.string.discover_upgrade_cta), color = NeonColors.Primary)
+                        Text(stringResource(Res.string.discover_upgrade_cta), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -186,7 +185,7 @@ fun LimitSheet(
         dismissButton = {
             if (!isFairUseCap) {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(Res.string.discover_block_cancel), color = NeonColors.TextSecondary)
+                    Text(stringResource(Res.string.discover_block_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         },

@@ -26,7 +26,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.mcclabs.mook.ui.theme.NeonColors
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.eye_closed_svgrepo_com
 import mook.shared.generated.resources.eye_svgrepo_com
@@ -37,7 +36,7 @@ import org.jetbrains.compose.resources.painterResource
  * A dark-themed text field designed for authentication and form screens.
  *
  * Features:
- * - Dark [NeonColors.InputBackground] fill with no default underline indicator.
+ * - Dark [MaterialTheme.colorScheme.surfaceContainerHighest] fill with no default underline indicator.
  * - Cyan cursor and focus highlight.
  * - Optional password visibility toggle (eye icon).
  * - Error state: red border and error message below the field.
@@ -74,7 +73,7 @@ fun CustomAuthTextField(
 
     val shape = RoundedCornerShape(12.dp)
     val borderColor = when {
-        isError -> NeonColors.Error
+        isError -> MaterialTheme.colorScheme.error
         else -> Color.Transparent
     }
 
@@ -83,7 +82,7 @@ fun CustomAuthTextField(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = NeonColors.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -96,7 +95,7 @@ fun CustomAuthTextField(
                 Text(
                     text = placeholder,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = NeonColors.TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
             singleLine = singleLine,
@@ -115,7 +114,7 @@ fun CustomAuthTextField(
                     Icon(
                         painter = painterResource(icon),
                         contentDescription = null,
-                        tint = NeonColors.TextSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -137,7 +136,7 @@ fun CustomAuthTextField(
                                 } else {
                                     "Show password"
                                 },
-                                tint = NeonColors.TextSecondary,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(20.dp),
                             )
                         }
@@ -147,16 +146,16 @@ fun CustomAuthTextField(
                 else -> null
             },
             colors = TextFieldDefaults.colors(
-                focusedTextColor = NeonColors.TextPrimary,
-                unfocusedTextColor = NeonColors.TextPrimary,
-                cursorColor = NeonColors.Primary,
-                focusedContainerColor = NeonColors.InputBackground,
-                unfocusedContainerColor = NeonColors.InputBackground,
-                errorContainerColor = NeonColors.InputBackground,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                errorContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 errorIndicatorColor = Color.Transparent,
-                errorCursorColor = NeonColors.Error,
+                errorCursorColor = MaterialTheme.colorScheme.error,
             ),
             shape = shape,
             modifier = Modifier
@@ -174,7 +173,7 @@ fun CustomAuthTextField(
             Text(
                 text = errorMessage,
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonColors.Error,
+                color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(start = 4.dp),
             )
         }

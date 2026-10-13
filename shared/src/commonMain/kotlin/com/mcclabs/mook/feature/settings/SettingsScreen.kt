@@ -51,7 +51,6 @@ import com.mcclabs.mook.domain.billing.Tier
 import com.mcclabs.mook.domain.billing.playStoreSubscriptionManagementUrl
 import com.mcclabs.mook.ads.AdPrivacyOptionsEntry
 import com.mcclabs.mook.ui.components.NeonToggle
-import com.mcclabs.mook.ui.theme.NeonColors
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -72,6 +71,7 @@ fun SettingsScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToFilters: () -> Unit = {},
     onNavigateToPaywall: () -> Unit = {},
+    themeViewModel: com.mcclabs.mook.feature.theme.ThemeViewModel = koinViewModel(),
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     // KVKK tercih düzenleyicisi; kök ekrandaki zorunlu onaydan bağımsız örnek.
@@ -96,12 +96,12 @@ fun SettingsScreen(
         AlertDialog(
             // Silme sürerken kapatmaya izin verilmez ki işlem yarıda kalmasın.
             onDismissRequest = { if (!isDeleting) viewModel.onDeleteDismiss() },
-            containerColor = NeonColors.Card,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             title = {
                 Text(
                     text = stringResource(Res.string.settings_delete_account_title),
                     style = MaterialTheme.typography.titleMedium,
-                    color = NeonColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -110,7 +110,7 @@ fun SettingsScreen(
                     Text(
                         text = stringResource(Res.string.settings_delete_account_message),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = NeonColors.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     val deleteState = state.deleteAccount
@@ -122,14 +122,14 @@ fun SettingsScreen(
                         Text(
                             text = stringResource(Res.string.settings_delete_account_subscription_warning),
                             style = MaterialTheme.typography.bodySmall,
-                            color = NeonColors.Error,
+                            color = MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.SemiBold
                         )
                         // Kullanıcıyı Google Play abonelik yönetimi sayfasına derin bağlantıyla götürür.
                         TextButton(onClick = { uriHandler.openUri(PLAY_STORE_SUBSCRIPTIONS_URL) }) {
                             Text(
                                 text = stringResource(Res.string.settings_delete_account_manage_subs),
-                                color = NeonColors.Primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -141,7 +141,7 @@ fun SettingsScreen(
                             Text(
                                 text = stringResource(Res.string.settings_delete_account_progress),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = NeonColors.TextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         is DeleteAccountUiState.Error -> {
@@ -149,7 +149,7 @@ fun SettingsScreen(
                             Text(
                                 text = deleteState.message,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = NeonColors.Error
+                                color = MaterialTheme.colorScheme.error
                             )
                         }
                         else -> Unit
@@ -172,12 +172,12 @@ fun SettingsScreen(
                         }
                     },
                     enabled = !isDeleting,
-                    colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Error)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)
                 ) {
                     if (isDeleting) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(18.dp),
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = MaterialTheme.colorScheme.onError,
                             strokeWidth = 2.dp
                         )
                     } else {
@@ -186,7 +186,7 @@ fun SettingsScreen(
                                 if (isAwaitingSubscriptionAck) Res.string.settings_delete_account_confirm_anyway
                                 else Res.string.settings_delete_account_confirm
                             ),
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = MaterialTheme.colorScheme.onError,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -196,9 +196,9 @@ fun SettingsScreen(
                 Button(
                     onClick = viewModel::onDeleteDismiss,
                     enabled = !isDeleting,
-                    colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outlineVariant)
                 ) {
-                    Text(stringResource(Res.string.settings_delete_account_cancel), color = NeonColors.TextPrimary)
+                    Text(stringResource(Res.string.settings_delete_account_cancel), color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         )
@@ -207,7 +207,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NeonColors.Background)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
@@ -223,14 +223,14 @@ fun SettingsScreen(
                 Icon(
                     painter = painterResource(Res.drawable.back_svgrepo_com),
                     contentDescription = "Back",
-                    tint = NeonColors.TextPrimary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Text(
                 text = stringResource(Res.string.settings_title),
                 style = MaterialTheme.typography.titleLarge,
-                color = NeonColors.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -239,12 +239,12 @@ fun SettingsScreen(
         if (state.showLanguageDialog) {
             AlertDialog(
                 onDismissRequest = viewModel::onLanguageDismiss,
-                containerColor = NeonColors.Card,
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 title = {
                     Text(
                         text = stringResource(Res.string.settings_language_dialog_title),
                         style = MaterialTheme.typography.titleMedium,
-                        color = NeonColors.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -273,7 +273,7 @@ fun SettingsScreen(
                                 Text(
                                     text = name,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (state.appLanguage == code) NeonColors.Primary else NeonColors.TextPrimary,
+                                    color = if (state.appLanguage == code) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                     fontWeight = if (state.appLanguage == code) FontWeight.Bold else FontWeight.Normal
                                 )
                             }
@@ -283,9 +283,9 @@ fun SettingsScreen(
                 confirmButton = {
                     Button(
                         onClick = viewModel::onLanguageDismiss,
-                        colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outlineVariant)
                     ) {
-                        Text(stringResource(Res.string.settings_language_dialog_close), color = NeonColors.TextPrimary)
+                        Text(stringResource(Res.string.settings_language_dialog_close), color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             )
@@ -339,14 +339,14 @@ fun SettingsScreen(
                 text = status.scheduledAtMillis
                     ?.let { stringResource(Res.string.settings_scheduled_change_on, it.formatSubscriptionDate(), targetName) }
                     ?: stringResource(Res.string.settings_scheduled_change, targetName),
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         // Ödeme sorunu: kullanıcı mağazada ödeme yöntemini güncelleyene kadar uyarı + bağlantı.
         if (status.showBillingIssue) {
             SettingsNotice(
                 text = stringResource(Res.string.settings_billing_issue_notice),
-                color = NeonColors.Error,
+                color = MaterialTheme.colorScheme.error,
             )
             SettingsRow(
                 title = stringResource(Res.string.settings_update_payment_method),
@@ -375,7 +375,7 @@ fun SettingsScreen(
                     notice.currentLocalizedPrice,
                 ),
                 style = MaterialTheme.typography.bodySmall,
-                color = NeonColors.Error,
+                color = MaterialTheme.colorScheme.error,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -391,7 +391,7 @@ fun SettingsScreen(
             ) {
                 Text(
                     text = stringResource(Res.string.settings_price_change_cta),
-                    color = NeonColors.Primary,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -409,38 +409,19 @@ fun SettingsScreen(
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodySmall,
-                color = NeonColors.TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Appearance
-        SectionLabel(stringResource(Res.string.settings_appearance_section))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(Res.string.settings_dark_mode_title),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = NeonColors.TextPrimary
-                )
-                Text(
-                    text = stringResource(Res.string.settings_dark_mode_subtitle),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = NeonColors.TextSecondary
-                )
-            }
-            NeonToggle(
-                checked = state.isDarkMode,
-                onCheckedChange = viewModel::onDarkModeChange
-            )
-        }
+        // Görünüm tercihi kök temayla aynı depodan okunur.
+        val themeState by themeViewModel.uiState.collectAsState()
+        com.mcclabs.mook.feature.theme.ThemePicker(
+            state = themeState,
+            onThemeSelected = themeViewModel::selectTheme,
+        )
 
         val languageMap = mapOf(
             "en" to "English", "tr" to "Türkçe", "es" to "Español", "fr" to "Français",
@@ -469,12 +450,12 @@ fun SettingsScreen(
                 Text(
                     text = stringResource(Res.string.settings_show_in_discover_title),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = NeonColors.TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(Res.string.settings_show_in_discover_subtitle),
                     style = MaterialTheme.typography.labelSmall,
-                    color = NeonColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             NeonToggle(
@@ -495,7 +476,7 @@ fun SettingsScreen(
                     Text(
                         text = stringResource(Res.string.settings_incognito_title),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = NeonColors.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     if (!state.subscription.limits.incognito) {
                         Spacer(modifier = Modifier.width(8.dp))
@@ -508,10 +489,10 @@ fun SettingsScreen(
                         else Res.string.settings_incognito_subtitle_locked
                     ),
                     style = MaterialTheme.typography.labelSmall,
-                    color = NeonColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 state.incognitoMessage?.let { message ->
-                    Text(text = message, style = MaterialTheme.typography.labelSmall, color = NeonColors.Error)
+                    Text(text = message, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
                 }
             }
             NeonToggle(
@@ -552,10 +533,10 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .height(52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outlineVariant),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(stringResource(Res.string.settings_logout_button), color = NeonColors.Error, fontWeight = FontWeight.Bold)
+            Text(stringResource(Res.string.settings_logout_button), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -568,12 +549,12 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .height(52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = NeonColors.CardBorder),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outlineVariant),
             shape = RoundedCornerShape(12.dp),
             enabled = !isExporting,
         ) {
             if (isExporting) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = NeonColors.TextPrimary)
+                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onSurface)
             } else {
                 Text(stringResource(Res.string.settings_export_data_button), fontWeight = FontWeight.Bold)
             }
@@ -584,7 +565,7 @@ fun SettingsScreen(
                 Text(
                     text = stringResource(Res.string.settings_export_data_requested),
                     style = MaterialTheme.typography.bodySmall,
-                    color = NeonColors.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                 )
             }
@@ -593,7 +574,7 @@ fun SettingsScreen(
                 Text(
                     text = exportState.message,
                     style = MaterialTheme.typography.bodySmall,
-                    color = NeonColors.Error,
+                    color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                 )
             }
@@ -609,13 +590,13 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .height(52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = NeonColors.Error),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError),
             shape = RoundedCornerShape(12.dp),
             enabled = !state.isLoading
         ) {
             Text(
                 text = stringResource(Res.string.settings_delete_account_button),
-                color = androidx.compose.ui.graphics.Color.White,
+                color = MaterialTheme.colorScheme.onError,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -629,7 +610,7 @@ fun SettingsScreen(
             Text(
                 text = deleteError,
                 style = MaterialTheme.typography.bodySmall,
-                color = NeonColors.Error,
+                color = MaterialTheme.colorScheme.error,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
@@ -645,7 +626,7 @@ private fun SectionLabel(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
-        color = NeonColors.Primary,
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
     )
@@ -692,12 +673,12 @@ private fun SettingsRow(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            color = NeonColors.TextPrimary
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = NeonColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
