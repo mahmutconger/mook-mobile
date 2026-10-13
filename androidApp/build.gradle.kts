@@ -44,7 +44,7 @@ android {
         applicationId = "com.mcclabs.mook"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 13
+        versionCode = 14
         versionName = "2.1.0"
 
         // This is RevenueCat's Android *public* SDK key, which is intentionally
