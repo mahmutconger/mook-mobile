@@ -133,3 +133,19 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
+
+// Eksik sınıf içeren ara dizin güncel sayılırsa D8, APK'ya yalnızca sınıf referansını yazar.
+// Kotlin çıktısındaki her sınıf kopyalanmadan Android çalışma zamanı paketlemesi atlanamaz.
+tasks.matching { it.name == "bundleLibRuntimeToDirAndroidMain" }.configureEach {
+    outputs.upToDateWhen { task ->
+        val runtimeDirectory = task.outputs.files.singleFile
+        task.inputs.files.files.filter { it.isDirectory }.all { inputDirectory ->
+            inputDirectory.walkTopDown()
+                .filter { it.isFile && it.extension == "class" }
+                .all { inputClass ->
+                    val runtimeClass = runtimeDirectory.resolve(inputClass.relativeTo(inputDirectory))
+                    runtimeClass.isFile && runtimeClass.length() == inputClass.length()
+                }
+        }
+    }
+}
