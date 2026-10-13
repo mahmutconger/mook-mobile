@@ -27,9 +27,9 @@ private class UserDefaultsPendingActionQueue : PendingActionQueue {
     override suspend fun clear() {
         val count = defaults.integerForKey(KEY_COUNT)
         for (i in 0 until count) {
-            defaults.removeObjectForKey(keyProfileId(i))
-            defaults.removeObjectForKey(keyIsLike(i))
-            defaults.removeObjectForKey(keyEnqueuedAt(i))
+            defaults.removeObjectForKey(keyProfileId(i.toLong()))
+            defaults.removeObjectForKey(keyIsLike(i.toLong()))
+            defaults.removeObjectForKey(keyEnqueuedAt(i.toLong()))
         }
         defaults.removeObjectForKey(KEY_COUNT)
     }
@@ -37,12 +37,12 @@ private class UserDefaultsPendingActionQueue : PendingActionQueue {
     private fun readAll(): List<PendingSwipeAction> {
         val count = defaults.integerForKey(KEY_COUNT)
         return (0 until count).mapNotNull { i ->
-            val profileId = defaults.stringForKey(keyProfileId(i)) ?: return@mapNotNull null
-            defaults.objectForKey(keyEnqueuedAt(i)) ?: return@mapNotNull null
+            val profileId = defaults.stringForKey(keyProfileId(i.toLong())) ?: return@mapNotNull null
+            defaults.objectForKey(keyEnqueuedAt(i.toLong())) ?: return@mapNotNull null
             PendingSwipeAction(
                 profileId = profileId,
-                isLike = defaults.boolForKey(keyIsLike(i)),
-                enqueuedAtMillis = defaults.integerForKey(keyEnqueuedAt(i)),
+                isLike = defaults.boolForKey(keyIsLike(i.toLong())),
+                enqueuedAtMillis = defaults.integerForKey(keyEnqueuedAt(i.toLong())),
             )
         }
     }
@@ -50,15 +50,15 @@ private class UserDefaultsPendingActionQueue : PendingActionQueue {
     private fun writeAll(actions: List<PendingSwipeAction>) {
         val previousCount = defaults.integerForKey(KEY_COUNT)
         for (i in 0 until previousCount) {
-            defaults.removeObjectForKey(keyProfileId(i))
-            defaults.removeObjectForKey(keyIsLike(i))
-            defaults.removeObjectForKey(keyEnqueuedAt(i))
+            defaults.removeObjectForKey(keyProfileId(i.toLong()))
+            defaults.removeObjectForKey(keyIsLike(i.toLong()))
+            defaults.removeObjectForKey(keyEnqueuedAt(i.toLong()))
         }
         actions.forEachIndexed { i, action ->
-            defaults.setObject(action.profileId, forKey = keyProfileId(i))
-            defaults.setBool(action.isLike, forKey = keyIsLike(i))
+            defaults.setObject(action.profileId, forKey = keyProfileId(i.toLong()))
+            defaults.setBool(action.isLike, forKey = keyIsLike(i.toLong()))
             // NSInteger 64 bit; epoch milisaniyesi sığar.
-            defaults.setInteger(action.enqueuedAtMillis, forKey = keyEnqueuedAt(i))
+            defaults.setInteger(action.enqueuedAtMillis, forKey = keyEnqueuedAt(i.toLong()))
         }
         defaults.setInteger(actions.size.toLong(), forKey = KEY_COUNT)
     }

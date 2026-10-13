@@ -167,10 +167,10 @@ fun AppNavGraph() {
         ) { backStackEntry ->
             com.mcclabs.mook.feature.paywall.PaywallScreen(
                 onClose = { navController.popBackStack() },
-                // Gereksinim 2.13 (Faz 4): bkz. NavRoutes.Paywall KDoc'u. Klasik Bundle API'si
-                // (`getBoolean(key, default)`) kasıtlı olarak kullanılır — `SavedStateReader`in
-                // `getBoolean` üyesi TEK argümanlıdır (varsayılan değer parametresi YOKTUR).
-                preselectTrial = backStackEntry.arguments?.getBoolean(NavRoutes.Paywall.ARG_PRESELECT_TRIAL, false) ?: false,
+                // Ortak SavedState okuyucusu Android ve iOS üzerinde aynı varsayılanı uygular.
+                preselectTrial = backStackEntry.arguments?.read {
+                    getBooleanOrNull(NavRoutes.Paywall.ARG_PRESELECT_TRIAL)
+                } ?: false,
                 // Dinamik başlık: Paywall'ı açan limit (yoksa genel başlık).
                 limitReason = backStackEntry.arguments
                     ?.read { getStringOrNull(NavRoutes.Paywall.ARG_REASON) }
