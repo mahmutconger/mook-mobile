@@ -10,6 +10,8 @@
         API 24–32 devices where the legacy picker needs READ_EXTERNAL_STORAGE.
         On API 33+ they are ignored by the system.
     -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
