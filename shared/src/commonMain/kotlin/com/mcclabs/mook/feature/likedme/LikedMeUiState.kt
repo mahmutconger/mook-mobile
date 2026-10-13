@@ -1,5 +1,8 @@
 package com.mcclabs.mook.feature.likedme
 
+import com.mcclabs.mook.ui.loading.ImageLoadingState
+import com.mcclabs.mook.ui.loading.ContentLoadingPhase
+
 import com.mcclabs.mook.domain.billing.EntitlementState
 import com.mcclabs.mook.domain.billing.LimitReason
 import com.mcclabs.mook.domain.model.LikedMeEntry
@@ -41,7 +44,11 @@ data class LikedMeUiState(
     val limitReason: LimitReason? = null,
     val errorMessage: String? = null,
     val message: String? = null,
+    val imageLoading: ImageLoadingState = ImageLoadingState(),
 ) {
+    val imagesLoading: Boolean get() = imageLoading.imagesLoading
+    val loadingPhase: ContentLoadingPhase get() = imageLoading.phase(isLoading, errorMessage != null)
+
     /** Sayaç metni için sayı: sunucu sınırına ulaşıldıysa "100+". */
     val counterLabel: String get() = if (hasMore) "$totalCount+" else totalCount.toString()
 

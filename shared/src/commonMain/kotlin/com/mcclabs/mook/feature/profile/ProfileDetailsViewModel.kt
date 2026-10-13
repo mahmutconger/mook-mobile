@@ -1,5 +1,8 @@
 package com.mcclabs.mook.feature.profile
 
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+import com.mcclabs.mook.ui.loading.progressiveLoadingEnabled
+
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import com.mcclabs.mook.domain.billing.ProfileVisitInterstitialUseCase
 import com.mcclabs.mook.domain.analytics.trackGateDecision
@@ -34,6 +37,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
@@ -86,6 +91,11 @@ class ProfileDetailsViewModel(
     /** Reklam istenmeden önce yerel kota kontrolü yapan saf mantık (bkz. Gereksinim 1.1). */
     private val featureGate = FeatureGate()
 
+    /** Görsel sonucu yalnızca mevcut veri kümesine aitse duruma uygulanır. */
+    fun onImageLoadChanged(url: String, status: ImageLoadStatus) {
+        _state.update { it.copy(imageLoading = it.imageLoading.onResult(url, status)) }
+    }
+
     init {
         loadProfile()
         observeEntitlement()
@@ -115,7 +125,7 @@ class ProfileDetailsViewModel(
 
     private fun act(isLike: Boolean) {
         val current = _state.value
-        if (current.isActionInFlight || current.isActedOn || current.isOwnProfile) return
+        if (current.isMetadataLoading || current.isActionInFlight || current.isActedOn || current.isOwnProfile) return
         if (isLike) {
             val usage = UsageSnapshot(likes = current.swipesUsedToday, rewardedLikes = current.rewardedLikesToday)
             val decision = featureGate.decide(Feature.LIKE, current.entitlement, usage, showInterstitial = false)
@@ -323,7 +333,14 @@ class ProfileDetailsViewModel(
         viewModelScope.launch {
             try {
                 val profile = repository.getProfileDetails(profileId)
-                
+
+                if (progressiveLoadingEnabled && profile != null) {
+                    // İlişki, kota ve ziyaret kaydı tamamlanmadan profil metni gösterilir.
+                    _state.update {
+                        it.copy(profile = profile, isLoading = false, isMetadataLoading = true,
+                            imageLoading = it.imageLoading.reconcile(profile.photoUrls))
+                    }
+                }
                 // If it's not our own profile, check if there is a mutual match
                 val isMatched = if (!isOwnProfile) {
                     interactionRepository.checkMutualMatch(profileId)
@@ -344,16 +361,20 @@ class ProfileDetailsViewModel(
                         // yokken hiç denenmeyerek boşuna bir ağ turu (ve gecikme) harcanmaz —
                         // profili görüntülemek yine de tamamen engellenmeden devam eder.
                         if (connectivityObserver.isOnline.value) {
-                            runCatching {
-                                appHttpsCallable("recordProfileVisit")
-                                    .invoke(ProfileVisitRequest(profileId))
+                            val recordVisit: suspend () -> Unit = {
+                                runCatching {
+                                    appHttpsCallable("recordProfileVisit").invoke(ProfileVisitRequest(profileId))
+                                }
                             }
+                            if (progressiveLoadingEnabled) viewModelScope.launch { recordVisit() }
+                            else recordVisit()
                         }
                     }
                     if (!isOwnProfile) onProfileVisited()
                     _state.value = _state.value.copy(
                         profile = profile,
                         isLoading = false,
+                        isMetadataLoading = false,
                         isMatched = isMatched,
                         isActedOn = alreadyActedOn,
                         swipesUsedToday = likeUsage.likes,
@@ -367,11 +388,16 @@ class ProfileDetailsViewModel(
                         isLoading = false
                     )
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    error = e.message ?: getString(Res.string.error_generic),
-                    isLoading = false
-                )
+                val message = e.message ?: getString(Res.string.error_generic)
+                if (progressiveLoadingEnabled && _state.value.profile != null) {
+                    // İkincil sorgu hatası metni ve fotoğraf yüklemelerini ekrandan kaldırmaz.
+                    _events.emit(ProfileDetailsEvent.ShowMessage(message))
+                } else {
+                    _state.update { it.copy(error = message, isLoading = false) }
+                }
             }
         }
     }

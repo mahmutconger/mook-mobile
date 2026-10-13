@@ -1,6 +1,14 @@
 package com.mcclabs.mook.feature.profile
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+
 import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.loading.LoadingSkeleton
+import com.mcclabs.mook.ui.loading.SkeletonLayout
+import com.mcclabs.mook.ui.loading.ProgressiveAsyncImage
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import com.mcclabs.mook.ui.components.PremiumBadge
 import androidx.compose.foundation.background
@@ -25,7 +33,6 @@ import androidx.compose.ui.layout.ContentScale
 import com.mcclabs.mook.util.rememberWalkTalkChatOpener
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.ui.components.ImageCarousel
 import com.mcclabs.mook.ui.components.LimitSheet
@@ -61,7 +68,7 @@ fun ProfileDetailsScreen(
         parameters = { parametersOf(profileId) }
     )
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val openWalkTalkChat = rememberWalkTalkChatOpener()
     val scope = rememberCoroutineScope()
     var pendingChatUrl by remember { mutableStateOf<String?>(null) }
@@ -161,14 +168,7 @@ fun ProfileDetailsScreen(
 
     val profile = state.profile
     when {
-        state.isLoading -> {
-            Box(
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            }
-        }
+        state.isLoading -> LoadingSkeleton(SkeletonLayout.Profile, Modifier.background(MaterialTheme.colorScheme.background))
 
         profile != null -> {
             // Opens expanded so details are visible at normal size; the user can then tap
@@ -191,6 +191,7 @@ fun ProfileDetailsScreen(
                 sheetContent = {
                     ProfileSheetContent(
                         profile = profile,
+                        onImageLoadChanged = viewModel::onImageLoadChanged,
                         isOwnProfile = state.isOwnProfile,
                         isMatched = state.isMatched,
                         canAct = state.canAct,
@@ -208,6 +209,7 @@ fun ProfileDetailsScreen(
                     val interaction = remember { MutableInteractionSource() }
                     ImageCarousel(
                         imageUrls = profile.photoUrls,
+                        onImageLoadChanged = viewModel::onImageLoadChanged,
                         modifier = Modifier
                             .fillMaxSize()
                             .clickable(
@@ -308,6 +310,7 @@ fun ProfileDetailsScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProfileSheetContent(
+    onImageLoadChanged: (String, ImageLoadStatus) -> Unit,
     profile: DiscoverProfile,
     isOwnProfile: Boolean,
     isMatched: Boolean,
@@ -327,8 +330,9 @@ private fun ProfileSheetContent(
     ) {
         // Peek row: small avatar + name, always visible when collapsed.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(
+            ProgressiveAsyncImage(
                 model = profile.photoUrls.firstOrNull(),
+                onImageLoadChanged = onImageLoadChanged,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

@@ -1,7 +1,12 @@
 package com.mcclabs.mook.feature.likedme
 
-import com.mcclabs.mook.ui.theme.LocalAppColors
 import com.mcclabs.mook.ui.layout.scaffoldPadding
+import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.loading.LoadingSkeleton
+import com.mcclabs.mook.ui.loading.SkeletonLayout
+import com.mcclabs.mook.ui.loading.ProgressiveAsyncImage
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -55,7 +60,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import com.mcclabs.mook.ads.NativeAdFeedCard
@@ -136,7 +140,7 @@ fun LikedMeScreen(
     ) { padding ->
         Box(Modifier.fillMaxSize().scaffoldPadding(padding)) {
             when {
-                state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.primary)
+                state.isLoading -> LoadingSkeleton(SkeletonLayout.LikedMe)
                 state.errorMessage != null -> ErrorState(state.errorMessage!!, onRetry = viewModel::load)
                 else -> LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -155,6 +159,7 @@ fun LikedMeScreen(
                                 entry = item.entry,
                                 isUnlocking = state.unlockingToken == item.entry.entryToken,
                                 onClick = { viewModel.onEntryClicked(item.entry) },
+                                onImageLoadChanged = viewModel::onImageLoadChanged,
                             )
                             is LikedMeListItem.NativeAd -> NativeAdFeedCard(isFree = true, placement = "liked_me_native")
                         }
@@ -222,7 +227,7 @@ private fun CounterHeader(state: LikedMeUiState, onGoPremium: () -> Unit) {
 }
 
 @Composable
-private fun LikerRow(entry: LikedMeEntry, isUnlocking: Boolean, onClick: () -> Unit) {
+private fun LikerRow(entry: LikedMeEntry, isUnlocking: Boolean, onClick: () -> Unit, onImageLoadChanged: (String, ImageLoadStatus) -> Unit) {
     val profile = entry.profile
     Row(
         modifier = Modifier
@@ -233,7 +238,7 @@ private fun LikerRow(entry: LikedMeEntry, isUnlocking: Boolean, onClick: () -> U
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        LikerPhoto(photoUrl = entry.photoUrl, locked = !entry.isUnlocked)
+        LikerPhoto(photoUrl = entry.photoUrl, locked = !entry.isUnlocked, onImageLoadChanged = onImageLoadChanged)
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(
@@ -275,7 +280,7 @@ private fun LikerRow(entry: LikedMeEntry, isUnlocking: Boolean, onClick: () -> U
  * çözülür ve ayrıca GPU bulanıklığı uygulanır (bkz. ekran KDoc'u).
  */
 @Composable
-private fun LikerPhoto(photoUrl: String?, locked: Boolean) {
+private fun LikerPhoto(photoUrl: String?, locked: Boolean, onImageLoadChanged: (String, ImageLoadStatus) -> Unit) {
     val context = LocalPlatformContext.current
     val request = remember(photoUrl, locked) {
         ImageRequest.Builder(context)
@@ -287,8 +292,10 @@ private fun LikerPhoto(photoUrl: String?, locked: Boolean) {
         modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHighest),
         contentAlignment = Alignment.Center,
     ) {
-        AsyncImage(
+        ProgressiveAsyncImage(
             model = request,
+            imageUrl = photoUrl,
+            onImageLoadChanged = onImageLoadChanged,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier

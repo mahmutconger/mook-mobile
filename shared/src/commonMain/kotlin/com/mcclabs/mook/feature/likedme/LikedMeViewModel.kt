@@ -1,5 +1,8 @@
 package com.mcclabs.mook.feature.likedme
 
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+import com.mcclabs.mook.ui.loading.progressiveLoadingEnabled
+
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,6 +26,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.error_offline
@@ -63,6 +68,13 @@ class LikedMeViewModel(
     /** Ödüllü reklam doğrulanınca yeniden denenecek giriş. */
     private var pendingUnlockToken: String? = null
 
+    /** Görsel sonucu yalnızca mevcut veri kümesine aitse duruma uygulanır. */
+    fun onImageLoadChanged(url: String, status: ImageLoadStatus) {
+        mutableState.update { it.copy(imageLoading = it.imageLoading.onResult(url, status)) }
+    }
+
+    private var loadJob: Job? = null
+
     init {
         viewModelScope.launch {
             subscriptions.state
@@ -78,13 +90,16 @@ class LikedMeViewModel(
     }
 
     fun load() {
-        viewModelScope.launch {
+        if (progressiveLoadingEnabled) loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             if (!connectivityObserver.isOnline.value) {
                 mutableState.update { it.copy(isLoading = false, errorMessage = getString(Res.string.error_offline)) }
                 return@launch
             }
             mutableState.update { it.copy(isLoading = it.entries.isEmpty(), errorMessage = null) }
-            likedMeRepository.load().fold(
+            val result = likedMeRepository.load()
+            ensureActive()
+            result.fold(
                 onSuccess = { page ->
                     mutableState.update {
                         it.copy(
@@ -198,6 +213,7 @@ class LikedMeViewModel(
 
     private fun LikedMeUiState.withEntries(entries: List<LikedMeEntry>): LikedMeUiState = copy(
         entries = entries,
+        imageLoading = imageLoading.reconcile(entries.map { it.photoUrl }),
         items = AdFrequencyRules.interleaveLikedMeAds(
             items = entries,
             showAds = showsAds,

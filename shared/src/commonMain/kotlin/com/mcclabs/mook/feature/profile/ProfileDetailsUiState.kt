@@ -1,5 +1,8 @@
 package com.mcclabs.mook.feature.profile
 
+import com.mcclabs.mook.ui.loading.ImageLoadingState
+import com.mcclabs.mook.ui.loading.ContentLoadingPhase
+
 import com.mcclabs.mook.domain.billing.BillingConfig
 import com.mcclabs.mook.domain.billing.EntitlementState
 import com.mcclabs.mook.domain.billing.LimitReason
@@ -8,6 +11,8 @@ import com.mcclabs.mook.domain.model.DiscoverProfile
 data class ProfileDetailsUiState(
     val profile: DiscoverProfile? = null,
     val isLoading: Boolean = false,
+    /** Eylemler, ilişki ve kota sorguları tamamlandıktan sonra açılır. */
+    val isMetadataLoading: Boolean = false,
     val error: String? = null,
     /** True when the viewed profile is the signed-in user's own — drives Settings vs Report UI. */
     val isOwnProfile: Boolean = false,
@@ -44,7 +49,11 @@ data class ProfileDetailsUiState(
     val limitReason: LimitReason? = null,
     /** [limitReason] bir adil kullanım tavanıysa (yükseltme çözmez) `true` — bkz. Gereksinim 1.5. */
     val limitIsFairUseCap: Boolean = false,
+    val imageLoading: ImageLoadingState = ImageLoadingState(),
 ) {
+    val imagesLoading: Boolean get() = imageLoading.imagesLoading
+    val loadingPhase: ContentLoadingPhase get() = imageLoading.phase(isLoading, error != null)
+
     /** Geriye dönük uyumluluk: mevcut arayüz kodu bu boolean'ı okumaya devam edebilir. */
     val showLimitDialog: Boolean
         get() = limitReason != null
@@ -66,5 +75,5 @@ data class ProfileDetailsUiState(
 
     /** Whether to offer the like/pass row: someone else's profile, not yet acted on. */
     val canAct: Boolean
-        get() = !isOwnProfile && !isActedOn && !isMatched
+        get() = !isMetadataLoading && !isOwnProfile && !isActedOn && !isMatched
 }

@@ -1,5 +1,8 @@
 package com.mcclabs.mook.feature.discover
 
+import com.mcclabs.mook.ui.loading.ImageLoadingState
+import com.mcclabs.mook.ui.loading.ContentLoadingPhase
+
 import com.mcclabs.mook.domain.billing.BillingConfig
 import com.mcclabs.mook.domain.billing.EntitlementState
 import com.mcclabs.mook.domain.billing.LimitReason
@@ -12,7 +15,7 @@ data class DiscoverUiState(
     /** IDs liked directly from the grid; kept visible until refresh/re-entry. */
     val likedProfileIds: Set<String> = emptySet(),
 
-    /** First page (or a filter change) is loading — the grid is replaced by a spinner. */
+    /** İlk sayfa veya filtre değişikliği yüklenirken Android’de iskelet gösterilir. */
     val isLoading: Boolean = false,
     /** A further page is loading — a footer spinner appears under the grid. */
     val isLoadingMore: Boolean = false,
@@ -75,7 +78,11 @@ data class DiscoverUiState(
      * `onBoostSummaryDismissed()` ile `null`a döner.
      */
     val boostSummary: BoostSummary? = null,
+    val imageLoading: ImageLoadingState = ImageLoadingState(),
 ) {
+    val imagesLoading: Boolean get() = imageLoading.imagesLoading
+    val loadingPhase: ContentLoadingPhase get() = imageLoading.phase(isLoading, error != null)
+
     /** Geriye dönük uyumluluk: mevcut arayüz kodu bu boolean'ı okumaya devam edebilir. */
     val showLimitSheet: Boolean
         get() = limitReason != null

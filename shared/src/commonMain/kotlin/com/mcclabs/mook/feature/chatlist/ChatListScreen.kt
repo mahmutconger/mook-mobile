@@ -1,7 +1,13 @@
 package com.mcclabs.mook.feature.chatlist
 
-import com.mcclabs.mook.ui.theme.LocalAppColors
 import com.mcclabs.mook.ui.layout.scaffoldPadding
+import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.loading.progressiveLoadingEnabled
+import com.mcclabs.mook.ui.loading.LoadingSkeleton
+import com.mcclabs.mook.ui.loading.SkeletonLayout
+import com.mcclabs.mook.ui.loading.ProgressiveAsyncImage
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +25,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.ChatRoom
 import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.theme.BrandGradient
@@ -98,9 +102,10 @@ fun ChatListScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         when {
-            state.isLoading -> {
+            state.isLoading -> LoadingSkeleton(SkeletonLayout.Chats, Modifier.scaffoldPadding(padding))
+            progressiveLoadingEnabled && state.error != null && state.rooms.isEmpty() -> {
                 Box(Modifier.fillMaxSize().scaffoldPadding(padding), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    Text("Sohbetler yüklenemedi. Lütfen tekrar deneyin.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             state.rooms.isEmpty() -> {
@@ -122,6 +127,7 @@ fun ChatListScreen(
                         ChatRoomRow(
                             room = room,
                             currentUid = currentUid,
+                            onImageLoadChanged = viewModel::onImageLoadChanged,
                             onClick = { onNavigateToChat(room.chatId, room.peerUid) }
                         )
                     }
@@ -132,7 +138,7 @@ fun ChatListScreen(
 }
 
 @Composable
-private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit) {
+private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit, onImageLoadChanged: (String, ImageLoadStatus) -> Unit) {
     val isMeLastSender = room.lastSenderUid == currentUid
     val prefix = if (isMeLastSender) stringResource(Res.string.chat_list_own_message_prefix) else ""
     val messageText = when {
@@ -151,8 +157,10 @@ private fun ChatRoomRow(room: ChatRoom, currentUid: String, onClick: () -> Unit)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
+        ProgressiveAsyncImage(
             model = room.peerPhotoUrl,
+            onImageLoadChanged = onImageLoadChanged,
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             contentDescription = null,
             modifier = Modifier
                 .size(56.dp)

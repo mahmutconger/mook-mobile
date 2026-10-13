@@ -1,6 +1,13 @@
 package com.mcclabs.mook.feature.liked
 
 import com.mcclabs.mook.ui.layout.scaffoldPadding
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+import com.mcclabs.mook.ui.loading.LoadingSkeleton
+import com.mcclabs.mook.ui.loading.SkeletonLayout
+import com.mcclabs.mook.ui.loading.ProgressiveAsyncImage
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+
 import mook.shared.generated.resources.liked_me_title
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.LikedProfile
 import com.mcclabs.mook.ui.components.BottomNavBar
 import com.mcclabs.mook.ui.components.NeonChip
@@ -52,7 +58,7 @@ fun LikedScreen(
     onNavigateToPaywall: () -> Unit,
     viewModel: LikedViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val currentUserId = Firebase.auth.currentUser?.uid.orEmpty()
 
     Scaffold(
@@ -96,7 +102,7 @@ fun LikedScreen(
             contentAlignment = Alignment.Center
         ) {
             when {
-                state.isLoading -> CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                state.isLoading -> LoadingSkeleton(SkeletonLayout.Likes)
 
                 state.error != null -> Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -140,7 +146,7 @@ fun LikedScreen(
                         WalkTalkDemoPromoCard(onClick = onNavigateToWalkTalkDemo)
                     }
                     items(state.liked, key = { it.profile.id }) { liked ->
-                        LikedRow(liked = liked, onClick = { onNavigateToProfile(liked.profile.id) })
+                        LikedRow(liked = liked, onClick = { onNavigateToProfile(liked.profile.id) }, onImageLoadChanged = viewModel::onImageLoadChanged)
                     }
                 }
             }
@@ -149,7 +155,7 @@ fun LikedScreen(
 }
 
 @Composable
-private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
+private fun LikedRow( liked: LikedProfile, onClick: () -> Unit, onImageLoadChanged: (String, ImageLoadStatus) -> Unit) {
     val profile = liked.profile
     Row(
         modifier = Modifier
@@ -175,8 +181,9 @@ private fun LikedRow(liked: LikedProfile, onClick: () -> Unit) {
                 )
             }
         } else {
-            AsyncImage(
+            ProgressiveAsyncImage(
                 model = photo,
+                onImageLoadChanged = onImageLoadChanged,
                 contentDescription = profile.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerLow)

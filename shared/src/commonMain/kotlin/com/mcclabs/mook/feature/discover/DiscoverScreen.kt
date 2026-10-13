@@ -1,7 +1,13 @@
 package com.mcclabs.mook.feature.discover
 
-import com.mcclabs.mook.ui.theme.LocalAppColors
 import com.mcclabs.mook.ui.layout.scaffoldPadding
+import com.mcclabs.mook.ui.theme.LocalAppColors
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+
+import com.mcclabs.mook.ui.loading.LoadingSkeleton
+import com.mcclabs.mook.ui.loading.SkeletonLayout
+
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
@@ -37,7 +43,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.mcclabs.mook.feature.filters.FiltersScreen
 import com.mcclabs.mook.ads.NativeAdFeedCard
@@ -74,7 +79,7 @@ fun DiscoverScreen(
     onNavigateToPaywall: (PaywallRequest) -> Unit = {},
     viewModel: DiscoverViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val currentUserId = Firebase.auth.currentUser?.uid.orEmpty()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -105,13 +110,9 @@ fun DiscoverScreen(
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { onDiscoveryAdsHidden() }
 
     LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is DiscoverEvent.NavigateToProfile -> onNavigateToProfile(event.profileId)
-                is DiscoverEvent.NavigateToMatch -> onNavigateToMatch(event.matchedUserId)
-                is DiscoverEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
-                is DiscoverEvent.NavigateToPaywall -> onNavigateToPaywall(event.request)
-            }
+        while (true) {
+            delay(PRESENCE_TICK_MILLIS)
+            nowMillis = getCurrentTimeMillis()
         }
     }
 
@@ -228,12 +229,7 @@ fun DiscoverScreen(
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     when {
-                        state.isLoading -> Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                        }
+                        state.isLoading -> LoadingSkeleton(SkeletonLayout.Discover)
 
                         state.error != null -> ErrorState(
                             message = state.error.orEmpty(),
@@ -269,7 +265,8 @@ fun DiscoverScreen(
                                             onLike = { viewModel.likeProfile(profile.id) },
                                             onPass = { viewModel.passProfile(profile.id) },
                                             onReport = { viewModel.onReportClick(profile.id) },
-                                            onBlock = { viewModel.onBlockClick(profile.id) }
+                                            onBlock = { viewModel.onBlockClick(profile.id) },
+                                            onImageLoadChanged = viewModel::onImageLoadChanged
                                         )
                                     }
                                     if (adConfig.isNativeActive && state.entitlement.isResolved && state.entitlement.limits.showsAds && chunkIndex < profileChunks.lastIndex) {

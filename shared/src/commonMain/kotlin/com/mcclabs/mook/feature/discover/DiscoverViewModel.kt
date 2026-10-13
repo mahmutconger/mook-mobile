@@ -1,5 +1,8 @@
 package com.mcclabs.mook.feature.discover
 
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+import com.mcclabs.mook.ui.loading.progressiveLoadingEnabled
+
 import com.mcclabs.mook.domain.billing.LimitReason
 import com.mcclabs.mook.domain.billing.PaywallRequest
 import com.mcclabs.mook.domain.analytics.trackGateDecision
@@ -41,6 +44,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import mook.shared.generated.resources.Res
@@ -87,7 +91,7 @@ class DiscoverViewModel(
     private val analyticsRepository: AnalyticsRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(DiscoverUiState())
+    private val _state = MutableStateFlow(DiscoverUiState(isLoading = progressiveLoadingEnabled))
     val state: StateFlow<DiscoverUiState> = _state.asStateFlow()
 
     private val _events = MutableSharedFlow<DiscoverEvent>()
@@ -98,6 +102,12 @@ class DiscoverViewModel(
 
     /** The filters the visible page was loaded with; used by refresh and paging. */
     private var currentSettings: MatchSettings = MatchSettings()
+    private var contentGeneration: Long = 0
+
+    /** Görsel sonucu yalnızca mevcut veri kümesine aitse duruma uygulanır. */
+    fun onImageLoadChanged(url: String, status: ImageLoadStatus) {
+        _state.update { it.copy(imageLoading = it.imageLoading.onResult(url, status)) }
+    }
 
     init {
         observeEntitlement()
@@ -154,17 +164,34 @@ class DiscoverViewModel(
      * save, including saves that leave the values untouched.
      */
     private suspend fun loadFirstPage(settings: MatchSettings) {
+        val generation = ++contentGeneration
         val refreshing = _state.value.isRefreshing
         _state.update { it.copy(isLoading = !refreshing, error = null) }
         try {
             repository.resetDiscoverPaging()
             val profiles = repository.getDiscoverProfiles(settings)
+            if (progressiveLoadingEnabled && generation != contentGeneration) return
+            if (progressiveLoadingEnabled) {
+                // Profil metni, kota ve öğretici sorgularını beklemeden gösterilir.
+                _state.update {
+                    it.copy(
+                        profiles = profiles,
+                        imageLoading = it.imageLoading.reconcile(profiles.map { profile -> profile.photoUrls.firstOrNull() }),
+                        likedProfileIds = it.likedProfileIds,
+                        isLoading = false,
+                        isRefreshing = false,
+                        isLoadingMore = false,
+                        endReached = !repository.hasMoreProfiles(),
+                    )
+                }
+            }
             val hasSeenTutorial = settingsRepository.getHasSeenLikedMeTutorial()
             val likeUsage = repository.getLikeUsageToday()
+            if (progressiveLoadingEnabled && generation != contentGeneration) return
             _state.update {
                 it.copy(
-                    profiles = profiles,
-                    likedProfileIds = emptySet(),
+                    profiles = if (progressiveLoadingEnabled) it.profiles else profiles,
+                    likedProfileIds = it.likedProfileIds,
                     isLoading = false,
                     isRefreshing = false,
                     isLoadingMore = false,
@@ -176,7 +203,10 @@ class DiscoverViewModel(
                     likesEver = likeUsage.likesEver,
                 )
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
+            if (progressiveLoadingEnabled && generation != contentGeneration) return
             _state.update {
                 it.copy(
                     error = e.message ?: getString(Res.string.error_generic),
@@ -196,21 +226,27 @@ class DiscoverViewModel(
         val s = _state.value
         if (s.isLoading || s.isLoadingMore || s.isRefreshing || s.endReached) return
 
+        val generation = contentGeneration
         _state.update { it.copy(isLoadingMore = true) }
         viewModelScope.launch {
             try {
                 val next = repository.getDiscoverProfiles(currentSettings)
+                if (progressiveLoadingEnabled && generation != contentGeneration) return@launch
                 _state.update { current ->
                     // Guard against duplicates: a profile can surface twice if documents shift
                     // between pages (someone's lastActiveTimestamp updates mid-scroll).
                     val existing = current.profiles.mapTo(mutableSetOf()) { p -> p.id }
                     current.copy(
                         profiles = current.profiles + next.filter { p -> existing.add(p.id) },
+                        imageLoading = current.imageLoading.reconcile((current.profiles + next).map { profile -> profile.photoUrls.firstOrNull() }),
                         isLoadingMore = false,
                         endReached = next.isEmpty() || !repository.hasMoreProfiles(),
                     )
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
+                if (progressiveLoadingEnabled && generation != contentGeneration) return@launch
                 // A failed page must not clear what is already on screen; the user can scroll
                 // again to retry.
                 _state.update { it.copy(isLoadingMore = false) }
@@ -246,6 +282,7 @@ class DiscoverViewModel(
             if (remaining.size == current.profiles.size) current
             else current.copy(
                 profiles = remaining,
+                imageLoading = current.imageLoading.reconcile(remaining.map { profile -> profile.photoUrls.firstOrNull() }),
                 likedProfileIds = current.likedProfileIds - acted,
                 likedMeTutorialProfileId = remaining.firstOrNull { it.hasLikedMe }?.id,
             )
@@ -548,6 +585,7 @@ class DiscoverViewModel(
             val remaining = current.profiles.filterNot { it.id == profileId }
             current.copy(
                 profiles = remaining,
+                imageLoading = current.imageLoading.reconcile(remaining.map { profile -> profile.photoUrls.firstOrNull() }),
                 likedMeTutorialProfileId = remaining.firstOrNull { it.hasLikedMe }?.id,
             )
         }
@@ -560,6 +598,7 @@ class DiscoverViewModel(
             restored.add(index.coerceIn(0, restored.size), profile)
             current.copy(
                 profiles = restored,
+                imageLoading = current.imageLoading.reconcile(restored.map { profile -> profile.photoUrls.firstOrNull() }),
                 likedMeTutorialProfileId = restored.firstOrNull { it.hasLikedMe }?.id,
             )
         }

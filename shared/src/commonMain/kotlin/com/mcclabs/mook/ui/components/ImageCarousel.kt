@@ -1,7 +1,9 @@
 package com.mcclabs.mook.ui.components
 
-import coil3.compose.AsyncImage
 import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.loading.ProgressiveAsyncImage
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,7 +29,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
+fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier, onImageLoadChanged: (String, ImageLoadStatus) -> Unit = { _, _ -> }) {
     if (imageUrls.isEmpty()) {
         EmptyPhotoPlaceholder(modifier)
         return
@@ -40,8 +42,9 @@ fun ImageCarousel(imageUrls: List<String>, modifier: Modifier = Modifier) {
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) { page ->
-            AsyncImage(
+            ProgressiveAsyncImage(
                 model = imageUrls[page],
+                onImageLoadChanged = onImageLoadChanged,
                 contentDescription = stringResource(Res.string.carousel_photo_cd, page + 1),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

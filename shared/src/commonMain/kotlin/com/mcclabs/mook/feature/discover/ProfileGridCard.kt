@@ -1,6 +1,9 @@
 package com.mcclabs.mook.feature.discover
 
 import com.mcclabs.mook.ui.theme.LocalAppColors
+import com.mcclabs.mook.ui.loading.ProgressiveAsyncImage
+import com.mcclabs.mook.ui.loading.ImageLoadStatus
+
 import com.mcclabs.mook.ui.components.PremiumBadge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,7 +45,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.ui.theme.BrandGradient
 import com.mcclabs.mook.util.countryCodeToFlagEmoji
@@ -79,6 +81,7 @@ fun ProfileGridCard(
     onReport: () -> Unit,
     onBlock: () -> Unit,
     modifier: Modifier = Modifier,
+    onImageLoadChanged: (String, ImageLoadStatus) -> Unit = { _, _ -> },
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(20.dp)
@@ -93,8 +96,9 @@ fun ProfileGridCard(
     ) {
         val photo = profile.photoUrls.firstOrNull()
         if (photo != null) {
-            AsyncImage(
+            ProgressiveAsyncImage(
                 model = photo,
+                onImageLoadChanged = onImageLoadChanged,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
