@@ -14,6 +14,8 @@ import com.mcclabs.mook.domain.model.DiscoverProfile
 import com.mcclabs.mook.domain.model.MatchResult
 import com.mcclabs.mook.domain.model.MatchSettings
 import com.mcclabs.mook.domain.repository.DiscoverRepository
+import com.mcclabs.mook.domain.interaction.SetLikeUseCase
+import com.mcclabs.mook.domain.repository.LikeRepository
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import com.mcclabs.mook.domain.repository.LikeUsage
 import com.mcclabs.mook.domain.repository.SettingsRepository
@@ -119,13 +121,16 @@ class LikeInterstitialTransitionOrderTest {
         interactionRepository = interactionRepository,
         settingsRepository = settingsRepository,
         subscriptions = subscriptionRepository,
-        pendingActionQueue = pendingActionQueue,
         recoverPendingSwipeActionsUseCase = RecoverPendingSwipeActionsUseCase(
             pendingActionQueue, interactionRepository, connectivityObserver,
         ),
         likeInterstitialGateway = likeInterstitialGateway,
         boostManagerUseCase = boostManagerUseCase,
         analyticsRepository = analyticsRepository,
+        setLikeUseCase = SetLikeUseCase(object : LikeRepository {
+            override suspend fun setLiked(profileId: String, isLiked: Boolean) =
+                interactionRepository.swipeUser(profileId, isLiked)
+        }),
     )
 
     @Test

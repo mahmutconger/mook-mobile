@@ -75,6 +75,7 @@ fun ProfileGridCard(
     profile: DiscoverProfile,
     nowMillis: Long,
     isLiked: Boolean = false,
+    isLikePending: Boolean = false,
     onClick: () -> Unit,
     onLike: () -> Unit,
     onPass: () -> Unit,
@@ -259,14 +260,12 @@ fun ProfileGridCard(
                             if (isLiked) Brush.linearGradient(listOf(LocalAppColors.current.gradientStart, LocalAppColors.current.gradientEnd))
                             else BrandGradient
                         )
-                        .clickable(enabled = !isLiked, onClick = onLike),
+                        .clickable(enabled = !isLikePending, onClick = onLike),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = stringResource(
-                            if (isLiked) Res.string.discover_card_liked else Res.string.discover_card_like_cd
-                        ),
+                        contentDescription = if (isLiked) "Beğeniyi geri çek" else "Beğen",
                         tint = LocalAppColors.current.onGradient,
                         modifier = Modifier.size(19.dp)
                     )

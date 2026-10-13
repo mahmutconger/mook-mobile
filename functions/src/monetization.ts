@@ -426,6 +426,27 @@ export const swipe = onCall(
     });
 });
 
+/** Beğeniyi geri çeker; geçmiş kota tüketimi iade edilmez, sohbet geçmişi korunur. */
+export const unlike = onCall({ region: "us-central1", enforceAppCheck: true }, async (request) => {
+    const uid = requireUid(request);
+    await assertNotBanned(uid);
+    const targetUid = (request.data as { toUserId?: unknown } | null)?.toUserId;
+    if (typeof targetUid !== "string" || !targetUid || targetUid.includes("/") || targetUid === uid) {
+        throw new HttpsError("invalid-argument", "Geçerli bir profil seçilmelidir.");
+    }
+    const interactionRef = db.collection("interactions").doc(`${uid}_${targetUid}`);
+    const matchRef = db.collection("matches").doc(orderedPair(uid, targetUid));
+    return db.runTransaction(async (transaction) => {
+        const interaction = await transaction.get(interactionRef);
+        // Yinelenen istek güvenlidir; geçme kayıtları ve karşı tarafın beğenisi değişmez.
+        if (interaction.data()?.type === "like") {
+            transaction.delete(interactionRef);
+            transaction.delete(matchRef);
+        }
+        return { unliked: true };
+    });
+});
+
 export const switchRoom = onCall({ region: "us-central1", enforceAppCheck: true }, async (request) => {
     const uid = requireUid(request);
     const code = (request.data as { languageCode?: unknown }).languageCode;

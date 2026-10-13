@@ -10,6 +10,11 @@ import com.mcclabs.mook.domain.analytics.AnalyticsRepository
 import com.mcclabs.mook.ads.LikeInterstitialAttempt
 import com.mcclabs.mook.domain.billing.AdDisplayRules
 import com.mcclabs.mook.data.appHttpsCallable
+import com.mcclabs.mook.domain.interaction.SetLikeUseCase
+import com.mcclabs.mook.ui.optimistic.OptimisticStateController
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.Flow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.billing.SubscriptionRepository
@@ -18,9 +23,6 @@ import com.mcclabs.mook.domain.billing.FeatureGate
 import com.mcclabs.mook.domain.billing.GateDecision
 import com.mcclabs.mook.domain.billing.UsageSnapshot
 import com.mcclabs.mook.domain.connectivity.ConnectivityObserver
-import com.mcclabs.mook.domain.billing.PendingActionQueue
-import com.mcclabs.mook.domain.billing.PendingSwipeAction
-import com.mcclabs.mook.util.getCurrentTimeMillis
 import com.mcclabs.mook.domain.billing.LikeInterstitialGateway
 import com.mcclabs.mook.domain.model.MatchResult
 import com.mcclabs.mook.domain.repository.DiscoverRepository
@@ -31,11 +33,8 @@ import dev.gitlive.firebase.firestore.FieldValue
 import com.mcclabs.mook.data.appFirestore
 import com.mcclabs.mook.domain.repository.ChatRepository
 import com.mcclabs.mook.util.buildWalkTalkChatUrl
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CancellationException
@@ -45,7 +44,6 @@ import org.jetbrains.compose.resources.getString
 import mook.shared.generated.resources.Res
 import mook.shared.generated.resources.profile_not_found
 import mook.shared.generated.resources.error_generic
-import mook.shared.generated.resources.error_swipe_failed
 
 sealed class ProfileDetailsEvent {
     data class OpenDeepLink(val url: String) : ProfileDetailsEvent()
@@ -69,13 +67,13 @@ class ProfileDetailsViewModel(
     private val subscriptions: SubscriptionRepository,
     private val chatRepository: ChatRepository,
     private val connectivityObserver: ConnectivityObserver,
-    private val pendingActionQueue: PendingActionQueue,
     private val likeInterstitialGateway: LikeInterstitialGateway,
     /** `gate_decision` / `limit_reached` analitik olayları için. */
     private val analyticsRepository: AnalyticsRepository,
     /** Her 3. profil ziyaretinde geçiş reklamı (bkz. [ProfileVisitInterstitialUseCase]). */
     private val profileVisitInterstitial: ProfileVisitInterstitialUseCase,
-    private val profileId: String
+    private val profileId: String,
+    private val setLikeUseCase: SetLikeUseCase,
 ) : ViewModel() {
 
     // Whether this is the signed-in user's own profile decides the entire chrome:
@@ -85,8 +83,9 @@ class ProfileDetailsViewModel(
     private val _state = MutableStateFlow(ProfileDetailsUiState(isOwnProfile = isOwnProfile))
     val state: StateFlow<ProfileDetailsUiState> = _state.asStateFlow()
 
-    private val _events = MutableSharedFlow<ProfileDetailsEvent>()
-    val events: SharedFlow<ProfileDetailsEvent> = _events.asSharedFlow()
+    private val _events = Channel<ProfileDetailsEvent>(Channel.UNLIMITED)
+    val events: Flow<ProfileDetailsEvent> = _events.receiveAsFlow()
+    private val optimisticState = OptimisticStateController<ProfileDetailsUiState, String>(_state, viewModelScope)
 
     /** Reklam istenmeden önce yerel kota kontrolü yapan saf mantık (bkz. Gereksinim 1.1). */
     private val featureGate = FeatureGate()
@@ -136,70 +135,45 @@ class ProfileDetailsViewModel(
             }
         }
 
-        _state.value = current.copy(
-            isActionInFlight = true,
-            swipesUsedToday = if (isLike) current.swipesUsedToday + 1 else current.swipesUsedToday
+        optimisticState.execute(
+            key = profileId,
+            optimistic = { it.copy(isActionInFlight = true, isLiked = isLike,
+                swipesUsedToday = if (isLike) it.swipesUsedToday + 1 else it.swipesUsedToday) },
+            rollback = { latest, previous -> latest.copy(isLiked = previous.isLiked,
+                swipesUsedToday = if (isLike) (latest.swipesUsedToday - 1).coerceAtLeast(0) else latest.swipesUsedToday) },
+            settle = { it.copy(isActionInFlight = false) },
+            sync = {
+                if (isLike) setLikeUseCase(profileId, true)
+                else interactionRepository.swipeUser(profileId, false).also {
+                    check(it !is MatchResult.Error) { "İşlem tamamlanamadı. Lütfen tekrar deneyin." }
+                }
+            },
+            onFailure = { _events.trySend(ProfileDetailsEvent.ShowMessage("İşlem tamamlanamadı. Lütfen tekrar deneyin.")) },
+            onSuccess = { result ->
+                val isFree = current.entitlement.isResolved && current.entitlement.limits.showsAds
+                repository.markActedOn(profileId)
+                _state.update { it.copy(isActedOn = true,
+                    likesEver = if (isLike) it.likesEver + 1 else it.likesEver) }
+                if (result is MatchResult.MutualMatch) {
+                    _events.send(ProfileDetailsEvent.NavigateToMatch(profileId))
+                } else {
+                    _events.send(ProfileDetailsEvent.ActionCompleted)
+                }
+                // Reklam yalnızca sunucu onayı ve arayüz geçişinden sonra denenir.
+                if (isLike && AdDisplayRules.allowsLikeInterstitial(result)) {
+                    val attempt = likeInterstitialGateway.attemptShowAfterTransition(isFree, _state.value.likesEver)
+                    likeInterstitialGateway.recordAction(isFree, attempt, true)
+                } else if (isLike && AdDisplayRules.countsTowardAdCadence(result)) {
+                    likeInterstitialGateway.recordAction(isFree, LikeInterstitialAttempt(countSuccessfulLike = true), true)
+                }
+            },
         )
-        viewModelScope.launch {
-            val isFree = current.entitlement.isResolved && current.entitlement.limits.showsAds
-            // Gereksinim 1.3: sunucuya gönderilmeden ÖNCE eylemi kalıcı kuyruğa yaz (bkz. aynı
-            // desenin DiscoverViewModel.likeProfile()'daki KDoc'u).
-            val pendingAction = if (isLike) {
-                PendingSwipeAction(profileId, isLike = true, enqueuedAtMillis = getCurrentTimeMillis())
-                    .also { pendingActionQueue.enqueue(it) }
-            } else null
-            val result = interactionRepository.swipeUser(profileId, isLike = isLike)
-            pendingAction?.let { pendingActionQueue.remove(it) }
-            val succeeded = result !is MatchResult.Error
-            when (result) {
-                is MatchResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isActionInFlight = false,
-                        swipesUsedToday = if (isLike) (_state.value.swipesUsedToday - 1).coerceAtLeast(0) else _state.value.swipesUsedToday
-                    )
-                    _events.emit(ProfileDetailsEvent.ShowMessage(getString(Res.string.error_swipe_failed)))
-                }
-                is MatchResult.MutualMatch -> {
-                    // Tell Discovery to drop the card before the match screen takes over, so
-                    // coming back from it does not show someone already matched with.
-                    repository.markActedOn(profileId)
-                    _state.value = _state.value.copy(
-                        isActionInFlight = false,
-                        isActedOn = true,
-                        likesEver = if (isLike) _state.value.likesEver + 1 else _state.value.likesEver,
-                    )
-                    _events.emit(ProfileDetailsEvent.NavigateToMatch(profileId))
-                }
-                else -> {
-                    repository.markActedOn(profileId)
-                    _state.value = _state.value.copy(
-                        isActionInFlight = false,
-                        isActedOn = true,
-                        likesEver = if (isLike) _state.value.likesEver + 1 else _state.value.likesEver,
-                    )
-                    // The card disappearing from the feed is the confirmation; a toast the
-                    // user navigates away from before reading is not.
-                    _events.emit(ProfileDetailsEvent.ActionCompleted)
-                }
-            }
-            // Gereksinim 2.15 (KRİTİK): bkz. DiscoverViewModel.likeProfile() KDoc'u — aynı
-            // gerekçeyle interstitial burada da yalnızca sunucu yanıtı işlenip arayüz geçişi
-            // (yukarıdaki `when` bloğu) tamamlandıktan SONRA denenir.
-            // Reklam gösterim kuralı: karşılıklı eşleşmede kutlama ekranı reklamla kesilmez
-            // (bkz. AdDisplayRules); eşleşme yine de reklam sıklığı sayacına eklenir.
-            if (isLike && AdDisplayRules.allowsLikeInterstitial(result)) {
-                val adAttempt = likeInterstitialGateway.attemptShowAfterTransition(isFree, _state.value.likesEver)
-                likeInterstitialGateway.recordAction(isFree, adAttempt, succeeded)
-            } else if (isLike && AdDisplayRules.countsTowardAdCadence(result)) {
-                likeInterstitialGateway.recordAction(isFree, LikeInterstitialAttempt(countSuccessfulLike = true), succeeded)
-            }
-        }
     }
 
     fun onUpgradeClicked() {
         val reason = _state.value.limitReason
         _state.value = _state.value.copy(limitReason = null)
-        viewModelScope.launch { _events.emit(ProfileDetailsEvent.NavigateToPaywall(PaywallRequest(reason))) }
+        viewModelScope.launch { _events.send(ProfileDetailsEvent.NavigateToPaywall(PaywallRequest(reason))) }
     }
 
     /** Limit sayfasında "Standart'ı ücretsiz dene" seçildi. */
@@ -207,7 +181,7 @@ class ProfileDetailsViewModel(
         val reason = _state.value.limitReason
         _state.value = _state.value.copy(limitReason = null)
         viewModelScope.launch {
-            _events.emit(ProfileDetailsEvent.NavigateToPaywall(PaywallRequest(reason, preselectTrial = true)))
+            _events.send(ProfileDetailsEvent.NavigateToPaywall(PaywallRequest(reason, preselectTrial = true)))
         }
     }
 
@@ -233,7 +207,7 @@ class ProfileDetailsViewModel(
         viewModelScope.launch {
             val currentUid = Firebase.auth.currentUser?.uid ?: return@launch
             val chatId = chatRepository.buildChatId(currentUid, profileId)
-            _events.emit(ProfileDetailsEvent.NavigateToChat(chatId = chatId, peerUid = profileId))
+            _events.send(ProfileDetailsEvent.NavigateToChat(chatId = chatId, peerUid = profileId))
         }
     }
 
@@ -275,7 +249,9 @@ class ProfileDetailsViewModel(
                     showReportDialog = false,
                     selectedReportReason = null
                 )
-                _events.emit(ProfileDetailsEvent.ReportSubmitted)
+                _events.send(ProfileDetailsEvent.ReportSubmitted)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 // Silently ignore — the user sees the dialog close regardless.
             }
@@ -308,7 +284,9 @@ class ProfileDetailsViewModel(
                         merge = true
                     )
                 _state.value = _state.value.copy(showBlockConfirmDialog = false)
-                _events.emit(ProfileDetailsEvent.BlockConfirmed)
+                _events.send(ProfileDetailsEvent.BlockConfirmed)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _state.value = _state.value.copy(showBlockConfirmDialog = false)
             }
@@ -394,7 +372,7 @@ class ProfileDetailsViewModel(
                 val message = e.message ?: getString(Res.string.error_generic)
                 if (progressiveLoadingEnabled && _state.value.profile != null) {
                     // İkincil sorgu hatası metni ve fotoğraf yüklemelerini ekrandan kaldırmaz.
-                    _events.emit(ProfileDetailsEvent.ShowMessage(message))
+                    _events.send(ProfileDetailsEvent.ShowMessage(message))
                 } else {
                     _state.update { it.copy(error = message, isLoading = false) }
                 }

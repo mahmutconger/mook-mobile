@@ -2,6 +2,9 @@ package com.mcclabs.mook.feature.liked
 
 import com.mcclabs.mook.ui.layout.scaffoldPadding
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 
 import com.mcclabs.mook.ui.loading.LoadingSkeleton
 import com.mcclabs.mook.ui.loading.SkeletonLayout
@@ -59,9 +62,21 @@ fun LikedScreen(
     viewModel: LikedViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collect { event ->
+                when (event) {
+                    is LikedEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
     val currentUserId = Firebase.auth.currentUser?.uid.orEmpty()
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -129,7 +144,7 @@ fun LikedScreen(
                     )
                 }
 
-                state.liked.isEmpty() -> Text(
+                state.visibleLiked.isEmpty() -> Text(
                     text = stringResource(Res.string.liked_empty),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleMedium
@@ -145,8 +160,8 @@ fun LikedScreen(
                     item(key = "walktalk_demo_promo") {
                         WalkTalkDemoPromoCard(onClick = onNavigateToWalkTalkDemo)
                     }
-                    items(state.liked, key = { it.profile.id }) { liked ->
-                        LikedRow(liked = liked, onClick = { onNavigateToProfile(liked.profile.id) }, onImageLoadChanged = viewModel::onImageLoadChanged)
+                    items(state.visibleLiked, key = { it.profile.id }) { liked ->
+                        LikedRow(onUnlike = { viewModel.unlikeProfile(liked.profile.id) }, liked = liked, onClick = { onNavigateToProfile(liked.profile.id) }, onImageLoadChanged = viewModel::onImageLoadChanged)
                     }
                 }
             }
@@ -155,7 +170,7 @@ fun LikedScreen(
 }
 
 @Composable
-private fun LikedRow( liked: LikedProfile, onClick: () -> Unit, onImageLoadChanged: (String, ImageLoadStatus) -> Unit) {
+private fun LikedRow(onUnlike: () -> Unit, liked: LikedProfile, onClick: () -> Unit, onImageLoadChanged: (String, ImageLoadStatus) -> Unit) {
     val profile = liked.profile
     Row(
         modifier = Modifier
@@ -212,6 +227,10 @@ private fun LikedRow( liked: LikedProfile, onClick: () -> Unit, onImageLoadChang
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+        }
+
+        IconButton(onClick = onUnlike) {
+            Icon(Icons.Filled.Favorite, contentDescription = "Beğeniyi geri çek", tint = MaterialTheme.colorScheme.primary)
         }
 
         if (liked.isMatch) {

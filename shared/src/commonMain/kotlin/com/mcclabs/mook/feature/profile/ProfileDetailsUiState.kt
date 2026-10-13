@@ -34,6 +34,8 @@ data class ProfileDetailsUiState(
     val isActedOn: Boolean = false,
     /** A like or pass write is in flight; both buttons are disabled meanwhile. */
     val isActionInFlight: Boolean = false,
+    /** Sunucu onayı beklenirken de anlık beğeni geri bildirimini taşır. */
+    val isLiked: Boolean = false,
     /** Live entitlement; Economy and Standard must not be treated as the Free tier. */
     val entitlement: EntitlementState = EntitlementState(),
     /** Likes used today, read from the server when the profile loads. */

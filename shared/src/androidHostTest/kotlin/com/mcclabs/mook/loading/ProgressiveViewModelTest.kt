@@ -1,5 +1,6 @@
 package com.mcclabs.mook.loading
 
+import com.mcclabs.mook.domain.interaction.SetLikeUseCase
 import com.mcclabs.mook.domain.analytics.AnalyticsRepository
 import com.mcclabs.mook.domain.billing.*
 import com.mcclabs.mook.domain.connectivity.ConnectivityObserver
@@ -50,7 +51,7 @@ class ProgressiveViewModelTest {
     fun likedMovesFromLoadingToTextThenImageSuccess() = runTest {
         val response = CompletableDeferred<List<LikedProfile>>()
         coEvery { repository.getLikedProfiles() } coAnswers { response.await() }
-        val viewModel = LikedViewModel(repository)
+        val viewModel = LikedViewModel(repository, SetLikeUseCase(mockk(relaxed = true)))
         assertEquals(ContentLoadingPhase.Loading, viewModel.state.value.loadingPhase)
         runCurrent()
         response.complete(listOf(LikedProfile(profile, false)))
@@ -66,7 +67,7 @@ class ProgressiveViewModelTest {
     @Test
     fun likedImageFailureEndsShimmerAndPreservesText() = runTest {
         coEvery { repository.getLikedProfiles() } returns listOf(LikedProfile(profile, false))
-        val viewModel = LikedViewModel(repository)
+        val viewModel = LikedViewModel(repository, SetLikeUseCase(mockk(relaxed = true)))
         runCurrent()
         viewModel.onImageLoadChanged("photo-1", ImageLoadStatus.Error)
         assertFalse(viewModel.state.value.imagesLoading)
@@ -107,8 +108,8 @@ class ProgressiveViewModelTest {
         val metadata = CompletableDeferred<Boolean>()
         coEvery { repository.getDiscoverProfiles(any()) } coAnswers { response.await() }
         coEvery { settings.getHasSeenLikedMeTutorial() } coAnswers { metadata.await() }
-        val viewModel = DiscoverViewModel(repository, interactions, settings, subscriptions, mockk(relaxed = true),
-            mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk<AnalyticsRepository>(relaxed = true))
+        val viewModel = DiscoverViewModel(repository, interactions, settings, subscriptions,
+            mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk<AnalyticsRepository>(relaxed = true), SetLikeUseCase(mockk(relaxed = true)))
         assertEquals(ContentLoadingPhase.Loading, viewModel.state.value.loadingPhase)
         runCurrent()
         response.complete(listOf(profile))
@@ -185,8 +186,8 @@ class ProgressiveViewModelTest {
         val metadata = CompletableDeferred<Boolean>()
         coEvery { repository.getProfileDetails("peer") } coAnswers { response.await() }
         coEvery { interactions.checkMutualMatch("peer") } coAnswers { metadata.await() }
-        val viewModel = ProfileDetailsViewModel(repository, interactions, subscriptions, chats, connectivity, mockk(relaxed = true),
-            mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), "peer")
+        val viewModel = ProfileDetailsViewModel(repository, interactions, subscriptions, chats, connectivity,
+            mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), "peer", SetLikeUseCase(mockk(relaxed = true)))
         assertEquals(ContentLoadingPhase.Loading, viewModel.state.value.loadingPhase)
         runCurrent()
         response.complete(profile)
@@ -207,7 +208,7 @@ class ProgressiveViewModelTest {
     @Test
     fun emptyAndPhotolessListsFinishWithoutShimmer() = runTest {
         coEvery { repository.getLikedProfiles() } returns listOf(LikedProfile(profile.copy(photoUrls = listOf("", " ")), false))
-        val viewModel = LikedViewModel(repository)
+        val viewModel = LikedViewModel(repository, SetLikeUseCase(mockk(relaxed = true)))
         runCurrent()
         assertEquals(ContentLoadingPhase.Success, viewModel.state.value.loadingPhase)
         coEvery { repository.getLikedProfiles() } returns emptyList()
@@ -220,7 +221,7 @@ class ProgressiveViewModelTest {
     @Test
     fun likedDataFailureEmitsErrorWithoutImageLoading() = runTest {
         coEvery { repository.getLikedProfiles() } throws IllegalStateException("Bağlantı kurulamadı")
-        val viewModel = LikedViewModel(repository)
+        val viewModel = LikedViewModel(repository, SetLikeUseCase(mockk(relaxed = true)))
         runCurrent()
         assertEquals(ContentLoadingPhase.Error, viewModel.state.value.loadingPhase)
         assertFalse(viewModel.state.value.imagesLoading)
@@ -229,7 +230,7 @@ class ProgressiveViewModelTest {
     @Test
     fun reloadCancelsOldLikedRequestAndPreservesNewestText() = runTest {
         coEvery { repository.getLikedProfiles() } coAnswers { awaitCancellation() }
-        val viewModel = LikedViewModel(repository)
+        val viewModel = LikedViewModel(repository, SetLikeUseCase(mockk(relaxed = true)))
         runCurrent()
         coEvery { repository.getLikedProfiles() } returns listOf(LikedProfile(profile, false))
         viewModel.load()

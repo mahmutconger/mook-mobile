@@ -39,6 +39,7 @@ export {
     recordProfileVisit,
     setIncognito,
     swipe,
+    unlike,
     switchRoom,
     syncPublicProfile,
     unlockLikedMe,

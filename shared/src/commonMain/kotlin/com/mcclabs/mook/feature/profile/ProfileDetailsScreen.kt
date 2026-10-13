@@ -1,6 +1,8 @@
 package com.mcclabs.mook.feature.profile
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.Lifecycle
 
 import com.mcclabs.mook.ui.theme.LocalAppColors
@@ -74,21 +76,24 @@ fun ProfileDetailsScreen(
     var pendingChatUrl by remember { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                // Don't redirect immediately — show a branded explainer first.
-                is ProfileDetailsEvent.OpenDeepLink -> pendingChatUrl = event.url
-                is ProfileDetailsEvent.ReportSubmitted -> onNavigateBack()
-                is ProfileDetailsEvent.BlockConfirmed -> onNavigateBack()
-                is ProfileDetailsEvent.NavigateToMatch -> onNavigateToMatch(event.matchedUserId)
-                is ProfileDetailsEvent.NavigateToChat -> onNavigateToChat(event.chatId, event.peerUid)
-                // The feed is what the user was doing; a like or pass returns them to it.
-                ProfileDetailsEvent.ActionCompleted -> {
-                    onNavigateBack()
+    val eventLifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel, eventLifecycleOwner) {
+        eventLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collect { event ->
+                when (event) {
+                    // Don't redirect immediately — show a branded explainer first.
+                    is ProfileDetailsEvent.OpenDeepLink -> pendingChatUrl = event.url
+                    is ProfileDetailsEvent.ReportSubmitted -> onNavigateBack()
+                    is ProfileDetailsEvent.BlockConfirmed -> onNavigateBack()
+                    is ProfileDetailsEvent.NavigateToMatch -> onNavigateToMatch(event.matchedUserId)
+                    is ProfileDetailsEvent.NavigateToChat -> onNavigateToChat(event.chatId, event.peerUid)
+                    // The feed is what the user was doing; a like or pass returns them to it.
+                    ProfileDetailsEvent.ActionCompleted -> {
+                        onNavigateBack()
+                    }
+                    is ProfileDetailsEvent.NavigateToPaywall -> onNavigateToPaywall(event.request)
+                    is ProfileDetailsEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
                 }
-                is ProfileDetailsEvent.NavigateToPaywall -> onNavigateToPaywall(event.request)
-                is ProfileDetailsEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -196,6 +201,7 @@ fun ProfileDetailsScreen(
                         isMatched = state.isMatched,
                         canAct = state.canAct,
                         isActionInFlight = state.isActionInFlight,
+                        isLiked = state.isLiked,
                         onLike = { viewModel.onLikeClicked() },
                         onPass = { viewModel.onPassClicked() },
                         onSendMessage = { viewModel.onSendMessageClicked() },
@@ -316,6 +322,7 @@ private fun ProfileSheetContent(
     isMatched: Boolean,
     canAct: Boolean,
     isActionInFlight: Boolean,
+    isLiked: Boolean,
     onLike: () -> Unit,
     onPass: () -> Unit,
     onSendMessage: () -> Unit,
@@ -429,6 +436,7 @@ private fun ProfileSheetContent(
             Spacer(modifier = Modifier.height(24.dp))
             LikePassRow(
                 enabled = !isActionInFlight,
+                isLiked = isLiked,
                 onPass = onPass,
                 onLike = onLike
             )
@@ -549,6 +557,7 @@ fun InfoCard(
 @Composable
 private fun LikePassRow(
     enabled: Boolean,
+    isLiked: Boolean,
     onPass: () -> Unit,
     onLike: () -> Unit,
 ) {
@@ -590,7 +599,7 @@ private fun LikePassRow(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(Res.string.profile_like),
+                    text = if (isLiked) "Beğenildi" else "Beğen",
                     color = LocalAppColors.current.onGradient,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall

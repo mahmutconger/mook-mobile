@@ -3,7 +3,9 @@ package com.mcclabs.mook.feature.discover
 import com.mcclabs.mook.ui.layout.scaffoldPadding
 import com.mcclabs.mook.ui.theme.LocalAppColors
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 
 import com.mcclabs.mook.ui.loading.LoadingSkeleton
 import com.mcclabs.mook.ui.loading.SkeletonLayout
@@ -109,10 +111,17 @@ fun DiscoverScreen(
     }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { onDiscoveryAdsHidden() }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(PRESENCE_TICK_MILLIS)
-            nowMillis = getCurrentTimeMillis()
+    val eventLifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel, eventLifecycleOwner) {
+        eventLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collect { event ->
+                when (event) {
+                    is DiscoverEvent.NavigateToProfile -> onNavigateToProfile(event.profileId)
+                    is DiscoverEvent.NavigateToMatch -> onNavigateToMatch(event.matchedUserId)
+                    is DiscoverEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                    is DiscoverEvent.NavigateToPaywall -> onNavigateToPaywall(event.request)
+                }
+            }
         }
     }
 
@@ -261,6 +270,7 @@ fun DiscoverScreen(
                                             profile = profile,
                                             nowMillis = nowMillis,
                                             isLiked = profile.id in state.likedProfileIds,
+                                            isLikePending = state.isSwipeInFlight,
                                             onClick = { viewModel.onProfileClicked(profile.id) },
                                             onLike = { viewModel.likeProfile(profile.id) },
                                             onPass = { viewModel.passProfile(profile.id) },

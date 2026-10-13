@@ -28,6 +28,9 @@ import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.LanguageRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
 import com.mcclabs.mook.data.repository.InteractionRepositoryImpl
+import com.mcclabs.mook.domain.repository.LikeRepository
+import com.mcclabs.mook.data.repository.FirebaseLikeRepository
+import com.mcclabs.mook.domain.interaction.SetLikeUseCase
 import com.mcclabs.mook.domain.repository.InteractionRepository
 import com.mcclabs.mook.data.repository.ChatRepositoryImpl
 import com.mcclabs.mook.domain.repository.ChatRepository
@@ -137,6 +140,8 @@ val appModule = module {
     singleOf(::LanguageRepositoryImpl) bind LanguageRepository::class
     singleOf(::DiscoverRepositoryImpl) bind DiscoverRepository::class
     singleOf(::SettingsRepositoryImpl) bind SettingsRepository::class
+    singleOf(::FirebaseLikeRepository) bind LikeRepository::class
+    singleOf(::SetLikeUseCase)
     singleOf(::InteractionRepositoryImpl) bind InteractionRepository::class
     singleOf(::UpdateRepositoryImpl) bind com.mcclabs.mook.domain.repository.UpdateRepository::class
     single<InAppUpdateGateway> { createInAppUpdateGateway() }
@@ -258,7 +263,7 @@ val appModule = module {
     single<UserTimeZoneRepository> { UserTimeZoneRepositoryImpl() }
 
     // These take a screen argument alongside their injected dependencies.
-    viewModel { parameters -> ProfileDetailsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), parameters.get()) }
+    viewModel { parameters -> ProfileDetailsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), parameters.get(), get()) }
     viewModel { parameters -> MatchViewModel(get(), get(), parameters.get()) }
     viewModel { parameters -> ChatViewModel(get(), get(), get(), get(), get(), parameters.get(), parameters.get()) }
 }
