@@ -24,3 +24,6 @@ firestore-debug.log
 ui-debug.log
 firebase-debug.log
 androidApp/release/
+
+# Temporary document renderings and local analysis output.
+tmp/

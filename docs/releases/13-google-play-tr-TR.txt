@@ -1,0 +1,10 @@
+<tr-TR>
+Görünüm
+• Sistem, açık, koyu ve Okyanus temaları; tercihiniz cihazda saklanır.
+Akıcı kullanım
+• Profil ve sohbet bilgileri fotoğrafları beklemeden görünür. Yeni yükleme göstergeleri eklendi.
+Beğeniler
+• Beğeniler anında görünür; Keşfet ve Beğendiklerim’den geri çekilebilir. Bağlantı hatasında ekranın önceki durumu geri yüklenir.
+Düzeltmeler
+• Profil erişimi ve kilidi açılan profillere geçiş düzeltildi. Klavye ve sistem çubuklarıyla ekran uyumu iyileştirildi.
+</tr-TR>

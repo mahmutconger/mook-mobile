@@ -44,8 +44,8 @@ android {
         applicationId = "com.mcclabs.mook"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 12
-        versionName = "2.0.0"
+        versionCode = 13
+        versionName = "2.1.0"
 
         // This is RevenueCat's Android *public* SDK key, which is intentionally
         // shipped in the app binary. Secret API keys never belong in a client build.
