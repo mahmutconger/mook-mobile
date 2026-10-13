@@ -57,7 +57,8 @@ Secret eksikse fonksiyon deploy'u başarısız olur.
 
 Dizinlerin oluşması dakikalar sürebilir; fonksiyonlardan önce başlat.
 
-- [ ] `firebase deploy --only firestore:indexes`
+- [x] `interactions (toUserId, type, timestamp desc)` dizini 2026-10-03'te REST API ile oluşturuldu (firestore.indexes.json'a da eklendi)
+- [ ] İleride `firebase deploy --only firestore:indexes` çalıştırırsan: "dosyada olmayan dizinleri sil?" sorusuna **N** (onlar eski WalkTalk'un)
       → `interactions` (Beni Beğenenler listesi) ve `messages.senderUid` (hesap silmede herkese açık oda mesajları)
 - [ ] Firebase Console → Firestore → Dizinler: hepsi **Etkin** olana kadar bekle
 

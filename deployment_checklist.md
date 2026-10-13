@@ -256,9 +256,9 @@ tüketir). Bu adım YANLIŞ sırayla yapılırsa PRODUCTION kullanıcılarını 
       fonksiyona çarparsa REDDEDİLİR.
 - [ ] Yukarıdaki madde doğrulandıktan SONRA Cloud Functions'ı bu faz koduyla deploy et
       (`enforceAppCheck: true` sunucu tarafında aktif olur).
-- [ ] Firestore Console → bu veritabanı için App Check **Enforce** modu — `public_profiles`
-      kuralındaki `request.app != null` koşulunun ANLAMLI olması için bu konsol
-      ayarının da açılması GEREKİR (bkz. `firestore.rules`deki not). Enforce modu
+- [ ] Firebase Console → App Check → APIs → **Cloud Firestore** için **Enforce** modu.
+      Firestore Security Rules içinde `request.app` alanı yoktur; App Check doğrulaması
+      bu ürün düzeyindeki ayarla yapılır (bkz. `firestore.rules`deki not). Enforce modu
       AÇILMADAN önce Metrics sekmesinde bir süre "monitor" modunda izlenip mevcut
       istemcilerin App Check jetonu taşıdığı DOĞRULANMALIDIR.
 - [ ] `migrateExistingUsers` (bölüm 1'deki tek seferlik göç) App Check kapsamının
