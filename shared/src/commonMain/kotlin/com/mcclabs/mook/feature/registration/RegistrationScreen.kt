@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
+import com.mcclabs.mook.ui.legal.LocalLegalLinks
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import mook.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -593,19 +595,35 @@ private fun ColumnScope.StepAccount(
 
     Spacer(modifier = Modifier.height(16.dp))
 
+    RegistrationLegalLinks()
+
+    Spacer(modifier = Modifier.height(8.dp))
+}
+
+/** Gizlilik Politikası ve Kullanım Koşulları için iki ayrı bağlantı; adresler seçili dile göredir. */
+@Composable
+internal fun RegistrationLegalLinks() {
     val uriHandler = LocalUriHandler.current
-    TextButton(
-        onClick = { uriHandler.openUri("https://walktalkk.com/legal.html") },
-        modifier = Modifier.fillMaxWidth()
+    val legalLinks = LocalLegalLinks.current
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        RegistrationLegalLink(Res.string.legal_privacy_policy) { uriHandler.openUri(legalLinks.privacyPolicyUrl) }
+        RegistrationLegalLink(Res.string.legal_terms_of_use) { uriHandler.openUri(legalLinks.termsOfUseUrl) }
+    }
+}
+
+@Composable
+private fun RegistrationLegalLink(label: StringResource, onClick: () -> Unit) {
+    TextButton(onClick = onClick) {
         Text(
-            text = stringResource(Res.string.registration_read_privacy_policy),
+            text = stringResource(label),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary
         )
     }
-
-    Spacer(modifier = Modifier.height(8.dp))
 }
 
 /** Small inline error line shown under a field when [message] is non-null. */

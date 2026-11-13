@@ -94,7 +94,6 @@
     <string name="settings_show_in_discover_subtitle">让他人发现你的个人资料</string>
     <string name="settings_age_preferences_label">年龄偏好</string>
     <string name="settings_legal_section">法律</string>
-    <string name="settings_privacy_policy_label">隐私政策和使用条款</string>
     <string name="settings_view_label">查看</string>
     <string name="settings_logout_button">退出登录</string>
     <string name="settings_delete_account_button">永久删除账户</string>
@@ -134,7 +133,6 @@
     <string name="registration_interests_label">兴趣</string>
     <string name="registration_show_in_discover_title">在“发现”中显示我</string>
     <string name="registration_show_in_discover_subtitle">让他人发现你的个人资料</string>
-    <string name="registration_read_privacy_policy">阅读隐私政策和使用条款</string>
     <string name="registration_eula_accept_text">我已阅读并同意 Mook 的服务条款和隐私政策。我了解 Mook 对不良内容和滥用用户零容忍，任何此类行为都将导致永久封禁。</string>
     <string name="chat_error_blocked">您无法再在此对话中发送消息。</string>
     <string name="chat_blocked_notice">此对话已不可用——您可以查看，但无法发送新消息。</string>
@@ -183,7 +181,6 @@
     <string name="paywall_renewal_terms_trial">Free trial, then %1$s · %2$s. Automatically renews until canceled in Google Play.</string>
     <string name="paywall_restore">Restore purchases</string>
     <string name="paywall_manage_google_play">Manage in Google Play</string>
-    <string name="paywall_terms_privacy">Terms · Privacy</string>
     <string name="paywall_distance_selling_contract_waiver">I have read the Distance Selling Contract's Right of Withdrawal Waiver and agree that digital content access begins immediately, waiving my right of withdrawal.</string>
     <string name="paywall_active_title">Your %1$s plan is active</string>
     <string name="paywall_trial_detail">You are currently in a trial.</string>
@@ -270,4 +267,7 @@
     <string name="paywall_load_error">We couldn't load the plans. Check your connection and try again.</string>
     <string name="paywall_retry">Try again</string>
     <!-- needs-translation:end -->
+    <string name="legal_privacy_policy">隐私政策</string>
+    <string name="legal_terms_of_use">使用条款</string>
+    <string name="legal_child_safety">儿童安全标准</string>
 </resources>

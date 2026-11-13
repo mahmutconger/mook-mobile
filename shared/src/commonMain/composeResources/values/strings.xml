@@ -81,7 +81,6 @@
     <string name="paywall_renewal_terms_trial">Free trial, then %1$s · %2$s. Automatically renews until canceled in Google Play.</string>
     <string name="paywall_restore">Restore purchases</string>
     <string name="paywall_manage_google_play">Manage in Google Play</string>
-    <string name="paywall_terms_privacy">Terms · Privacy</string>
     <string name="paywall_distance_selling_contract_waiver">I have read the Distance Selling Contract's Right of Withdrawal Waiver and agree that digital content access begins immediately, waiving my right of withdrawal.</string>
     <string name="paywall_active_title">Your %1$s plan is active</string>
     <string name="paywall_trial_detail">You are currently in a trial.</string>
@@ -221,7 +220,6 @@
     <string name="settings_show_in_discover_subtitle">Let others discover your profile</string>
     <string name="settings_age_preferences_label">Age preferences</string>
     <string name="settings_legal_section">LEGAL</string>
-    <string name="settings_privacy_policy_label">Privacy Policy &amp; Terms of Use</string>
     <string name="settings_view_label">View</string>
     <string name="settings_logout_button">Log Out</string>
     <string name="settings_delete_account_button">Permanently Delete Account</string>
@@ -261,7 +259,6 @@
     <string name="registration_interests_label">INTERESTS</string>
     <string name="registration_show_in_discover_title">Show me in Discover</string>
     <string name="registration_show_in_discover_subtitle">Let others discover your profile</string>
-    <string name="registration_read_privacy_policy">Read Privacy Policy &amp; Terms of Use</string>
     <string name="registration_eula_accept_text">I have read and agree to the Mook Terms of Service and Privacy Policy. I understand that Mook has zero tolerance for objectionable content and abusive users, and any such behavior will result in a permanent ban.</string>
 
     <!-- Common -->
@@ -568,4 +565,7 @@
     <string name="settings_scheduled_change">Your plan will change to %1$s at the end of this period</string>
     <string name="settings_billing_issue_notice">We couldn't process your payment. Update your payment method to keep your subscription.</string>
     <string name="settings_update_payment_method">Update payment method</string>
+    <string name="legal_privacy_policy">Privacy Policy</string>
+    <string name="legal_terms_of_use">Terms of Use</string>
+    <string name="legal_child_safety">Child Safety Standards</string>
 </resources>

@@ -45,9 +45,7 @@ import mook.shared.generated.resources.consent_save_choices
 import mook.shared.generated.resources.consent_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-
-/** KVKK aydınlatma metninin yayınlandığı adres (Ayarlar'daki gizlilik politikasıyla aynı). */
-private const val PRIVACY_NOTICE_URL = "https://walktalkk.com/legal.html"
+import com.mcclabs.mook.ui.legal.LocalLegalLinks
 
 /**
  * KVKK onay ekranını gerektiğinde gösteren kapsayıcı.
@@ -66,6 +64,8 @@ fun PrivacyConsentHost(
     if (!isMandatory && !state.isEditorOpen) return
 
     val uriHandler = LocalUriHandler.current
+    // Aydınlatma metni, seçili uygulama dilindeki gizlilik politikası sayfasında yayınlanır.
+    val privacyPolicyUrl = LocalLegalLinks.current.privacyPolicyUrl
     KvkkConsentBottomSheet(
         choices = state.choices,
         isMandatory = isMandatory,
@@ -75,7 +75,7 @@ fun PrivacyConsentHost(
         onRejectAll = viewModel::rejectAll,
         onSaveChoices = viewModel::saveChoices,
         onDismiss = viewModel::dismissEditor,
-        onReadNotice = { uriHandler.openUri(PRIVACY_NOTICE_URL) },
+        onReadNotice = { uriHandler.openUri(privacyPolicyUrl) },
     )
 }
 

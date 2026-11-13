@@ -72,7 +72,6 @@
     <string name="settings_show_in_discover_subtitle">他の人があなたのプロフィールを見つけられるようにする</string>
     <string name="settings_age_preferences_label">希望する年齢</string>
     <string name="settings_legal_section">法的情報</string>
-    <string name="settings_privacy_policy_label">プライバシーポリシーと利用規約</string>
     <string name="settings_view_label">表示</string>
     <string name="settings_logout_button">ログアウト</string>
     <string name="settings_delete_account_button">アカウントを完全に削除</string>
@@ -112,7 +111,6 @@
     <string name="registration_interests_label">興味・関心</string>
     <string name="registration_show_in_discover_title">ディスカバリーに表示する</string>
     <string name="registration_show_in_discover_subtitle">他の人があなたのプロフィールを見つけられるようにする</string>
-    <string name="registration_read_privacy_policy">プライバシーポリシーと利用規約を読む</string>
     <string name="registration_eula_accept_text">私はMookの利用規約とプライバシーポリシーを読み、同意します。Mookが不適切なコンテンツや迷惑なユーザーに対してゼロ・トレランスであり、そのような行為があった場合は永久に利用禁止となることを理解しています。</string>
     <string name="walktalk_dialog_title">チャットはWalkTalkで続きます</string>
     <string name="walktalk_dialog_title_named">WalkTalkで%1$sさんに会う</string>
@@ -181,7 +179,6 @@
     <string name="paywall_renewal_terms_trial">Free trial, then %1$s · %2$s. Automatically renews until canceled in Google Play.</string>
     <string name="paywall_restore">Restore purchases</string>
     <string name="paywall_manage_google_play">Manage in Google Play</string>
-    <string name="paywall_terms_privacy">Terms · Privacy</string>
     <string name="paywall_distance_selling_contract_waiver">I have read the Distance Selling Contract's Right of Withdrawal Waiver and agree that digital content access begins immediately, waiving my right of withdrawal.</string>
     <string name="paywall_active_title">Your %1$s plan is active</string>
     <string name="paywall_trial_detail">You are currently in a trial.</string>
@@ -268,4 +265,7 @@
     <string name="paywall_load_error">We couldn't load the plans. Check your connection and try again.</string>
     <string name="paywall_retry">Try again</string>
     <!-- needs-translation:end -->
+    <string name="legal_privacy_policy">プライバシーポリシー</string>
+    <string name="legal_terms_of_use">利用規約</string>
+    <string name="legal_child_safety">子どもの安全に関する基準</string>
 </resources>

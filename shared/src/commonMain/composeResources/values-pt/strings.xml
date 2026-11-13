@@ -72,7 +72,6 @@
     <string name="settings_show_in_discover_subtitle">Permitir que outras pessoas descubram seu perfil</string>
     <string name="settings_age_preferences_label">Preferências de idade</string>
     <string name="settings_legal_section">LEGAL</string>
-    <string name="settings_privacy_policy_label">Política de Privacidade &amp; Termos de Uso</string>
     <string name="settings_view_label">Visualizar</string>
     <string name="settings_logout_button">Sair</string>
     <string name="settings_delete_account_button">Excluir conta permanentemente</string>
@@ -112,7 +111,6 @@
     <string name="registration_interests_label">INTERESSES</string>
     <string name="registration_show_in_discover_title">Mostrar-me no Descobrir</string>
     <string name="registration_show_in_discover_subtitle">Permita que outras pessoas descubram seu perfil</string>
-    <string name="registration_read_privacy_policy">Ler Política de Privacidade &amp; Termos de Uso</string>
     <string name="registration_eula_accept_text">Li e concordo com os Termos de Serviço e a Política de Privacidade do Mook. Entendo que o Mook tem tolerância zero para conteúdo censurável e usuários abusivos, e que qualquer comportamento desse tipo resultará em banimento permanente.</string>
     <string name="walktalk_dialog_title">A conversa continua no WalkTalk</string>
     <string name="walktalk_dialog_title_named">Conheça %1$s no WalkTalk</string>
@@ -181,7 +179,6 @@
     <string name="paywall_renewal_terms_trial">Free trial, then %1$s · %2$s. Automatically renews until canceled in Google Play.</string>
     <string name="paywall_restore">Restore purchases</string>
     <string name="paywall_manage_google_play">Manage in Google Play</string>
-    <string name="paywall_terms_privacy">Terms · Privacy</string>
     <string name="paywall_distance_selling_contract_waiver">I have read the Distance Selling Contract's Right of Withdrawal Waiver and agree that digital content access begins immediately, waiving my right of withdrawal.</string>
     <string name="paywall_active_title">Your %1$s plan is active</string>
     <string name="paywall_trial_detail">You are currently in a trial.</string>
@@ -268,4 +265,7 @@
     <string name="paywall_load_error">We couldn't load the plans. Check your connection and try again.</string>
     <string name="paywall_retry">Try again</string>
     <!-- needs-translation:end -->
+    <string name="legal_privacy_policy">Política de Privacidade</string>
+    <string name="legal_terms_of_use">Termos de Utilização</string>
+    <string name="legal_child_safety">Normas de Segurança Infantil</string>
 </resources>
