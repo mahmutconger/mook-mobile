@@ -383,7 +383,7 @@
     <string name="billing_error_in_progress">Zaten devam eden bir satın alma var. Lütfen tamamlanmasını bekleyin.</string>
     <string name="billing_error_activity_unavailable">Satın alırken lütfen uygulamayı açık tutun.</string>
     <string name="billing_error_product_unavailable">Bu plan artık mevcut değil. Yenileyip tekrar deneyin.</string>
-    <string name="billing_error_linked_to_another_account">Bu abonelik zaten başka bir WalkMatch hesabına bağlı. Aktarmak için lütfen destek ile iletişime geç.</string>
+    <string name="billing_error_linked_to_another_account">Bu abonelik zaten başka bir Mook hesabına bağlı. Aktarmak için lütfen destek ile iletişime geç.</string>
     <string name="report_submitted">Şikayet başarıyla gönderildi.</string>
     <string name="report_failed">Şikayet gönderilemedi.</string>
     <string name="user_blocked">Kullanıcı engellendi.</string>
@@ -506,7 +506,7 @@
     <string name="paywall_change_scheduled_no_date">Plan değişikliğin mevcut fatura döneminin sonunda geçerli olacak. O zamana kadar mevcut planının tüm avantajları sürer.</string>
     <string name="room_error_daily_limit">Bugünkü oda değiştirme hakkını kullandın. Yarın tekrar deneyebilir ya da planını yükseltebilirsin.</string>
     <string name="consent_title">Gizliliğin ve veri tercihlerin</string>
-    <string name="consent_intro">Aşağıdaki iki izin tamamen isteğe bağlıdır. İzin vermesen de WalkMatch'in tüm temel özelliklerini kullanmaya devam edebilirsin. Kararını istediğin zaman Ayarlar &gt; Gizlilik ve veri tercihleri bölümünden değiştirebilirsin.</string>
+    <string name="consent_intro">Aşağıdaki iki izin tamamen isteğe bağlıdır. İzin vermesen de Mook'un tüm temel özelliklerini kullanmaya devam edebilirsin. Kararını istediğin zaman Ayarlar &gt; Gizlilik ve veri tercihleri bölümünden değiştirebilirsin.</string>
     <string name="consent_cross_border_title">Analiz için yurt dışına veri aktarımı</string>
     <string name="consent_cross_border_body">Uygulamayı geliştirmek için kullanım verilerin (ör. ziyaret ettiğin ekranlar ve uygulama içi etkinlikler) Google Firebase Analytics aracılığıyla yurt dışındaki sunuculara aktarılarak işlenir. Bu aktarım, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında açık rızana dayanır.</string>
     <string name="consent_personalized_ads_title">Kişiselleştirilmiş reklamlar</string>
