@@ -131,7 +131,9 @@ new_strings = []
 for key, value in merged_data.items():
     if f'name="{key}"' not in content:
         # Escape single quotes, double quotes and ampersands
-        escaped_value = value.replace("&", "&amp;").replace("'", "\\'").replace('"', '\\"').replace("<", "&lt;").replace(">", "&gt;")
+        # Compose Multiplatform kaynakları \' ve \" kaçışlarını çözmez; kesme işareti ve tırnak
+        # olduğu gibi yazılır, yalnızca XML kaçışları uygulanır.
+        escaped_value = value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         new_strings.append(f'    <string name="{key}">{escaped_value}</string>')
 
 if new_strings:

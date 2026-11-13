@@ -132,6 +132,8 @@ class ChatBlockedUiTest {
         showChat()
 
         compose.onNodeWithText(blockedNotice).assertIsDisplayed()
+        // Kesme işareti ekranda ters eğik çizgisiz görünmeli (Compose kaynakları bu kaçışı çözmez).
+        org.junit.Assert.assertTrue(blockedNotice, "can't" in blockedNotice && !blockedNotice.contains(92.toChar()))
         assertComposerIsGone()
         coVerify(exactly = 0) { chats.sendMessage(any(), any(), any(), any(), any()) }
     }
