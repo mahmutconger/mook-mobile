@@ -5,6 +5,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { consumeMessageQuota, isRecipientAtDailyMessageLimit, resolveTierFor } from "./monetization";
 import { assertNotBanned } from "./moderation";
 import { recordAbuseSignal } from "./abuseFlags";
+import { BLOCKED_USER_ERROR, isBlockedBetween } from "./blocking";
 
 if (admin.apps.length === 0) admin.initializeApp();
 const db = admin.firestore();
@@ -287,7 +288,21 @@ export const sendMessage = onCall(
         //    jetonlarını taşır. Sohbet belgesinde önbelleğe ALINMAZ: dilini sonradan
         //    değiştiren bir kullanıcı aksi halde eski dilde mesaj almaya devam ederdi.
         //    "EN-US" yalnızca son çaredir.
-        const peerData = (await db.collection("users").doc(data.peerUid).get()).data();
+        const [peerSnapshot, ownSnapshot] = await Promise.all([
+            db.collection("users").doc(data.peerUid).get(),
+            db.collection("users").doc(uid).get(),
+        ]);
+        const peerData = peerSnapshot.data();
+
+        // Engel iki yönlüdür: gönderen karşı tarafı engellediyse YA DA karşı taraf
+        // göndereni engellediyse mesaj kaydedilmez, çevrilmez ve bildirim gönderilmez.
+        // Eşleşme belgesi engellemeden sonra da durduğu için yukarıdaki eşleşme kontrolü
+        // tek başına yetmez. Kota adımından ÖNCE çalışır: reddedilen mesaj kota harcamaz.
+        // Hata metni iki yön için de aynıdır, böylece engellenen kişi engellendiğini
+        // öğrenmez.
+        if (isBlockedBetween(uid, ownSnapshot.data(), data.peerUid, peerData)) {
+            throw new HttpsError("permission-denied", BLOCKED_USER_ERROR);
+        }
         const targetLanguage = (readUserLanguage(peerData) ?? "EN-US").toUpperCase();
         const sourceLanguage = (data.senderLanguage || "").toUpperCase();
 

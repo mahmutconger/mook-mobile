@@ -476,6 +476,8 @@
     <string name="chat_error_rate_limited">You are sending messages too quickly. Please wait a moment.</string>
     <string name="chat_error_character_quota_exhausted">You\'ve used up your translation quota for today. It resets automatically.</string>
     <string name="chat_error_send_failed">Message could not be sent. Please try again.</string>
+    <string name="chat_error_blocked">You can no longer send messages in this conversation.</string>
+    <string name="chat_blocked_notice">This conversation is no longer available — you can view it, but can\'t send new messages.</string>
     <string name="chat_list_yesterday">Yesterday</string>
     <string name="chat_message_deleted">This message was deleted</string>
     <string name="chat_action_delete">Delete message</string>

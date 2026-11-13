@@ -213,3 +213,32 @@ test("new-chat and message ceilings prevent the 51st free message", { timeout: 3
     assert.equal(usage.messages, 50);
     assert.equal(usage.newChats, 3);
 });
+
+test("blocked users cannot message each other in either direction", { timeout: 30000, concurrency: true }, async () => {
+    const blocker = await actor();
+    const blocked = await actor();
+    const chatId = [blocker.uid, blocked.uid].sort().join("_");
+    // Eşleşme belgesi engellemeden sonra da durur; engel kontrolü bu yüzden ayrıca gerekir.
+    await db.collection("matches").doc(chatId).set({ users: [blocker.uid, blocked.uid].sort() });
+    await db.collection("users").doc(blocker.uid).update({ blockedUsers: [blocked.uid] });
+
+    // Engellenen kişi, onu engelleyene yazamaz.
+    const fromBlocked = await callable("sendMessage", blocked.token, {
+        chatId, peerUid: blocker.uid, text: "hello?", senderLanguage: "EN-US", messageId: "blocked-message-1",
+    });
+    assertError(fromBlocked, "PERMISSION_DENIED");
+    assert.equal(fromBlocked.body.error?.message, "blocked-user");
+
+    // Engelleyen kişi de engellediği kişiye yazamaz.
+    const fromBlocker = await callable("sendMessage", blocker.token, {
+        chatId, peerUid: blocked.uid, text: "hello", senderLanguage: "EN-US", messageId: "blocked-message-2",
+    });
+    assertError(fromBlocker, "PERMISSION_DENIED");
+    assert.equal(fromBlocker.body.error?.message, "blocked-user");
+
+    // Reddedilen mesajlar kaydedilmez ve kota harcamaz.
+    const messages = await db.collection("chats").doc(chatId).collection("messages").get();
+    assert.equal(messages.size, 0);
+    const blockedUsage = (await db.collection("usage").doc(blocked.uid).get()).data();
+    assert.equal(blockedUsage?.messages ?? 0, 0);
+});

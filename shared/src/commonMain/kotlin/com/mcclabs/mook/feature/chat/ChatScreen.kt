@@ -76,6 +76,8 @@ import mook.shared.generated.resources.chat_action_report
 import mook.shared.generated.resources.chat_action_retry
 import mook.shared.generated.resources.chat_composer_placeholder
 import mook.shared.generated.resources.chat_empty
+import mook.shared.generated.resources.chat_blocked_notice
+import mook.shared.generated.resources.chat_error_blocked
 import mook.shared.generated.resources.chat_error_character_quota_exhausted
 import mook.shared.generated.resources.chat_error_not_matched
 import mook.shared.generated.resources.chat_error_rate_limited
@@ -185,8 +187,12 @@ fun ChatScreen(
                 // salt-okunur olur — kompozer yerine bir bilgi şeridi gösterilir.
                 // Yalnızca Çeviri Kotası: çeviri kotası bitse bile kompozer KAPANMAZ — mesajlar
                 // çevrilmeden gönderilir ve sohbete bir kez bilgilendirme notu düşülür.
-                if (state.isReadOnly) {
-                    ReadOnlyRoomBanner()
+                // Engel, oda kapanmasından önce gelir: engellenen bir sohbette oda açık
+                // olsa bile yazılamaz. Metin kimin kimi engellediğini söylemez.
+                if (state.isBlocked) {
+                    ChatNoticeBanner(Res.string.chat_blocked_notice)
+                } else if (state.isReadOnly) {
+                    ChatNoticeBanner(Res.string.chat_room_closed_read_only)
                 } else {
                     ChatComposer(
                         text = state.composerText,
@@ -580,17 +586,19 @@ private fun ChatSendError.messageRes(): StringResource = when (this) {
     ChatSendError.NOT_MATCHED -> Res.string.chat_error_not_matched
     ChatSendError.RATE_LIMITED -> Res.string.chat_error_rate_limited
     ChatSendError.CHARACTER_QUOTA_EXHAUSTED -> Res.string.chat_error_character_quota_exhausted
+    ChatSendError.BLOCKED -> Res.string.chat_error_blocked
     ChatSendError.GENERIC -> Res.string.chat_error_send_failed
 }
 
 // ── Composer ────────────────────────────────────────────────────────────
 
 /**
- * Shown instead of [ChatComposer] when [ChatUiState.isReadOnly] is `true`
- * (Gereksinim 1.7) — the conversation stays visible, but nothing can be typed.
+ * Shown instead of [ChatComposer] when nothing can be typed: the chat's room is closed
+ * ([ChatUiState.isReadOnly], Gereksinim 1.7) or one of the users blocked the other
+ * ([ChatUiState.isBlocked]). The conversation itself stays visible.
  */
 @Composable
-private fun ReadOnlyRoomBanner() {
+private fun ChatNoticeBanner(message: StringResource) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -598,7 +606,7 @@ private fun ReadOnlyRoomBanner() {
         horizontalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(Res.string.chat_room_closed_read_only),
+            text = stringResource(message),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

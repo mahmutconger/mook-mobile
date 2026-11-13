@@ -12,6 +12,7 @@ import com.mcclabs.mook.domain.model.ChatSendError
 import com.mcclabs.mook.domain.model.ChatSendException
 import com.mcclabs.mook.domain.model.Languages
 import com.mcclabs.mook.domain.model.MessageStatus
+import com.mcclabs.mook.domain.moderation.canComposeInChat
 import com.mcclabs.mook.domain.repository.ChatRepository
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.RoomSlotRepository
@@ -120,6 +121,7 @@ class ChatViewModel(
         loadPeerProfile()
         observeMessages()
         loadReadOnlyState()
+        loadBlockState()
         observeReadReceipts()
     }
 
@@ -207,6 +209,23 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Kullanıcı karşı tarafı engellediyse kompozer baştan kapatılır. Karşı tarafın
+     * kullanıcıyı engellediği durum buradan bilinemez; o durumda ilk gönderim sunucudan
+     * [ChatSendError.BLOCKED] ile döner ve [dispatchSend] aynı bayrağı açar.
+     */
+    private fun loadBlockState() {
+        viewModelScope.launch {
+            if (chatRepository.hasBlocked(peerUid)) {
+                _state.update { it.copy(isBlocked = true) }
+            }
+        }
+    }
+
+    /** Oda kapalıysa veya iki taraftan biri diğerini engellediyse gönderim yapılmaz. */
+    private val canCompose: Boolean
+        get() = _state.value.let { canComposeInChat(isReadOnly = it.isReadOnly, isBlocked = it.isBlocked) }
+
     // ── Real-time message stream ────────────────────────────────────────
 
     private fun observeMessages() {
@@ -288,7 +307,7 @@ class ChatViewModel(
         // Gereksinim 1.7: arayüz zaten kompozer'ı devre dışı bırakır (bkz.
         // `ChatUiState.isReadOnly`); bu, o korumayı atlayan herhangi bir çağrı yolu
         // için ikinci bir güvenlik hattıdır. Çeviri kotasının bitmesi gönderimi ENGELLEMEZ.
-        if (_state.value.isReadOnly) return
+        if (!canCompose) return
         val text = _state.value.composerText.trim()
         if (text.isBlank()) return
 
@@ -298,7 +317,7 @@ class ChatViewModel(
 
     /** Re-sends a message that previously failed, reusing its id so it cannot double-post. */
     fun onRetry(message: ChatMessage) {
-        if (_state.value.isReadOnly) return
+        if (!canCompose) return
         val pending = pendingMessages[message.id] ?: return
         closeActionSheet()
         dispatchSend(messageId = message.id, text = pending.text)
@@ -342,7 +361,14 @@ class ChatViewModel(
                 onTranslationQuotaStateKnown(result.translationQuotaExhausted)
             } catch (e: ChatSendException) {
                 markFailed(messageId)
-                _state.update { it.copy(sendError = e.reason) }
+                _state.update {
+                    it.copy(
+                        sendError = e.reason,
+                        // Sunucu engel nedeniyle reddettiyse kompozer kapanır; kullanıcı
+                        // aynı hatayı tekrar tekrar görmek için yazmaya devam etmez.
+                        isBlocked = it.isBlocked || e.reason == ChatSendError.BLOCKED,
+                    )
+                }
             }
         }
     }
