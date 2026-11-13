@@ -317,9 +317,11 @@ class ChatViewModel(
 
     /** Re-sends a message that previously failed, reusing its id so it cannot double-post. */
     fun onRetry(message: ChatMessage) {
+        // Gönderim reddedilse bile eylem sayfası kapanır; aksi halde engelli/salt-okunur
+        // bir sohbette "Yeniden dene" hiçbir şey yapmayan açık bir sayfa bırakırdı.
+        closeActionSheet()
         if (!canCompose) return
         val pending = pendingMessages[message.id] ?: return
-        closeActionSheet()
         dispatchSend(messageId = message.id, text = pending.text)
     }
 

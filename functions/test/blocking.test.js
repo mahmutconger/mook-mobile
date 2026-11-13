@@ -22,6 +22,17 @@ test("Karşı taraf göndereni engellediyse de engel vardır (iki yönlü)", () 
     assert.equal(isBlockedBetween("uidA", {}, "uidB", { blockedUsers: ["uidA"] }), true);
 });
 
+test("Karşılıklı engelde (A B'yi, B de A'yı engelledi) engel sürer ve hata fırlatılmaz", () => {
+    const a = { blockedUsers: ["uidB"] };
+    const b = { blockedUsers: ["uidA"] };
+    assert.equal(isBlockedBetween("uidA", a, "uidB", b), true);
+    assert.equal(isBlockedBetween("uidB", b, "uidA", a), true);
+});
+
+test("Engel kaldırılınca (liste boşalınca) ikili yeniden mesajlaşabilir", () => {
+    assert.equal(isBlockedBetween("uidA", { blockedUsers: [] }, "uidB", { blockedUsers: [] }), false);
+});
+
 test("Üçüncü kişilerin engellenmesi bu ikiliyi etkilemez", () => {
     assert.equal(isBlockedBetween("uidA", { blockedUsers: ["uidC"] }, "uidB", { blockedUsers: ["uidD"] }), false);
 });
