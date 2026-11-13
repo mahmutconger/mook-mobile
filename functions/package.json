@@ -19,7 +19,7 @@
     "test:rules": "firebase --config ../firebase.json emulators:exec --only firestore --project demo-walkmatch-rules \"node --test test/firestore.rules.test.js test/firestore.security.test.js\""
   },
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "dependencies": {
     "firebase-admin": "^12.1.0",
