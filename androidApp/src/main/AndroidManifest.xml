@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Required for Firebase Auth, Firestore, Storage, and Coil image loading. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!--
-        Photo picker (ActivityResultContracts.PickVisualMedia) does NOT require
-        storage permissions on API 33+. The declarations below are kept only for
-        API 24–32 devices where the legacy picker needs READ_EXTERNAL_STORAGE.
-        On API 33+ they are ignored by the system.
+        Reklam kimliği: AdMob reklamları ve (kişiselleştirilmiş reklam onayı varsa) Firebase
+        Analytics için. Reklam SDK'sı yalnızca KVKK onay ekranında karar verildikten sonra
+        başlatılır (bkz. AdMobConsentManager.applyAdsGate).
     -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
+    <!--
+        Fotoğraf seçimi (ActivityResultContracts.PickVisualMedia) hiçbir Android sürümünde
+        depolama izni gerektirmez: API 33+'ta sistem Fotoğraf Seçicisi, daha eski sürümlerde
+        Google Play hizmetlerinin sağladığı seçici ya da ACTION_OPEN_DOCUMENT kullanılır ve
+        uygulamaya yalnızca seçilen dosya için geçici erişim verilir. Uygulama bu izni hiçbir
+        yerde istemediği için bildirilmez; tools:node="remove" ise bir kütüphanenin onu
+        birleşik manifest'e eklemesini de engeller.
+    -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+        tools:node="remove" />
 
     <!--
         New-message push notifications (Android 13+). Without this the system drops
