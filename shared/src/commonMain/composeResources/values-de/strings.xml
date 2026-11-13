@@ -72,7 +72,6 @@
     <string name="settings_show_in_discover_subtitle">Lass andere dein Profil entdecken</string>
     <string name="settings_age_preferences_label">Alterspräferenzen</string>
     <string name="settings_legal_section">RECHTLICHES</string>
-    <string name="settings_privacy_policy_label">Datenschutz &amp; Nutzungsbedingungen</string>
     <string name="settings_view_label">Ansehen</string>
     <string name="settings_logout_button">Abmelden</string>
     <string name="settings_delete_account_button">Konto dauerhaft löschen</string>
@@ -112,7 +111,6 @@
     <string name="registration_interests_label">INTERESSEN</string>
     <string name="registration_show_in_discover_title">Mich in Entdecken anzeigen</string>
     <string name="registration_show_in_discover_subtitle">Lass andere dein Profil entdecken</string>
-    <string name="registration_read_privacy_policy">Datenschutzrichtlinien &amp; Nutzungsbedingungen lesen</string>
     <string name="registration_eula_accept_text">Ich habe die Nutzungsbedingungen und Datenschutzrichtlinien von Mook gelesen und stimme ihnen zu. Ich verstehe, dass Mook null Toleranz für anstößige Inhalte und missbräuchliche Benutzer hat, und jegliches derartiges Verhalten zu einer dauerhaften Sperrung führt.</string>
     <string name="walktalk_dialog_title">Der Chat geht auf WalkTalk weiter</string>
     <string name="walktalk_dialog_title_named">Triff %1$s auf WalkTalk</string>
@@ -181,7 +179,6 @@
     <string name="paywall_renewal_terms_trial">Free trial, then %1$s · %2$s. Automatically renews until canceled in Google Play.</string>
     <string name="paywall_restore">Restore purchases</string>
     <string name="paywall_manage_google_play">Manage in Google Play</string>
-    <string name="paywall_terms_privacy">Terms · Privacy</string>
     <string name="paywall_distance_selling_contract_waiver">I have read the Distance Selling Contract's Right of Withdrawal Waiver and agree that digital content access begins immediately, waiving my right of withdrawal.</string>
     <string name="paywall_active_title">Your %1$s plan is active</string>
     <string name="paywall_trial_detail">You are currently in a trial.</string>
@@ -221,7 +218,7 @@
     <string name="billing_error_in_progress">A purchase is already in progress. Please wait for it to finish.</string>
     <string name="billing_error_activity_unavailable">Please keep the app open while purchasing.</string>
     <string name="billing_error_product_unavailable">This plan is no longer available. Refresh and try again.</string>
-    <string name="billing_error_linked_to_another_account">This subscription is already linked to another WalkMatch account. To transfer it, contact support.</string>
+    <string name="billing_error_linked_to_another_account">This subscription is already linked to another Mook account. To transfer it, contact support.</string>
     <string name="discover_boost">Boost</string>
     <string name="discover_boost_active">Boost active</string>
     <string name="discover_boost_started">Your profile is boosted for 30 minutes.</string>
@@ -268,4 +265,7 @@
     <string name="paywall_load_error">We couldn't load the plans. Check your connection and try again.</string>
     <string name="paywall_retry">Try again</string>
     <!-- needs-translation:end -->
+    <string name="legal_privacy_policy">Datenschutzerklärung</string>
+    <string name="legal_terms_of_use">Nutzungsbedingungen</string>
+    <string name="legal_child_safety">Standards zum Schutz von Kindern</string>
 </resources>

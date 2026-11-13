@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalUriHandler
+import com.mcclabs.mook.ui.legal.LocalLegalLinks
 import com.mcclabs.mook.domain.billing.Tier
 import com.mcclabs.mook.domain.billing.playStoreSubscriptionManagementUrl
 import com.mcclabs.mook.ads.AdPrivacyOptionsEntry
@@ -510,11 +511,7 @@ fun SettingsScreen(
 
         // Legal
         SectionLabel(stringResource(Res.string.settings_legal_section))
-        SettingsRow(
-            title = stringResource(Res.string.settings_privacy_policy_label),
-            value = stringResource(Res.string.settings_view_label),
-            onClick = { uriHandler.openUri("https://walktalkk.com/legal.html") }
-        )
+        SettingsLegalLinks()
         AdPrivacyOptionsEntry()
         // KVKK: kullanıcı açık rızasını istediği an geri alabilmeli ya da değiştirebilmeli.
         SettingsRow(
@@ -654,6 +651,29 @@ private fun Tier.displayName(): String = when (this) {
 private fun Long.formatSubscriptionDate(): String {
     val date = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.currentSystemDefault()).date
     return "${date.dayOfMonth.toString().padStart(2, '0')}.${date.monthNumber.toString().padStart(2, '0')}.${date.year}"
+}
+
+/** Yasal bölümün üç satırı; her biri seçili dildeki ilgili sayfayı açar. */
+@Composable
+internal fun SettingsLegalLinks() {
+    val uriHandler = LocalUriHandler.current
+    val legalLinks = LocalLegalLinks.current
+    val viewLabel = stringResource(Res.string.settings_view_label)
+    SettingsRow(
+        title = stringResource(Res.string.legal_privacy_policy),
+        value = viewLabel,
+        onClick = { uriHandler.openUri(legalLinks.privacyPolicyUrl) }
+    )
+    SettingsRow(
+        title = stringResource(Res.string.legal_terms_of_use),
+        value = viewLabel,
+        onClick = { uriHandler.openUri(legalLinks.termsOfUseUrl) }
+    )
+    SettingsRow(
+        title = stringResource(Res.string.legal_child_safety),
+        value = viewLabel,
+        onClick = { uriHandler.openUri(legalLinks.childSafetyUrl) }
+    )
 }
 
 @Composable

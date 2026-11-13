@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalUriHandler
+import com.mcclabs.mook.ui.legal.LocalLegalLinks
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mcclabs.mook.domain.billing.Period
 import com.mcclabs.mook.domain.billing.PlanPackage
@@ -107,7 +108,8 @@ import mook.shared.generated.resources.paywall_subtitle
 import mook.shared.generated.resources.paywall_tier_economy
 import mook.shared.generated.resources.paywall_tier_premium
 import mook.shared.generated.resources.paywall_tier_standard
-import mook.shared.generated.resources.paywall_terms_privacy
+import mook.shared.generated.resources.legal_privacy_policy
+import mook.shared.generated.resources.legal_terms_of_use
 import mook.shared.generated.resources.paywall_title
 import mook.shared.generated.resources.paywall_trial_cancelled_detail
 import mook.shared.generated.resources.paywall_trial_days_remaining
@@ -118,7 +120,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 private const val PLAY_STORE_SUBSCRIPTIONS_URL = "https://play.google.com/store/account/subscriptions"
-private const val LEGAL_URL = "https://walktalkk.com/legal.html"
 
 @Composable
 fun PaywallScreen(
@@ -441,9 +442,22 @@ fun PaywallScreen(
                     }
                 }
             }
-            TextButton(onClick = { uriHandler.openUri(LEGAL_URL) }) {
-                Text(stringResource(Res.string.paywall_terms_privacy), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+            PaywallLegalLinks()
+        }
+    }
+}
+
+/** Kullanım Koşulları ve Gizlilik Politikası için iki ayrı bağlantı; adresler seçili dile göredir. */
+@Composable
+internal fun PaywallLegalLinks() {
+    val uriHandler = LocalUriHandler.current
+    val legalLinks = LocalLegalLinks.current
+    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        TextButton(onClick = { uriHandler.openUri(legalLinks.termsOfUseUrl) }) {
+            Text(stringResource(Res.string.legal_terms_of_use), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        TextButton(onClick = { uriHandler.openUri(legalLinks.privacyPolicyUrl) }) {
+            Text(stringResource(Res.string.legal_privacy_policy), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

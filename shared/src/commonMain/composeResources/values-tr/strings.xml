@@ -109,7 +109,6 @@
     <string name="settings_show_in_discover_subtitle">Başkalarının profilinizi keşfetmesine izin verin</string>
     <string name="settings_age_preferences_label">Yaş tercihleri</string>
     <string name="settings_legal_section">YASAL</string>
-    <string name="settings_privacy_policy_label">Gizlilik Politikası ve Kullanım Koşulları</string>
     <string name="settings_view_label">Görüntüle</string>
     <string name="settings_logout_button">Çıkış Yap</string>
     <string name="settings_delete_account_button">Hesabı Kalıcı Olarak Sil</string>
@@ -149,7 +148,6 @@
     <string name="registration_interests_label">İLGİ ALANLARI</string>
     <string name="registration_show_in_discover_title">Beni Keşfet'te Göster</string>
     <string name="registration_show_in_discover_subtitle">Başkalarının profilinizi keşfetmesine izin verin</string>
-    <string name="registration_read_privacy_policy">Gizlilik Politikası ve Kullanım Koşullarını Oku</string>
     <string name="registration_eula_accept_text">Mook Hizmet Şartları ve Gizlilik Politikasını okudum ve kabul ediyorum. Mook'un sakıncalı içerik ve kötü niyetli kullanıcılara karşı sıfır toleransı olduğunu ve bu tür davranışların kalıcı bir yasaklamayla sonuçlanacağını anlıyorum.</string>
     <string name="walktalk_dialog_title">Sohbet WalkTalk'ta devam ediyor</string>
     <string name="walktalk_dialog_title_named">WalkTalk'ta %1$s ile tanış</string>
@@ -231,7 +229,6 @@
     <string name="paywall_renewal_terms_trial">Ücretsiz deneme, ardından %1$s · %2$s. Google Play'den iptal edene kadar otomatik yenilenir.</string>
     <string name="paywall_restore">Satın alımları geri yükle</string>
     <string name="paywall_manage_google_play">Google Play'de yönet</string>
-    <string name="paywall_terms_privacy">Kullanım koşulları · Gizlilik</string>
     <string name="paywall_distance_selling_contract_waiver">Mesafeli Sözleşmeler Yönetmeliği kapsamındaki Cayma Hakkı İstisnası Ön Bilgilendirmesi'ni okudum, dijital içerik ifasının hemen başlamasını onaylıyorum ve bu onayla cayma hakkımdan feragat ettiğimi kabul ediyorum.</string>
     <string name="paywall_active_title">%1$s planın aktif</string>
     <string name="paywall_trial_detail">Şu anda deneme dönemindesin.</string>
@@ -383,7 +380,7 @@
     <string name="billing_error_in_progress">Zaten devam eden bir satın alma var. Lütfen tamamlanmasını bekleyin.</string>
     <string name="billing_error_activity_unavailable">Satın alırken lütfen uygulamayı açık tutun.</string>
     <string name="billing_error_product_unavailable">Bu plan artık mevcut değil. Yenileyip tekrar deneyin.</string>
-    <string name="billing_error_linked_to_another_account">Bu abonelik zaten başka bir WalkMatch hesabına bağlı. Aktarmak için lütfen destek ile iletişime geç.</string>
+    <string name="billing_error_linked_to_another_account">Bu abonelik zaten başka bir Mook hesabına bağlı. Aktarmak için lütfen destek ile iletişime geç.</string>
     <string name="report_submitted">Şikayet başarıyla gönderildi.</string>
     <string name="report_failed">Şikayet gönderilemedi.</string>
     <string name="user_blocked">Kullanıcı engellendi.</string>
@@ -506,7 +503,7 @@
     <string name="paywall_change_scheduled_no_date">Plan değişikliğin mevcut fatura döneminin sonunda geçerli olacak. O zamana kadar mevcut planının tüm avantajları sürer.</string>
     <string name="room_error_daily_limit">Bugünkü oda değiştirme hakkını kullandın. Yarın tekrar deneyebilir ya da planını yükseltebilirsin.</string>
     <string name="consent_title">Gizliliğin ve veri tercihlerin</string>
-    <string name="consent_intro">Aşağıdaki iki izin tamamen isteğe bağlıdır. İzin vermesen de WalkMatch'in tüm temel özelliklerini kullanmaya devam edebilirsin. Kararını istediğin zaman Ayarlar &gt; Gizlilik ve veri tercihleri bölümünden değiştirebilirsin.</string>
+    <string name="consent_intro">Aşağıdaki iki izin tamamen isteğe bağlıdır. İzin vermesen de Mook'un tüm temel özelliklerini kullanmaya devam edebilirsin. Kararını istediğin zaman Ayarlar &gt; Gizlilik ve veri tercihleri bölümünden değiştirebilirsin.</string>
     <string name="consent_cross_border_title">Analiz için yurt dışına veri aktarımı</string>
     <string name="consent_cross_border_body">Uygulamayı geliştirmek için kullanım verilerin (ör. ziyaret ettiğin ekranlar ve uygulama içi etkinlikler) Google Firebase Analytics aracılığıyla yurt dışındaki sunuculara aktarılarak işlenir. Bu aktarım, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında açık rızana dayanır.</string>
     <string name="consent_personalized_ads_title">Kişiselleştirilmiş reklamlar</string>
@@ -567,4 +564,7 @@
     <string name="settings_scheduled_change">Dönem sonunda %1$s pakete geçilecek</string>
     <string name="settings_billing_issue_notice">Ödemen alınamadı. Aboneliğinin kesintiye uğramaması için ödeme yöntemini güncelle.</string>
     <string name="settings_update_payment_method">Ödeme Yöntemini Güncelle</string>
+    <string name="legal_privacy_policy">Gizlilik Politikası</string>
+    <string name="legal_terms_of_use">Kullanım Koşulları</string>
+    <string name="legal_child_safety">Çocuk Güvenliği Standartları</string>
 </resources>

@@ -26,6 +26,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.CompositionLocalProvider
+import com.mcclabs.mook.domain.legal.LegalLinksResolver
+import com.mcclabs.mook.ui.legal.LocalLegalLinks
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -198,41 +201,46 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
             forceUpdateUseCase.evaluate()
         }
 
+        // Yasal bağlantılar yerel ayarla AYNI dil değerini izler: uygulama içi dil
+        // değiştiğinde açılan gizlilik/koşullar sayfaları da o dile geçer.
+        val legalLinks = remember(appLanguage) { LegalLinksResolver.forLanguage(appLanguage) }
         key(appLanguage) {
-            MookTheme(onDarkModeChange = onDarkModeChange) {
-                AppScaffold {
-                    pendingConflict?.let { conflict ->
-                        AccountConflictDialog(
-                            conflict = conflict,
-                            onTransferConfirmed = {
-                                val uid = conflictUserId
-                                pendingConflict = null
-                                conflictUserId = null
-                                if (uid != null) {
-                                    coroutineScope.launch { accountMergeUseCase.proceedWithTransfer(uid) }
-                                }
-                            },
-                            onContactSupport = {
-                                pendingConflict = null
-                                conflictUserId = null
-                                uriHandler.openUri("mailto:destek@walktalkk.com")
-                            },
-                        )
-                    }
+            CompositionLocalProvider(LocalLegalLinks provides legalLinks) {
+                MookTheme(onDarkModeChange = onDarkModeChange) {
+                    AppScaffold {
+                        pendingConflict?.let { conflict ->
+                            AccountConflictDialog(
+                                conflict = conflict,
+                                onTransferConfirmed = {
+                                    val uid = conflictUserId
+                                    pendingConflict = null
+                                    conflictUserId = null
+                                    if (uid != null) {
+                                        coroutineScope.launch { accountMergeUseCase.proceedWithTransfer(uid) }
+                                    }
+                                },
+                                onContactSupport = {
+                                    pendingConflict = null
+                                    conflictUserId = null
+                                    uriHandler.openUri("mailto:destek@walktalkk.com")
+                                },
+                            )
+                        }
 
-                    when {
-                        isBanned -> AccountSuspendedScreen()
-                        updateState == UpdateState.ForceUpdateRequired -> ForceUpdateScreen(
-                            onUpdateNowClicked = {
-                                coroutineScope.launch { forceUpdateUseCase.startImmediateUpdate() }
-                            },
-                        )
-                        else -> {
-                            AppNavGraph()
-                            // KVKK: politika sürümü için karar verilmediyse onay ekranı zorunlu olarak
-                            // açılır (Android'de UMP formu çözüldükten SONRA). Analytics ve kişisel
-                            // reklamlar karar verilene kadar kapalıdır.
-                            PrivacyConsentHost(promptWhenRequired = true)
+                        when {
+                            isBanned -> AccountSuspendedScreen()
+                            updateState == UpdateState.ForceUpdateRequired -> ForceUpdateScreen(
+                                onUpdateNowClicked = {
+                                    coroutineScope.launch { forceUpdateUseCase.startImmediateUpdate() }
+                                },
+                            )
+                            else -> {
+                                AppNavGraph()
+                                // KVKK: politika sürümü için karar verilmediyse onay ekranı zorunlu olarak
+                                // açılır (Android'de UMP formu çözüldükten SONRA). Analytics ve kişisel
+                                // reklamlar karar verilene kadar kapalıdır.
+                                PrivacyConsentHost(promptWhenRequired = true)
+                            }
                         }
                     }
                 }
