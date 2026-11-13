@@ -134,6 +134,8 @@
     <string name="eula_gate_accept">Ich habe die Nutzungsbedingungen und die EULA gelesen und akzeptiere sie</string>
     <string name="eula_gate_continue">Akzeptieren &amp; Weiter</string>
     <string name="eula_gate_logout">Abmelden</string>
+    <string name="chat_error_blocked">In dieser Unterhaltung können keine Nachrichten mehr gesendet werden.</string>
+    <string name="chat_blocked_notice">Diese Unterhaltung ist nicht mehr verfügbar — sie kann weiterhin angesehen werden, neue Nachrichten sind aber nicht möglich.</string>
     <!-- needs-translation:start | Otomatik İngilizce yedek. Bu metinler henüz bu dile çevrilmedi; scripts/l10n/sync_missing_translations.py tarafından eklendi. -->
     <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
     <string name="discover_swipe_limit_body">You\'ve used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>

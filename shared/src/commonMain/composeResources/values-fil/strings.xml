@@ -20,6 +20,8 @@
     <string name="eula_gate_accept">Nabasa ko at tinatanggap ko ang Mga Tuntunin ng Paggamit at EULA</string>
     <string name="eula_gate_continue">Tanggapin at Magpatuloy</string>
     <string name="eula_gate_logout">Log out</string>
+    <string name="chat_error_blocked">Hindi ka na makakapagpadala ng mga mensahe sa usapang ito.</string>
+    <string name="chat_blocked_notice">Hindi na available ang usapang ito — maaari mo itong tingnan, ngunit hindi ka na makakapagpadala ng mga bagong mensahe.</string>
     <!-- needs-translation:start | Otomatik İngilizce yedek. Bu metinler henüz bu dile çevrilmedi; scripts/l10n/sync_missing_translations.py tarafından eklendi. -->
     <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
     <string name="discover_swipe_limit_body">You\'ve used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>
