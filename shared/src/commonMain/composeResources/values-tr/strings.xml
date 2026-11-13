@@ -27,7 +27,7 @@
     <string name="profile_block_user">🚫 Kullanıcıyı Engelle</string>
     <string name="match_title">Eşleşme!</string>
     <string name="match_liked_each_other">Sen ve %1$s birbirinizi beğendiniz</string>
-    <string name="match_chat_walktalk">💬 WalkTalk\'ta Sohbet Et</string>
+    <string name="match_chat_walktalk">💬 WalkTalk'ta Sohbet Et</string>
     <string name="match_keep_swiping">Kaydırmaya Devam Et</string>
     <string name="swipeable_card_liked_me">Sizi beğendi ✨</string>
     <string name="swipeable_card_report_profile">Profili Şikayet Et</string>
@@ -96,7 +96,7 @@
     <string name="settings_membership_ends">Bitiş tarihi</string>
     <string name="settings_membership_manage">Aboneliği yönet</string>
     <string name="settings_price_change_notice">Fiyat güncellemesi: %1$s idi, şimdi %2$s. Yürürlüğe girmeden önce Google Play senden onay isteyecek.</string>
-    <string name="settings_price_change_cta">Google Play\'de incele</string>
+    <string name="settings_price_change_cta">Google Play'de incele</string>
     <string name="settings_membership_restore">Satın alımları geri yükle</string>
     <string name="settings_membership_restoring">Geri yükleniyor…</string>
     <string name="settings_email_label">E-posta</string>
@@ -105,7 +105,7 @@
     <string name="settings_dark_mode_subtitle">Uygulama genelinde koyu tema kullan</string>
     <string name="settings_app_language_label">Uygulama Dili</string>
     <string name="settings_discovery_section">KEŞİF</string>
-    <string name="settings_show_in_discover_title">Beni Keşfet\'te Göster</string>
+    <string name="settings_show_in_discover_title">Beni Keşfet'te Göster</string>
     <string name="settings_show_in_discover_subtitle">Başkalarının profilinizi keşfetmesine izin verin</string>
     <string name="settings_age_preferences_label">Yaş tercihleri</string>
     <string name="settings_legal_section">YASAL</string>
@@ -147,28 +147,28 @@
     <string name="registration_bio_label">BİYOGRAFİ</string>
     <string name="registration_bio_placeholder">Bize kendinizden bahsedin...</string>
     <string name="registration_interests_label">İLGİ ALANLARI</string>
-    <string name="registration_show_in_discover_title">Beni Keşfet\'te Göster</string>
+    <string name="registration_show_in_discover_title">Beni Keşfet'te Göster</string>
     <string name="registration_show_in_discover_subtitle">Başkalarının profilinizi keşfetmesine izin verin</string>
     <string name="registration_read_privacy_policy">Gizlilik Politikası ve Kullanım Koşullarını Oku</string>
-    <string name="registration_eula_accept_text">Mook Hizmet Şartları ve Gizlilik Politikasını okudum ve kabul ediyorum. Mook\'un sakıncalı içerik ve kötü niyetli kullanıcılara karşı sıfır toleransı olduğunu ve bu tür davranışların kalıcı bir yasaklamayla sonuçlanacağını anlıyorum.</string>
-    <string name="walktalk_dialog_title">Sohbet WalkTalk\'ta devam ediyor</string>
-    <string name="walktalk_dialog_title_named">WalkTalk\'ta %1$s ile tanış</string>
-    <string name="walktalk_dialog_body">Mesajlaşmak WalkTalk\'ta çok daha iyi! Daha sorunsuz, yüksek kaliteli sohbetlerin, sesli konuşmaların ve anında çevirinin tadını çıkararak dil engeli olmadan konuşun.</string>
+    <string name="registration_eula_accept_text">Mook Hizmet Şartları ve Gizlilik Politikasını okudum ve kabul ediyorum. Mook'un sakıncalı içerik ve kötü niyetli kullanıcılara karşı sıfır toleransı olduğunu ve bu tür davranışların kalıcı bir yasaklamayla sonuçlanacağını anlıyorum.</string>
+    <string name="walktalk_dialog_title">Sohbet WalkTalk'ta devam ediyor</string>
+    <string name="walktalk_dialog_title_named">WalkTalk'ta %1$s ile tanış</string>
+    <string name="walktalk_dialog_body">Mesajlaşmak WalkTalk'ta çok daha iyi! Daha sorunsuz, yüksek kaliteli sohbetlerin, sesli konuşmaların ve anında çevirinin tadını çıkararak dil engeli olmadan konuşun.</string>
     <string name="walktalk_dialog_feature_translation">Anında çeviri — dil engeli yok</string>
     <string name="walktalk_dialog_feature_voice">Sesli sohbet</string>
     <string name="walktalk_dialog_feature_quality">Daha sorunsuz, daha kaliteli bir deneyim</string>
     <string name="walktalk_dialog_back">Geri</string>
-    <string name="walktalk_dialog_confirm">WalkTalk\'ta Bul</string>
+    <string name="walktalk_dialog_confirm">WalkTalk'ta Bul</string>
     <string name="legal_consent_paragraph">Bir hesap oluşturarak Kullanım Koşullarımızı ve Gizlilik Politikamızı kabul etmiş olursunuz. Mook, Çocuk Cinsel İstismarı Materyallerinin (CSAM) veya İstismarının (CSAE) oluşturulmasını, yüklenmesini veya paylaşılmasını kesinlikle yasaklar. Herhangi bir ihlal, hesabın derhal feshedilmesi ve yetkililere bildirilmesiyle sonuçlanacaktır.</string>
     <string name="legal_accept_terms">Kullanım Koşullarını kabul ediyorum</string>
     <string name="legal_accept_eula">Son Kullanıcı Lisans Sözleşmesini kabul ediyorum</string>
     <string name="legal_zero_tolerance">Sakıncalı içerik, küfürlü kullanıcılar, taciz veya cinsel içerikli materyallerin yüklenmesine kesinlikle tolerans gösterilmez. İhlal edenler kalıcı olarak yasaklanacaktır.</string>
     <string name="legal_terms_error">Devam etmek için Kullanım Koşullarını kabul etmelisiniz</string>
-    <string name="legal_eula_error">Devam etmek için EULA\'yı kabul etmelisiniz</string>
-    <string name="eula_gate_welcome">Mook\'a Hoş Geldiniz</string>
+    <string name="legal_eula_error">Devam etmek için EULA'yı kabul etmelisiniz</string>
+    <string name="eula_gate_welcome">Mook'a Hoş Geldiniz</string>
     <string name="eula_gate_subtitle">Lütfen devam etmek için inceleyin ve kabul edin</string>
-    <string name="legal_eula_body">Mook\'u kullanarak Kullanım Koşullarımızı ve Son Kullanıcı Lisans Sözleşmemizi (EULA) kabul etmiş olursunuz.\n\nSakıncalı içerik, küfürlü kullanıcılar, taciz veya cinsel içerikli materyallerin yüklenmesine kesinlikle tolerans gösterilmez. İhlal edenler kalıcı olarak yasaklanacaktır.\n\nOluşturduğunuz ve paylaştığınız içerikten siz sorumlusunuz. Bildirilen içerik ve kullanıcılar incelenir ve bu politikayı ihlal eden hesaplar kaldırılır. Herhangi bir kullanıcıyı istediğiniz zaman profilinden şikayet edebilir veya engelleyebilirsiniz.</string>
-    <string name="eula_gate_accept">Kullanım Koşullarını ve EULA\'yı okudum ve kabul ediyorum</string>
+    <string name="legal_eula_body">Mook'u kullanarak Kullanım Koşullarımızı ve Son Kullanıcı Lisans Sözleşmemizi (EULA) kabul etmiş olursunuz.\n\nSakıncalı içerik, küfürlü kullanıcılar, taciz veya cinsel içerikli materyallerin yüklenmesine kesinlikle tolerans gösterilmez. İhlal edenler kalıcı olarak yasaklanacaktır.\n\nOluşturduğunuz ve paylaştığınız içerikten siz sorumlusunuz. Bildirilen içerik ve kullanıcılar incelenir ve bu politikayı ihlal eden hesaplar kaldırılır. Herhangi bir kullanıcıyı istediğiniz zaman profilinden şikayet edebilir veya engelleyebilirsiniz.</string>
+    <string name="eula_gate_accept">Kullanım Koşullarını ve EULA'yı okudum ve kabul ediyorum</string>
     <string name="eula_gate_continue">Kabul Et ve Devam Et</string>
     <string name="eula_gate_logout">Çıkış Yap</string>
 
@@ -188,7 +188,7 @@
     <string name="limit_sheet_body_messages">Bugünlük %1$d mesaj hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
     <string name="limit_sheet_body_new_chats">Bugünlük %1$d yeni sohbet başlatma hakkını kullandın. Zaten başlattığın sohbetlere yanıt vermenin bir sınırı yoktur — daha fazlası için planları incele.</string>
     <string name="limit_sheet_body_room_switches">Bugünlük %1$d oda değiştirme hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
-    <string name="limit_sheet_body_liked_me">Bugünlük %1$d \'seni beğenenler\' açma hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
+    <string name="limit_sheet_body_liked_me">Bugünlük %1$d 'seni beğenenler' açma hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
     <string name="limit_sheet_body_rewinds">Bugünlük %1$d geri alma hakkını kullandın. Yarın yenilenecek — devam etmek için planları incele.</string>
     <string name="limit_sheet_body_boosts">Bu ayki %1$d Boost hakkını kullandın — daha fazlası için planları incele.</string>
     <string name="limit_sheet_body_boosts_fair_use">Planına dahil aylık %1$d Boost hakkına ulaştın.</string>
@@ -207,7 +207,7 @@
 
     <!-- Paywall -->
     <string name="paywall_title">Mook Premium</string>
-    <string name="paywall_subtitle">Sana uygun planı seç, Mook\'ta daha fazlasını keşfet.</string>
+    <string name="paywall_subtitle">Sana uygun planı seç, Mook'ta daha fazlasını keşfet.</string>
     <string name="paywall_benefit_unlimited">Her gün sınırsız kaydırma</string>
     <string name="paywall_benefit_likes">Seni beğenen herkesi gör</string>
     <string name="paywall_benefit_filters">Gelişmiş filtreler ve tüm dil odaları</string>
@@ -227,12 +227,12 @@
     <string name="paywall_continue_with">%1$s ile devam et</string>
     <string name="paywall_start_free_trial">Ücretsiz denemeyi başlat</string>
     <string name="paywall_manage_plan">Aboneliği yönet</string>
-    <string name="paywall_renewal_terms">%1$s · %2$s. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
-    <string name="paywall_renewal_terms_trial">Ücretsiz deneme, ardından %1$s · %2$s. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_renewal_terms">%1$s · %2$s. Google Play'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_renewal_terms_trial">Ücretsiz deneme, ardından %1$s · %2$s. Google Play'den iptal edene kadar otomatik yenilenir.</string>
     <string name="paywall_restore">Satın alımları geri yükle</string>
     <string name="paywall_manage_google_play">Google Play'de yönet</string>
     <string name="paywall_terms_privacy">Kullanım koşulları · Gizlilik</string>
-    <string name="paywall_distance_selling_contract_waiver">Mesafeli Sözleşmeler Yönetmeliği kapsamındaki Cayma Hakkı İstisnası Ön Bilgilendirmesi\'ni okudum, dijital içerik ifasının hemen başlamasını onaylıyorum ve bu onayla cayma hakkımdan feragat ettiğimi kabul ediyorum.</string>
+    <string name="paywall_distance_selling_contract_waiver">Mesafeli Sözleşmeler Yönetmeliği kapsamındaki Cayma Hakkı İstisnası Ön Bilgilendirmesi'ni okudum, dijital içerik ifasının hemen başlamasını onaylıyorum ve bu onayla cayma hakkımdan feragat ettiğimi kabul ediyorum.</string>
     <string name="paywall_active_title">%1$s planın aktif</string>
     <string name="paywall_trial_detail">Şu anda deneme dönemindesin.</string>
     <string name="paywall_trial_days_remaining">Deneme sürende %1$d gün kaldı.</string>
@@ -242,7 +242,7 @@
     <string name="paywall_included_title">%1$s planına dahil</string>
     <string name="paywall_economy_likes">Günde 30 beğeni</string>
     <string name="paywall_economy_rooms">En fazla 3 odaya katıl</string>
-    <string name="paywall_economy_no_ads">Mook\'u reklamsız kullan</string>
+    <string name="paywall_economy_no_ads">Mook'u reklamsız kullan</string>
     <string name="paywall_standard_likes">Günde 100 beğeni</string>
     <string name="paywall_standard_liked_by">Seni beğenen en fazla 5 kişiyi her gün gör</string>
     <string name="paywall_standard_tools">Günde 3 Geri Al · Ayda 1 Boost</string>
@@ -346,9 +346,9 @@
 
     <!-- Update dialogs -->
     <string name="update_required_title">Güncelleme Gerekli</string>
-    <string name="update_required_body">Devam etmek için Mook\'un yeni bir sürümü gerekli. En iyi deneyim ve yeni özellikler için lütfen en son sürüme güncelle.</string>
+    <string name="update_required_body">Devam etmek için Mook'un yeni bir sürümü gerekli. En iyi deneyim ve yeni özellikler için lütfen en son sürüme güncelle.</string>
     <string name="update_available_title">Güncelleme Mevcut</string>
-    <string name="update_available_body">Mook\'un yeni bir sürümü mevcut. En son özellikleri ve iyileştirmeleri görmek için şimdi güncelle.</string>
+    <string name="update_available_body">Mook'un yeni bir sürümü mevcut. En son özellikleri ve iyileştirmeleri görmek için şimdi güncelle.</string>
     <string name="update_now">Şimdi Güncelle</string>
     <string name="update_later">Sonra</string>
 
@@ -457,10 +457,10 @@
     <string name="wtdemo_error_invalid_input">Bu mesaj çeviri için çok uzun (en fazla %1$d karakter).</string>
     <string name="wtdemo_error_unauthenticated">Oturumun doğrulanamadı. Tekrar giriş yapıp dene.</string>
     <string name="wtdemo_error_server">Çeviri şu an kullanılamıyor. Tekrar dene.</string>
-    <string name="wtdemo_cta">WalkTalk\'ı Dene</string>
+    <string name="wtdemo_cta">WalkTalk'ı Dene</string>
     <string name="wtdemo_cta_caption">Mook hesabınla saniyeler içinde gir — yeni kayıt yok.</string>
     <string name="wtdemo_promo_title">Dil engeli olmadan sohbet et</string>
-    <string name="wtdemo_promo_body">WalkTalk\'ın canlı çevirisini hemen burada dene.</string>
+    <string name="wtdemo_promo_body">WalkTalk'ın canlı çevirisini hemen burada dene.</string>
     <string name="wtdemo_promo_cd">WalkTalk canlı çeviri demosunu aç</string>
     <string name="chat_list_title">Sohbetler</string>
     <string name="chat_list_empty">Henüz sohbetin yok.</string>
@@ -492,7 +492,7 @@
     <string name="chat_system_recipient_limit_reached">Bu kullanıcı günlük mesaj limitine ulaştı ve şu anda yanıt veremiyor.</string>
     <string name="chat_system_translation_quota_exhausted">Çeviri kotan doldu; mesajların şimdilik çevrilmeden gönderiliyor. Kotan otomatik olarak yenilenecek.</string>
     <string name="chat_room_closed_read_only">Bu sohbetin odası kapatıldı — görüntüleyebilirsiniz ama yeni mesaj gönderemezsiniz.</string>
-    <string name="billing_error_existing_subscription_not_found">Mevcut aboneliğin bu cihazdaki Google hesabında bulunamadı. Aboneliği satın aldığın Google hesabıyla Play Store\'a giriş yapıp tekrar dene ya da planını Google Play\'den yönet.</string>
+    <string name="billing_error_existing_subscription_not_found">Mevcut aboneliğin bu cihazdaki Google hesabında bulunamadı. Aboneliği satın aldığın Google hesabıyla Play Store'a giriş yapıp tekrar dene ya da planını Google Play'den yönet.</string>
     <string name="billing_error_subscription_managed_elsewhere">Mevcut aboneliğin Google Play dışında yönetiliyor. Plan değişikliğini aboneliği satın aldığın yerden yapabilirsin.</string>
     <string name="billing_error_plan_already_active">Bu plan zaten aktif.</string>
     <string name="billing_error_active_plan_unknown">Mevcut aboneliğin şu an doğrulanamadı. İnternet bağlantını kontrol edip tekrar dene.</string>
@@ -500,18 +500,18 @@
     <string name="paywall_schedule_downgrade_to">Dönem sonunda %1$s planına geç</string>
     <string name="paywall_switch_to_yearly">Yıllık plana geç</string>
     <string name="paywall_schedule_switch_to_monthly">Dönem sonunda aylık plana geç</string>
-    <string name="paywall_change_terms_immediate">%1$s · %2$s. Yeni planın hemen başlar; mevcut planından kalan süre Google Play tarafından yeni planına ek süre olarak eklenir. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
-    <string name="paywall_change_terms_deferred">%1$s · %2$s. Mevcut planın dönem sonuna kadar sürer; yeni plan ve fiyatı yenileme tarihinde başlar. Google Play\'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_change_terms_immediate">%1$s · %2$s. Yeni planın hemen başlar; mevcut planından kalan süre Google Play tarafından yeni planına ek süre olarak eklenir. Google Play'den iptal edene kadar otomatik yenilenir.</string>
+    <string name="paywall_change_terms_deferred">%1$s · %2$s. Mevcut planın dönem sonuna kadar sürer; yeni plan ve fiyatı yenileme tarihinde başlar. Google Play'den iptal edene kadar otomatik yenilenir.</string>
     <string name="paywall_change_scheduled">Plan değişikliğin %1$s tarihinde geçerli olacak. O zamana kadar mevcut planının tüm avantajları sürer.</string>
     <string name="paywall_change_scheduled_no_date">Plan değişikliğin mevcut fatura döneminin sonunda geçerli olacak. O zamana kadar mevcut planının tüm avantajları sürer.</string>
     <string name="room_error_daily_limit">Bugünkü oda değiştirme hakkını kullandın. Yarın tekrar deneyebilir ya da planını yükseltebilirsin.</string>
     <string name="consent_title">Gizliliğin ve veri tercihlerin</string>
-    <string name="consent_intro">Aşağıdaki iki izin tamamen isteğe bağlıdır. İzin vermesen de WalkMatch\'in tüm temel özelliklerini kullanmaya devam edebilirsin. Kararını istediğin zaman Ayarlar &gt; Gizlilik ve veri tercihleri bölümünden değiştirebilirsin.</string>
+    <string name="consent_intro">Aşağıdaki iki izin tamamen isteğe bağlıdır. İzin vermesen de WalkMatch'in tüm temel özelliklerini kullanmaya devam edebilirsin. Kararını istediğin zaman Ayarlar &gt; Gizlilik ve veri tercihleri bölümünden değiştirebilirsin.</string>
     <string name="consent_cross_border_title">Analiz için yurt dışına veri aktarımı</string>
     <string name="consent_cross_border_body">Uygulamayı geliştirmek için kullanım verilerin (ör. ziyaret ettiğin ekranlar ve uygulama içi etkinlikler) Google Firebase Analytics aracılığıyla yurt dışındaki sunuculara aktarılarak işlenir. Bu aktarım, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında açık rızana dayanır.</string>
     <string name="consent_personalized_ads_title">Kişiselleştirilmiş reklamlar</string>
     <string name="consent_personalized_ads_body">Ücretsiz planda gösterilen reklamların ilgi alanlarına göre seçilebilmesi için reklam kimliğin ve uygulama kullanım bilgilerin Google AdMob ile paylaşılır. İzin vermezsen reklamlar yine gösterilir ancak kişiselleştirilmez.</string>
-    <string name="consent_read_notice">Aydınlatma Metni\'ni oku</string>
+    <string name="consent_read_notice">Aydınlatma Metni'ni oku</string>
     <string name="consent_accept_all">Tümünü kabul et</string>
     <string name="consent_reject_all">Tümünü reddet</string>
     <string name="consent_save_choices">Seçimlerimi kaydet</string>
@@ -525,31 +525,31 @@
     <string name="liked_me_title">Beni Beğenenler</string>
     <string name="liked_me_counter">%1$s kişi seni beğendi</string>
     <string name="liked_me_unlocks_remaining">Bugün %1$d profilin kilidini açabilirsin</string>
-    <string name="liked_me_unlocks_none">Bugünkü açma hakkın bitti. Reklam izleyerek ya da Premium\'a geçerek seni beğenenleri gör.</string>
+    <string name="liked_me_unlocks_none">Bugünkü açma hakkın bitti. Reklam izleyerek ya da Premium'a geçerek seni beğenenleri gör.</string>
     <string name="liked_me_all_revealed">Premium: seni beğenen herkesi görüyorsun</string>
     <string name="liked_me_hidden_name">Gizli hayran</string>
     <string name="liked_me_liked_you">Seni beğendi</string>
     <string name="liked_me_unlock">Kilidi Aç</string>
     <string name="liked_me_view_profile">Profili Gör</string>
-    <string name="liked_me_go_premium">Premium\'a Geç</string>
+    <string name="liked_me_go_premium">Premium'a Geç</string>
     <string name="liked_me_empty_title">Henüz seni beğenen yok</string>
-    <string name="liked_me_empty_body">Keşfet\'te aktif kaldıkça seni beğenenler burada görünecek.</string>
+    <string name="liked_me_empty_body">Keşfet'te aktif kaldıkça seni beğenenler burada görünecek.</string>
     <string name="liked_me_error">Liste yüklenemedi. Lütfen tekrar dene.</string>
     <string name="liked_me_retry">Tekrar Dene</string>
     <string name="liked_me_not_liked_anymore">Bu kişi artık seni beğenmiyor.</string>
     <string name="liked_me_unlock_failed">Kilit açılamadı. Lütfen tekrar dene.</string>
     <string name="upsell_daily_title">Reklamsız ve sınırsız keşfet</string>
     <string name="upsell_daily_body">Premium ile reklamlar kalkar, seni beğenen herkesi görürsün ve sınırsız beğenebilirsin.</string>
-    <string name="upsell_daily_cta">Premium\'a Geç</string>
+    <string name="upsell_daily_cta">Premium'a Geç</string>
     <string name="upsell_daily_dismiss">Belki Sonra</string>
     <!-- Premium ayrıcalıkları ve dinamik Paywall/limit ekranı -->
     <string name="premium_badge">Premium</string>
     <string name="chat_read_receipt_seen">Görüldü</string>
     <string name="settings_incognito_title">Gizli Mod</string>
-    <string name="settings_incognito_subtitle">Keşfet\'te yalnızca beğendiğin kişiler seni görür; profil ziyaretlerin kaydedilmez.</string>
+    <string name="settings_incognito_subtitle">Keşfet'te yalnızca beğendiğin kişiler seni görür; profil ziyaretlerin kaydedilmez.</string>
     <string name="settings_incognito_subtitle_locked">Premium ayrıcalığı: görünmeden gez.</string>
     <string name="settings_incognito_error">Gizli mod güncellenemedi. Lütfen tekrar dene.</string>
-    <string name="limit_sheet_try_standard_trial">Standart\'ı %1$d gün ücretsiz dene</string>
+    <string name="limit_sheet_try_standard_trial">Standart'ı %1$d gün ücretsiz dene</string>
     <string name="limit_sheet_come_back_tomorrow">Ya da yarın tekrar gel</string>
     <string name="limit_sheet_resets_in">Hakların %1$s sonra yenilenir</string>
     <string name="paywall_limit_title_likes">Beğeni hakkın bitti</string>

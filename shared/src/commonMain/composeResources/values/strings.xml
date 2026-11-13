@@ -23,25 +23,25 @@
     <string name="eula_gate_logout">Log out</string>
 
     <string name="room_gate_title">Choose your room</string>
-    <string name="room_gate_subtitle">Pick the language you want to practice. You\'ll be matched with people who speak it natively.</string>
+    <string name="room_gate_subtitle">Pick the language you want to practice. You'll be matched with people who speak it natively.</string>
     <string name="room_switch_title">Switch room</string>
     <string name="room_switch_back_cd">Back</string>
     <string name="room_info_title">How rooms work</string>
     <string name="room_info_body">A room is the language you want to practice. Pick a language to discover and match with people who speak it — everything here revolves around that language. You can switch your room anytime from this screen.</string>
     <string name="room_info_confirm">Got it</string>
     <string name="discover_switch_room_cd">Switch room</string>
-    <string name="discover_empty_room_message">Sorry, we couldn\'t find anyone here yet. You can check out other rooms if you\'d like.</string>
-    <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
-    <string name="discover_swipe_limit_body">You\'ve used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>
-    <string name="limit_sheet_title_monthly">You\'ve hit this month\'s limit</string>
+    <string name="discover_empty_room_message">Sorry, we couldn't find anyone here yet. You can check out other rooms if you'd like.</string>
+    <string name="discover_swipe_limit_title">You've hit today's limit</string>
+    <string name="discover_swipe_limit_body">You've used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>
+    <string name="limit_sheet_title_monthly">You've hit this month's limit</string>
     <string name="limit_sheet_title_fair_use">Fair use limit reached</string>
-    <string name="limit_sheet_body_messages">You\'ve used today\'s %1$d message limit. They refresh tomorrow — view plans to continue.</string>
-    <string name="limit_sheet_body_new_chats">You\'ve used today\'s %1$d new conversation limit. Replying to conversations you already started is never limited — view plans to start more.</string>
-    <string name="limit_sheet_body_room_switches">You\'ve used today\'s %1$d room switch limit. They refresh tomorrow — view plans to continue.</string>
-    <string name="limit_sheet_body_liked_me">You\'ve used today\'s %1$d \'liked you\' reveal limit. They refresh tomorrow — view plans to continue.</string>
-    <string name="limit_sheet_body_rewinds">You\'ve used today\'s %1$d rewind limit. They refresh tomorrow — view plans to continue.</string>
-    <string name="limit_sheet_body_boosts">You\'ve used this month\'s %1$d Boost limit — view plans for more.</string>
-    <string name="limit_sheet_body_boosts_fair_use">You\'ve reached the monthly Boost limit of %1$d included in your plan.</string>
+    <string name="limit_sheet_body_messages">You've used today's %1$d message limit. They refresh tomorrow — view plans to continue.</string>
+    <string name="limit_sheet_body_new_chats">You've used today's %1$d new conversation limit. Replying to conversations you already started is never limited — view plans to start more.</string>
+    <string name="limit_sheet_body_room_switches">You've used today's %1$d room switch limit. They refresh tomorrow — view plans to continue.</string>
+    <string name="limit_sheet_body_liked_me">You've used today's %1$d 'liked you' reveal limit. They refresh tomorrow — view plans to continue.</string>
+    <string name="limit_sheet_body_rewinds">You've used today's %1$d rewind limit. They refresh tomorrow — view plans to continue.</string>
+    <string name="limit_sheet_body_boosts">You've used this month's %1$d Boost limit — view plans for more.</string>
+    <string name="limit_sheet_body_boosts_fair_use">You've reached the monthly Boost limit of %1$d included in your plan.</string>
     <string name="limit_sheet_ok_button">Got it</string>
     <string name="ads_reward_button">Watch an ad, get +5 likes</string>
     <string name="ads_reward_loading">Loading reward…</string>
@@ -50,7 +50,7 @@
     <string name="ads_reward_error">The ad could not be completed or verified. Please try again later.</string>
     <string name="ads_reward_no_fill">No reward ad is available right now. Please check back later.</string>
     <!-- Gereksinim 2.9 (Faz 4): sunucudaki AdMob SSV gunluk tavanina (rewardedLikes<=5, likedMeUnlocks<=2, roomSwitches<=1) ulasildiginda gosterilir. -->
-    <string name="ads_reward_daily_limit_reached">You\'ve reached today\'s reward limit.</string>
+    <string name="ads_reward_daily_limit_reached">You've reached today's reward limit.</string>
     <string name="ads_privacy_options">Privacy choices for ads</string>
     <string name="ads_sponsored">Sponsored</string>
     <string name="discover_upgrade_cta">View plans</string>
@@ -82,7 +82,7 @@
     <string name="paywall_restore">Restore purchases</string>
     <string name="paywall_manage_google_play">Manage in Google Play</string>
     <string name="paywall_terms_privacy">Terms · Privacy</string>
-    <string name="paywall_distance_selling_contract_waiver">I have read the Distance Selling Contract\'s Right of Withdrawal Waiver and agree that digital content access begins immediately, waiving my right of withdrawal.</string>
+    <string name="paywall_distance_selling_contract_waiver">I have read the Distance Selling Contract's Right of Withdrawal Waiver and agree that digital content access begins immediately, waiving my right of withdrawal.</string>
     <string name="paywall_active_title">Your %1$s plan is active</string>
     <string name="paywall_trial_detail">You are currently in a trial.</string>
     <string name="paywall_trial_days_remaining">%1$d days left in your trial.</string>
@@ -112,7 +112,7 @@
     <string name="paywall_restore_success">Purchases restored.</string>
     <string name="paywall_restore_pending">Your restoration is pending.</string>
     <string name="room_language_independent">Language-independent</string>
-    <string name="discover_error_couldnt_load_profiles">Couldn\'t load profiles</string>
+    <string name="discover_error_couldnt_load_profiles">Couldn't load profiles</string>
     <string name="discover_retry">Retry</string>
     <string name="discover_no_more_profiles">No more profiles</string>
     <string name="discover_liked_me_title">This person liked you ✨</string>
@@ -123,7 +123,7 @@
     <string name="discover_block_confirm">Block</string>
     <string name="discover_block_cancel">Cancel</string>
     <string name="profile_block_user_title">Block User</string>
-    <string name="profile_block_user_message">If you block this user, you won\'t see their profile again and they won\'t be able to find you.</string>
+    <string name="profile_block_user_message">If you block this user, you won't see their profile again and they won't be able to find you.</string>
     <string name="profile_block_confirm">Block</string>
     <string name="profile_block_cancel">Cancel</string>
     <string name="profile_error_loading">Error loading profile</string>
@@ -137,7 +137,7 @@
     <string name="profile_interests">Interests</string>
     <string name="profile_send_message">💬 Send Message</string>
     <string name="profile_block_user">🚫 Block User</string>
-    <string name="match_title">It\'s a Match!</string>
+    <string name="match_title">It's a Match!</string>
     <string name="match_liked_each_other">You and %1$s liked each other</string>
     <string name="match_chat_walktalk">💬 Chat on WalkTalk</string>
     <string name="match_keep_swiping">Keep Swiping</string>
@@ -154,7 +154,7 @@
     <string name="login_show_password_cd">Show password</string>
     <string name="login_forgot_password">Forgot Password?</string>
     <string name="login_sign_in_button">Sign In</string>
-    <string name="login_dont_have_account">Don\'t have an account? </string>
+    <string name="login_dont_have_account">Don't have an account? </string>
     <string name="login_sign_up">Sign Up</string>
     <string name="onboarding_step_indicator">STEP 1 OF 3</string>
     <string name="onboarding_title">Select Languages</string>
@@ -188,7 +188,7 @@
     <string name="settings_language_dialog_close">Close</string>
     <string name="settings_account_section">ACCOUNT</string>
     <string name="room_error_slot_limit">Your current plan has no remaining room slots. Upgrade or change an existing room.</string>
-    <string name="room_error_unavailable">We couldn\'t change your room. Please try again.</string>
+    <string name="room_error_unavailable">We couldn't change your room. Please try again.</string>
     <string name="room_downgrade_title">Room limit exceeded</string>
     <string name="room_downgrade_body">Your current plan supports up to %1$d rooms. Choose which extra rooms to close — matches and chats in a closed room stay visible, just read-only.</string>
     <string name="room_downgrade_confirm">Close selected</string>
@@ -231,7 +231,7 @@
     <string name="registration_step1_title">When is your birthday?</string>
     <string name="registration_step1_subtitle">Please enter your date of birth</string>
     <string name="registration_step2_title">Your languages</string>
-    <string name="registration_step2_subtitle">The language you speak and where you\'re from</string>
+    <string name="registration_step2_subtitle">The language you speak and where you're from</string>
     <string name="registration_step3_title">About you</string>
     <string name="registration_step3_subtitle">Your name and gender</string>
     <string name="registration_step4_title">Finish signing up</string>
@@ -293,8 +293,8 @@
     <string name="filters_any">Any</string>
 
     <!-- Liked -->
-    <string name="liked_load_error_title">Couldn\'t load your likes</string>
-    <string name="liked_empty">You haven\'t liked anyone yet</string>
+    <string name="liked_load_error_title">Couldn't load your likes</string>
+    <string name="liked_empty">You haven't liked anyone yet</string>
     <string name="liked_match_chip">Match</string>
 
     <!-- Edit profile -->
@@ -338,9 +338,9 @@
     <string name="sso_retry">Try again</string>
     <string name="sso_close">Close</string>
     <string name="sso_error_network">No connection. Check your internet and try again.</string>
-    <string name="sso_error_server">Sign-in couldn\'t be completed right now. Please try again.</string>
-    <string name="sso_error_client_unavailable">%1$s couldn\'t be opened. Make sure the latest version is installed.</string>
-    <string name="sso_blocked_title">Request couldn\'t be verified</string>
+    <string name="sso_error_server">Sign-in couldn't be completed right now. Please try again.</string>
+    <string name="sso_error_client_unavailable">%1$s couldn't be opened. Make sure the latest version is installed.</string>
+    <string name="sso_blocked_title">Request couldn't be verified</string>
     <string name="sso_blocked_body">For your security, this sign-in request was stopped. If you started it, open the app and try again.</string>
     <string name="sso_expired_title">Request expired</string>
     <string name="sso_expired_body">This sign-in request is too old. Start again from the app.</string>
@@ -374,7 +374,7 @@
     <!-- Snackbars / errors -->
     <string name="error_generic">Something went wrong.</string>
     <string name="error_swipe_failed">Swipe failed, please check connection.</string>
-    <string name="info_swipe_queued_offline">No connection — this will be sent automatically once you\'re back online.</string>
+    <string name="info_swipe_queued_offline">No connection — this will be sent automatically once you're back online.</string>
     <string name="settings_export_data_button">Export My Data</string>
     <string name="settings_export_data_requested">Request received — you will get an email with a download link within a few minutes.</string>
     <string name="error_offline">No internet connection. Please check your connection and try again.</string>
@@ -443,7 +443,7 @@
     <string name="wtdemo_side_left">You</string>
     <string name="wtdemo_side_right">The other person</string>
     <string name="wtdemo_writer_cd">Write as %1$s</string>
-    <string name="wtdemo_language_menu_cd">Change %1$s\'s language</string>
+    <string name="wtdemo_language_menu_cd">Change %1$s's language</string>
     <string name="wtdemo_swap_cd">Swap the two languages</string>
     <string name="wtdemo_composer_hint">Write in %1$s…</string>
     <string name="wtdemo_send_cd">Send message</string>
@@ -456,12 +456,12 @@
     <string name="wtdemo_error_timeout">The translation took too long. Try again.</string>
     <string name="wtdemo_error_rate_limited">That was quick — wait a few seconds and try again.</string>
     <string name="wtdemo_error_invalid_input">This message is too long to translate (max %1$d characters).</string>
-    <string name="wtdemo_error_unauthenticated">We couldn\'t verify your session. Sign in again and retry.</string>
+    <string name="wtdemo_error_unauthenticated">We couldn't verify your session. Sign in again and retry.</string>
     <string name="wtdemo_error_server">Translation is unavailable right now. Try again.</string>
     <string name="wtdemo_cta">Try WalkTalk</string>
     <string name="wtdemo_cta_caption">Sign in with your Mook account in seconds — no new sign-up.</string>
     <string name="wtdemo_promo_title">Chat without the language barrier</string>
-    <string name="wtdemo_promo_body">Try WalkTalk\'s live translation right here.</string>
+    <string name="wtdemo_promo_body">Try WalkTalk's live translation right here.</string>
     <string name="wtdemo_promo_cd">Open the WalkTalk live translation demo</string>
     <string name="chat_list_title">Chats</string>
     <string name="chat_list_empty">You have no chats yet.</string>
@@ -474,10 +474,10 @@
     <string name="chat_send_cd">Send</string>
     <string name="chat_error_not_matched">You can only message people you have matched with.</string>
     <string name="chat_error_rate_limited">You are sending messages too quickly. Please wait a moment.</string>
-    <string name="chat_error_character_quota_exhausted">You\'ve used up your translation quota for today. It resets automatically.</string>
+    <string name="chat_error_character_quota_exhausted">You've used up your translation quota for today. It resets automatically.</string>
     <string name="chat_error_send_failed">Message could not be sent. Please try again.</string>
     <string name="chat_error_blocked">You can no longer send messages in this conversation.</string>
-    <string name="chat_blocked_notice">This conversation is no longer available — you can view it, but can\'t send new messages.</string>
+    <string name="chat_blocked_notice">This conversation is no longer available — you can view it, but can't send new messages.</string>
     <string name="chat_list_yesterday">Yesterday</string>
     <string name="chat_message_deleted">This message was deleted</string>
     <string name="chat_action_delete">Delete message</string>
@@ -492,11 +492,11 @@
     <string name="chat_error_delete_failed">Message could not be deleted. Please try again.</string>
     <string name="chat_system_recipient_limit_reached">This user has reached their daily limit and cannot reply right now.</string>
     <string name="chat_system_translation_quota_exhausted">Your translation quota is used up, so your messages are being sent untranslated for now. It renews automatically.</string>
-    <string name="chat_room_closed_read_only">This conversation\'s room is closed — you can view it, but can\'t send new messages.</string>
+    <string name="chat_room_closed_read_only">This conversation's room is closed — you can view it, but can't send new messages.</string>
     <string name="billing_error_existing_subscription_not_found">Your current subscription was not found in the Google account on this device. Sign in to the Play Store with the Google account you subscribed with and try again, or manage your plan in Google Play.</string>
     <string name="billing_error_subscription_managed_elsewhere">Your current subscription is managed outside Google Play. Change your plan where you originally subscribed.</string>
     <string name="billing_error_plan_already_active">This plan is already active.</string>
-    <string name="billing_error_active_plan_unknown">We couldn\'t verify your current subscription right now. Check your connection and try again.</string>
+    <string name="billing_error_active_plan_unknown">We couldn't verify your current subscription right now. Check your connection and try again.</string>
     <string name="paywall_upgrade_to">Upgrade to %1$s</string>
     <string name="paywall_schedule_downgrade_to">Switch to %1$s at period end</string>
     <string name="paywall_switch_to_yearly">Switch to yearly</string>
@@ -505,7 +505,7 @@
     <string name="paywall_change_terms_deferred">%1$s · %2$s. Your current plan continues until the end of the period; the new plan and price start at renewal. Automatically renews until canceled in Google Play.</string>
     <string name="paywall_change_scheduled">Your plan change takes effect on %1$s. Until then you keep all benefits of your current plan.</string>
     <string name="paywall_change_scheduled_no_date">Your plan change takes effect at the end of the current billing period. Until then you keep all benefits of your current plan.</string>
-    <string name="room_error_daily_limit">You\'ve used today\'s room change. Try again tomorrow or upgrade your plan.</string>
+    <string name="room_error_daily_limit">You've used today's room change. Try again tomorrow or upgrade your plan.</string>
     <string name="consent_title">Your privacy and data choices</string>
     <string name="consent_intro">Both permissions below are optional. You can keep using all core features of WalkMatch without them. You can change your decision anytime in Settings &gt; Privacy and data choices.</string>
     <string name="consent_cross_border_title">Cross-border data transfer for analytics</string>
@@ -535,10 +535,10 @@
     <string name="liked_me_go_premium">Go Premium</string>
     <string name="liked_me_empty_title">No likes yet</string>
     <string name="liked_me_empty_body">Stay active in Discover; people who like you will appear here.</string>
-    <string name="liked_me_error">Couldn\'t load the list. Please try again.</string>
+    <string name="liked_me_error">Couldn't load the list. Please try again.</string>
     <string name="liked_me_retry">Try again</string>
     <string name="liked_me_not_liked_anymore">This person no longer likes you.</string>
-    <string name="liked_me_unlock_failed">Couldn\'t unlock. Please try again.</string>
+    <string name="liked_me_unlock_failed">Couldn't unlock. Please try again.</string>
     <string name="upsell_daily_title">Explore ad-free and without limits</string>
     <string name="upsell_daily_body">With Premium, ads disappear, you see everyone who liked you and you can like without limits.</string>
     <string name="upsell_daily_cta">Go Premium</string>
@@ -549,23 +549,23 @@
     <string name="settings_incognito_title">Incognito mode</string>
     <string name="settings_incognito_subtitle">Only people you like can see you in Discover; your profile visits are not recorded.</string>
     <string name="settings_incognito_subtitle_locked">Premium feature: browse without being seen.</string>
-    <string name="settings_incognito_error">Couldn\'t update incognito mode. Please try again.</string>
+    <string name="settings_incognito_error">Couldn't update incognito mode. Please try again.</string>
     <string name="limit_sheet_try_standard_trial">Try Standard free for %1$d days</string>
     <string name="limit_sheet_come_back_tomorrow">Or come back tomorrow</string>
     <string name="limit_sheet_resets_in">Your limits reset in %1$s</string>
-    <string name="paywall_limit_title_likes">You\'re out of likes</string>
+    <string name="paywall_limit_title_likes">You're out of likes</string>
     <string name="paywall_limit_title_messages">Daily message limit reached</string>
     <string name="paywall_limit_title_new_chats">No new chats left today</string>
     <string name="paywall_limit_title_room_switches">Room switches used up</string>
     <string name="paywall_limit_title_liked_me">See everyone who liked you</string>
-    <string name="paywall_limit_title_rewinds">You\'re out of rewinds</string>
+    <string name="paywall_limit_title_rewinds">You're out of rewinds</string>
     <string name="paywall_limit_title_boosts">Boosts used up for this cycle</string>
     <string name="paywall_most_popular">Most popular</string>
-    <string name="paywall_load_error">We couldn\'t load the plans. Check your connection and try again.</string>
+    <string name="paywall_load_error">We couldn't load the plans. Check your connection and try again.</string>
     <string name="paywall_retry">Try again</string>
     <!-- Ayarlar: ertelenmiş düşürme ve ödeme sorunu -->
     <string name="settings_scheduled_change_on">On %1$s your plan will change to %2$s</string>
     <string name="settings_scheduled_change">Your plan will change to %1$s at the end of this period</string>
-    <string name="settings_billing_issue_notice">We couldn\'t process your payment. Update your payment method to keep your subscription.</string>
+    <string name="settings_billing_issue_notice">We couldn't process your payment. Update your payment method to keep your subscription.</string>
     <string name="settings_update_payment_method">Update payment method</string>
 </resources>
