@@ -1,5 +1,6 @@
 package com.mcclabs.mook.chat
 
+import com.mcclabs.mook.domain.model.BLOCKED_USER_ERROR_MESSAGE
 import com.mcclabs.mook.domain.model.ChatSendError
 import com.mcclabs.mook.domain.model.chatSendErrorFor
 import kotlin.test.Test
@@ -72,6 +73,41 @@ class ChatSendErrorTest {
             ChatSendError.CHARACTER_QUOTA_EXHAUSTED,
             chatSendErrorFor("resource-exhausted", message = "  CHARACTER-QUOTA-DAILY-EXHAUSTED  "),
         )
+    }
+
+    @Test
+    fun permissionDeniedWithBlockedUserMessageMeansBlocked() {
+        // Sunucudaki `sendMessage` engelde `permission-denied` + "blocked-user" döner
+        // (functions/src/blocking.ts → BLOCKED_USER_ERROR). İki SDK yazımı da eşlenir.
+        assertEquals(ChatSendError.BLOCKED, chatSendErrorFor("PERMISSION_DENIED", message = "blocked-user"))
+        assertEquals(ChatSendError.BLOCKED, chatSendErrorFor("permission-denied", message = "blocked-user"))
+        assertEquals(ChatSendError.BLOCKED, chatSendErrorFor("permission-denied", message = "  BLOCKED-USER  "))
+    }
+
+    @Test
+    fun permissionDeniedWithOtherMessagesStillMeansNotMatched() {
+        // Engel dışındaki permission-denied sebepleri (ör. yasaklı kullanıcı) eskisi gibi
+        // NOT_MATCHED olarak kalır.
+        listOf("user-banned", "upgrade-required", "").forEach { reason ->
+            assertEquals(
+                ChatSendError.NOT_MATCHED,
+                chatSendErrorFor("PERMISSION_DENIED", message = reason),
+                "Unexpected mapping for message=$reason",
+            )
+        }
+    }
+
+    @Test
+    fun blockedMessageOnAnotherCodeIsNotBlocked() {
+        // Yalnızca permission-denied kodu engel anlamına gelir; aynı metin başka bir kodla
+        // gelirse kodun kendi eşlemesi geçerlidir.
+        assertEquals(ChatSendError.NOT_MATCHED, chatSendErrorFor("FAILED_PRECONDITION", message = "blocked-user"))
+        assertEquals(ChatSendError.GENERIC, chatSendErrorFor("INTERNAL", message = "blocked-user"))
+    }
+
+    @Test
+    fun clientAndServerAgreeOnTheBlockedMessage() {
+        assertEquals("blocked-user", BLOCKED_USER_ERROR_MESSAGE)
     }
 
     @Test

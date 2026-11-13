@@ -88,12 +88,19 @@ async function targets(count) {
     return ids;
 }
 
+// `enforceAppCheck: true` olan callable'lar App Check jetonu olmayan isteği 401 ile
+// reddeder. Emülatör jetonun imzasını doğrulamaz, yalnızca JWT biçimini çözer; bu yüzden
+// imzasız bir test jetonu yeterlidir (üretimde geçersizdir).
+const base64Url = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
+const emulatorAppCheckToken = `${base64Url({ alg: "none", typ: "JWT" })}.${base64Url({ sub: "emulator-test-app" })}.`;
+
 async function callable(name, token, data) {
     const response = await fetch(`http://${functionsHost}/${projectId}/us-central1/${name}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "X-Firebase-AppCheck": emulatorAppCheckToken,
         },
         body: JSON.stringify({ data }),
     });
@@ -212,4 +219,103 @@ test("new-chat and message ceilings prevent the 51st free message", { timeout: 3
     const usage = (await db.collection("usage").doc(sender.uid).get()).data();
     assert.equal(usage.messages, 50);
     assert.equal(usage.newChats, 3);
+});
+
+test("blocked users cannot message each other in either direction", { timeout: 30000, concurrency: true }, async () => {
+    const blocker = await actor();
+    const blocked = await actor();
+    const chatId = [blocker.uid, blocked.uid].sort().join("_");
+    // Eşleşme belgesi engellemeden sonra da durur; engel kontrolü bu yüzden ayrıca gerekir.
+    await db.collection("matches").doc(chatId).set({ users: [blocker.uid, blocked.uid].sort() });
+    await db.collection("users").doc(blocker.uid).update({ blockedUsers: [blocked.uid] });
+
+    // Engellenen kişi, onu engelleyene yazamaz.
+    const fromBlocked = await callable("sendMessage", blocked.token, {
+        chatId, peerUid: blocker.uid, text: "hello?", senderLanguage: "EN-US", messageId: "blocked-message-1",
+    });
+    assertError(fromBlocked, "PERMISSION_DENIED");
+    assert.equal(fromBlocked.body.error?.message, "blocked-user");
+
+    // Engelleyen kişi de engellediği kişiye yazamaz.
+    const fromBlocker = await callable("sendMessage", blocker.token, {
+        chatId, peerUid: blocked.uid, text: "hello", senderLanguage: "EN-US", messageId: "blocked-message-2",
+    });
+    assertError(fromBlocker, "PERMISSION_DENIED");
+    assert.equal(fromBlocker.body.error?.message, "blocked-user");
+
+    // Reddedilen mesajlar kaydedilmez ve kota harcamaz.
+    const messages = await db.collection("chats").doc(chatId).collection("messages").get();
+    assert.equal(messages.size, 0);
+    const blockedUsage = (await db.collection("usage").doc(blocked.uid).get()).data();
+    assert.equal(blockedUsage?.messages ?? 0, 0);
+});
+
+test("a mutual block keeps both directions closed and spends no quota or translation budget", { timeout: 30000, concurrency: true }, async () => {
+    const first = await actor();
+    const second = await actor();
+    const chatId = [first.uid, second.uid].sort().join("_");
+    await db.collection("matches").doc(chatId).set({ users: [first.uid, second.uid].sort() });
+    // Diller farklı: engel olmasaydı mesaj çevrilir ve karakter kotası düşerdi.
+    await db.collection("users").doc(first.uid).update({ blockedUsers: [second.uid], languageCode: "TR" });
+    await db.collection("users").doc(second.uid).update({ blockedUsers: [first.uid] });
+
+    for (const [sender, peer, messageId] of [[first, second, "mutual-1"], [second, first, "mutual-2"]]) {
+        const result = await callable("sendMessage", sender.token, {
+            chatId, peerUid: peer.uid, text: "merhaba", senderLanguage: sender === first ? "TR" : "EN-US", messageId,
+        });
+        assertError(result, "PERMISSION_DENIED");
+        assert.equal(result.body.error?.message, "blocked-user");
+        // Kota adımına hiç gelinmediği için kullanım belgesi oluşmaz: ne mesaj, ne yeni
+        // sohbet, ne de çeviri karakteri harcanır.
+        assert.equal((await db.collection("usage").doc(sender.uid).get()).exists, false);
+    }
+    assert.equal((await db.collection("chats").doc(chatId).get()).exists, false);
+});
+
+test("removing the block lets the pair message again", { timeout: 30000, concurrency: true }, async () => {
+    const blocker = await actor();
+    const peer = await actor();
+    const chatId = [blocker.uid, peer.uid].sort().join("_");
+    await db.collection("matches").doc(chatId).set({ users: [blocker.uid, peer.uid].sort() });
+    await db.collection("users").doc(blocker.uid).update({ blockedUsers: [peer.uid] });
+    const send = (messageId) => callable("sendMessage", peer.token, {
+        chatId, peerUid: blocker.uid, text: "hello", senderLanguage: "EN-US", messageId,
+    });
+
+    assertError(await send("unblock-1"), "PERMISSION_DENIED");
+    await db.collection("users").doc(blocker.uid).update({ blockedUsers: [] });
+    const afterUnblock = await send("unblock-2");
+    assert.equal(successful(afterUnblock), true, JSON.stringify(afterUnblock));
+});
+
+test("discover feed hides users who blocked the caller as well as users the caller blocked", { timeout: 30000, concurrency: true }, async () => {
+    const caller = await actor();
+    const blockedMe = `${runId}_feed_blocked_me`;
+    const blockedByMe = `${runId}_feed_blocked_by_me`;
+    const neutral = `${runId}_feed_neutral`;
+    // En yeni aktiflik: bu üç profil, diğer testlerin verisinden bağımsız olarak ilk sayfaya düşer.
+    const lastActiveTimestamp = Date.now() + 60 * 60 * 1000;
+    const seed = (uid, blockedUsers) => db.collection("users").doc(uid).set({
+        displayName: uid, languageCode: "EN-US", timeZone: "Europe/Istanbul",
+        isMookActive: true, lastActiveTimestamp, blockedUsers,
+    });
+    await Promise.all([seed(blockedMe, [caller.uid]), seed(blockedByMe, []), seed(neutral, [])]);
+    await db.collection("users").doc(caller.uid).update({ blockedUsers: [blockedByMe] });
+
+    // `public_profiles`, `syncPublicProfile` tetikleyicisiyle `users` belgesinden üretilir;
+    // akış sorgulanmadan önce üç projeksiyonun da yazılması beklenir.
+    const deadline = Date.now() + 15000;
+    for (;;) {
+        const snapshots = await db.getAll(...[blockedMe, blockedByMe, neutral].map((uid) => db.collection("public_profiles").doc(uid)));
+        if (snapshots.every((snapshot) => snapshot.data()?.isMookActive === true)) break;
+        assert.ok(Date.now() < deadline, "public_profiles projeksiyonu zamanında oluşmadı");
+        await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+
+    const feed = await callable("getDiscoverFeed", caller.token, {});
+    assert.equal(successful(feed), true, JSON.stringify(feed));
+    const ids = feed.body.result.profiles.map((profile) => profile.id);
+    assert.equal(ids.includes(neutral), true, JSON.stringify(ids));
+    assert.equal(ids.includes(blockedMe), false, "Çağıranı engelleyen kullanıcı akışta görünmemeli");
+    assert.equal(ids.includes(blockedByMe), false, "Çağıranın engellediği kullanıcı akışta görünmemeli");
 });

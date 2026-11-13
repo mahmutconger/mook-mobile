@@ -20,6 +20,8 @@
     <string name="eula_gate_accept">Pročitao sam i prihvaćam Uvjete korištenja i EULA</string>
     <string name="eula_gate_continue">Prihvati i nastavi</string>
     <string name="eula_gate_logout">Odjavi se</string>
+    <string name="chat_error_blocked">Više ne možete slati poruke u ovom razgovoru.</string>
+    <string name="chat_blocked_notice">Ovaj razgovor više nije dostupan — možete ga pregledati, ali ne možete slati nove poruke.</string>
     <!-- needs-translation:start | Otomatik İngilizce yedek. Bu metinler henüz bu dile çevrilmedi; scripts/l10n/sync_missing_translations.py tarafından eklendi. -->
     <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
     <string name="discover_swipe_limit_body">You\'ve used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>

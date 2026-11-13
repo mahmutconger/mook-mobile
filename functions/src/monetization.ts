@@ -3,6 +3,7 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { assertNotBanned } from "./moderation";
+import { BLOCKED_USER_ERROR, isBlockedBetween } from "./blocking";
 import {
     MAX_FREE_REWARDED_LIKES,
     MAX_REWARDED_ROOM_SWITCHES,
@@ -359,10 +360,8 @@ export const swipe = onCall(
             transaction.get(ownUserRef), transaction.get(targetUserRef),
         ]);
         if (!targetUser.exists) throw new HttpsError("not-found", "Profile not found.");
-        const ownBlocked = (ownUser.data()?.blockedUsers ?? []) as string[];
-        const targetBlocked = (targetUser.data()?.blockedUsers ?? []) as string[];
-        if (ownBlocked.includes(targetUid) || targetBlocked.includes(uid)) {
-            throw new HttpsError("permission-denied", "blocked-user");
+        if (isBlockedBetween(uid, ownUser.data(), targetUid, targetUser.data())) {
+            throw new HttpsError("permission-denied", BLOCKED_USER_ERROR);
         }
         if (existing.exists) {
             const wasLike = existing.data()?.type === "like";

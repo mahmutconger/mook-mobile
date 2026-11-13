@@ -49,7 +49,10 @@ data class ConsentState(
     val isResolved: Boolean = false,
     /** Firebase Analytics'in toplama yapıp yapamayacağı -- bkz. [crossBorderTransferAccepted]. */
     val analyticsAllowed: Boolean = false,
-    /** AdMob'un başlatılıp başlatılamayacağı (herhangi bir reklam -- kişiselleştirilmemiş dahil). */
+    /**
+     * AdMob'un başlatılıp başlatılamayacağı (herhangi bir reklam -- kişiselleştirilmemiş dahil).
+     * Hem platform onayının (UMP) hem de kullanıcının KVKK kararının sonucudur; bkz. [adsMayStart].
+     */
     val adsAllowed: Boolean = false,
     /**
      * Gereksinim 3 (KVKK): Firebase, RevenueCat ve DeepL'e (üçü de Türkiye dışı) kullanıcı
@@ -82,3 +85,22 @@ object ConsentPolicy {
  */
 val ConsentState.requiresDecision: Boolean
     get() = isResolved && (decisionPolicyVersion ?: 0) < ConsentPolicy.CURRENT_VERSION
+
+/**
+ * Reklam SDK'sı (AdMob) başlatılabilir ve reklam istenebilir mi?
+ *
+ * İki koşulun ikisi de gerekir:
+ * 1. Platformun onay altyapısı (Android'de UMP `canRequestAds()`) reklam isteğine izin veriyor.
+ *    UMP, onay formunu yalnızca yasal olarak gereken bölgelerde (AEA, Birleşik Krallık,
+ *    İsviçre) gösterir; Türkiye'de genellikle hemen `true` döner.
+ * 2. Kullanıcı KVKK onay ekranında [ConsentPolicy.CURRENT_VERSION] için kararını VERMİŞ.
+ *
+ * İkinci koşul olmadan reklam istekleri — ve onlarla birlikte reklam kimliği ile IP adresi —
+ * kullanıcı KVKK ekranını görmeden önce Google'a giderdi. Karar "kişiselleştirilmiş reklam
+ * yok" olsa bile reklam gösterilir; o durumda istekler kişiselleştirilmemiş (NPA) işaretlenir.
+ *
+ * @param platformAllowsAds UMP'nin `canRequestAds()` sonucu.
+ * @param decisionPolicyVersion Kullanıcının karar verdiği politika sürümü; karar yoksa `null`.
+ */
+fun adsMayStart(platformAllowsAds: Boolean, decisionPolicyVersion: Int?): Boolean =
+    platformAllowsAds && (decisionPolicyVersion ?: 0) >= ConsentPolicy.CURRENT_VERSION

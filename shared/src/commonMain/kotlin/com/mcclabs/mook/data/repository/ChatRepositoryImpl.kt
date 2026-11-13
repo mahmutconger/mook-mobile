@@ -9,6 +9,8 @@ import com.mcclabs.mook.domain.model.ChatSendError
 import com.mcclabs.mook.domain.model.ChatSendException
 import com.mcclabs.mook.domain.model.MessageStatus
 import com.mcclabs.mook.domain.model.chatSendErrorFor
+import com.mcclabs.mook.domain.moderation.blockedUidsFrom
+import com.mcclabs.mook.domain.moderation.withoutBlockedPeers
 import com.mcclabs.mook.domain.repository.ChatRepository
 import com.mcclabs.mook.domain.repository.SendMessageResult
 import com.mcclabs.mook.util.Log
@@ -22,6 +24,8 @@ import dev.gitlive.firebase.functions.FirebaseFunctionsException
 import dev.gitlive.firebase.functions.code
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
@@ -291,7 +295,7 @@ class ChatRepositoryImpl : ChatRepository {
     override fun observeChats(): Flow<List<ChatRoom>> {
         val uid = currentUid ?: return flowOf(emptyList())
 
-        return db
+        val rooms = db
             .collection("chats")
             .where { "users" contains uid }
             .snapshots
@@ -300,7 +304,43 @@ class ChatRepositoryImpl : ChatRepository {
                     .mapNotNull { doc -> doc.toChatRoom(currentUid = uid) }
                     .sortedByDescending { it.lastMessageTimestamp ?: 0L }
             }
+
+        // Kendi `users` belgesi canlı dinlenir: kullanıcı profil ekranından birini
+        // engellediği anda o sohbet listeden düşer. Engel listesi okunamazsa (ör. geçici
+        // bir dinleyici hatası) liste filtresiz gösterilir; mesaj gönderimini sunucu
+        // yine engeller.
+        val blocked = db
+            .collection("users")
+            .document(uid)
+            .snapshots
+            .map { snapshot -> blockedUidsFrom(snapshot.readBlockedUsers()) }
+            .catch { error ->
+                Log.e("Engel listesi okunamadı — sohbet listesi filtresiz gösteriliyor", error)
+                emit(emptySet())
+            }
+            .distinctUntilChanged()
+
+        return combine(rooms, blocked) { chatRooms, blockedUids ->
+            chatRooms.withoutBlockedPeers(blockedUids)
+        }
     }
+
+    override suspend fun hasBlocked(peerUid: String): Boolean {
+        val uid = currentUid ?: return false
+        return try {
+            val snapshot = db.collection("users").document(uid).get()
+            peerUid in blockedUidsFrom(snapshot.readBlockedUsers())
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (e: Exception) {
+            Log.e("Engel durumu okunamadı (peerUid=$peerUid)", e)
+            false
+        }
+    }
+
+    /** `blockedUsers` alanı yoksa veya beklenmeyen tipteyse `null` döner. */
+    private fun DocumentSnapshot.readBlockedUsers(): List<String>? =
+        runCatching { get<List<String>?>("blockedUsers") }.getOrNull()
 
     private fun DocumentSnapshot.toChatRoom(currentUid: String): ChatRoom? {
         val users = runCatching { get<List<String>>("users") }.getOrNull().orEmpty()

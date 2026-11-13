@@ -20,6 +20,8 @@
     <string name="eula_gate_accept">Jag har läst och accepterar användarvillkoren och EULA</string>
     <string name="eula_gate_continue">Acceptera och fortsätt</string>
     <string name="eula_gate_logout">Logga ut</string>
+    <string name="chat_error_blocked">Du kan inte längre skicka meddelanden i den här konversationen.</string>
+    <string name="chat_blocked_notice">Den här konversationen är inte längre tillgänglig — du kan visa den, men inte skicka nya meddelanden.</string>
     <!-- needs-translation:start | Otomatik İngilizce yedek. Bu metinler henüz bu dile çevrilmedi; scripts/l10n/sync_missing_translations.py tarafından eklendi. -->
     <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
     <string name="discover_swipe_limit_body">You\'ve used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>

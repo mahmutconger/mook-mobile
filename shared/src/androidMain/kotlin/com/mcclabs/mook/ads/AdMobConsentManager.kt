@@ -17,6 +17,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.FirebaseApp
 import com.mcclabs.mook.domain.consent.ConsentPolicy
 import com.mcclabs.mook.domain.consent.ConsentState
+import com.mcclabs.mook.domain.consent.adsMayStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,8 +48,16 @@ object AdMobConsentManager {
     private var adsInitialized = false
     private var analyticsInitialized = false
 
+    /**
+     * Reklam yükleme kodunun (`AdFormats.android.kt`, `RewardedAdButton.android.kt`) okuduğu
+     * TEK kapı. Yalnızca UMP izin verdiğinde VE kullanıcı KVKK kararını verdiğinde `true`
+     * olur (bkz. [adsMayStart]); böylece hiçbir reklam isteği KVKK ekranından önce gitmez.
+     */
     var canRequestAds by mutableStateOf(false)
         private set
+
+    /** UMP'nin son `canRequestAds()` sonucu — KVKK kararıyla birleştirilmeden önceki ham değer. */
+    private var platformAllowsAds = false
     var privacyOptionsRequired by mutableStateOf(false)
         private set
 
@@ -135,6 +144,9 @@ object AdMobConsentManager {
                 decisionPolicyVersion = ConsentPolicy.CURRENT_VERSION,
             )
         }
+        // KVKK kararı verildiği an reklam kapısı açılabilir; uygulamayı yeniden başlatmak
+        // gerekmez. UMP henüz izin vermediyse kapı kapalı kalır ve UMP çözüldüğünde açılır.
+        applyAdsGate(FirebaseApp.getInstance().applicationContext)
         applyAnalyticsGate()
     }
 
@@ -158,15 +170,27 @@ object AdMobConsentManager {
     ) {
         privacyOptionsRequired = consentInformation.privacyOptionsRequirementStatus ==
             ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
-        canRequestAds = consentInformation.canRequestAds()
+        platformAllowsAds = consentInformation.canRequestAds()
         mutableState.update {
             it.copy(
                 isResolved = true,
-                adsAllowed = canRequestAds,
                 privacyOptionsRequired = privacyOptionsRequired,
             )
         }
-        if (canRequestAds && !adsInitialized) {
+        applyAdsGate(activity.applicationContext)
+        applyAnalyticsGate()
+    }
+
+    /**
+     * [canRequestAds]'ı UMP sonucu ve KVKK kararından yeniden hesaplar; kapı ilk kez
+     * açıldığında Mobile Ads SDK'sını başlatır. Kapı kapalıyken SDK hiç başlatılmaz ve
+     * hiçbir reklam isteği gönderilmez.
+     */
+    private fun applyAdsGate(context: Context) {
+        val allowed = adsMayStart(platformAllowsAds, mutableState.value.decisionPolicyVersion)
+        canRequestAds = allowed
+        mutableState.update { it.copy(adsAllowed = allowed) }
+        if (allowed && !adsInitialized) {
             adsInitialized = true
             // Gereksinim 4 (Faz 6, TFUA): WalkMatch kayıt sırasında 18 yaş doğrulaması yapar --
             // bu yüzden bayrak BİLİNÇLİ olarak ve HER ZAMAN AÇIKÇA `false` olarak ayarlanır
@@ -183,9 +207,8 @@ object AdMobConsentManager {
                     .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_T)
                     .build(),
             )
-            MobileAds.initialize(activity.applicationContext) { }
+            MobileAds.initialize(context.applicationContext) { }
         }
-        applyAnalyticsGate()
     }
 
     /**

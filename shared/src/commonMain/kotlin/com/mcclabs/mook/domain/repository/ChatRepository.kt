@@ -105,8 +105,21 @@ interface ChatRepository {
      *
      * Each emission carries the full snapshot — consumers should diff or let
      * `LazyColumn` key-based diffing handle updates.
+     *
+     * Kullanıcının engellediği kişilerle olan sohbetler listeye hiç girmez. Engel
+     * listesi canlı izlenir: kullanıcı birini engellediği anda o sohbet listeden düşer.
      */
     fun observeChats(): Flow<List<ChatRoom>>
+
+    /**
+     * Oturumdaki kullanıcı [peerUid]'i engellediyse `true` döner.
+     *
+     * Yalnızca kullanıcının KENDİ engel listesine bakar; karşı tarafın kullanıcıyı
+     * engelleyip engellemediği istemciden okunamaz (sunucu bunu `sendMessage`
+     * yanıtında [com.mcclabs.mook.domain.model.ChatSendError.BLOCKED] olarak bildirir).
+     * Okuma başarısız olursa `false` döner; sunucu yine de mesajı reddeder.
+     */
+    suspend fun hasBlocked(peerUid: String): Boolean
 
     /**
      * One-shot lookup of a single chat room by id — e.g. to read the

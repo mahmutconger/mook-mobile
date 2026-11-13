@@ -25,9 +25,23 @@ enum class ChatSendError {
      */
     CHARACTER_QUOTA_EXHAUSTED,
 
+    /**
+     * İki kullanıcıdan biri diğerini engellemiş — sunucu (`sendMessage`) mesajı
+     * `permission-denied` + `"blocked-user"` ile reddeder. Engel hangi yönde olursa
+     * olsun aynı durum döner: engellenen kişi engellendiğini bu hatadan öğrenemez.
+     * Sohbet ekranı bu durumda kompozeri kapatır.
+     */
+    BLOCKED,
+
     /** Anything else: offline, function down, malformed payload. */
     GENERIC,
 }
+
+/**
+ * Sunucunun engel hatasında kullandığı `HttpsError` metni. `functions/src/blocking.ts`
+ * içindeki `BLOCKED_USER_ERROR` ile birebir aynı olmalıdır.
+ */
+const val BLOCKED_USER_ERROR_MESSAGE: String = "blocked-user"
 
 /** Thrown by the repository so callers can react without touching Firebase types. */
 class ChatSendException(
@@ -56,7 +70,14 @@ fun chatSendErrorFor(code: String?, message: String? = null): ChatSendError {
     val normalized = code?.trim()?.uppercase()?.replace('-', '_')?.replace(' ', '_')
     return when (normalized) {
         // The callable rejects an unmatched peer with failed-precondition.
-        "FAILED_PRECONDITION", "PERMISSION_DENIED" -> ChatSendError.NOT_MATCHED
+        "FAILED_PRECONDITION" -> ChatSendError.NOT_MATCHED
+        // Engel de permission-denied ile gelir; yalnızca sunucunun `BLOCKED_USER_ERROR`
+        // metni (functions/src/blocking.ts) onu "eşleşme yok" durumundan ayırır.
+        "PERMISSION_DENIED" -> if (message?.trim()?.lowercase() == BLOCKED_USER_ERROR_MESSAGE) {
+            ChatSendError.BLOCKED
+        } else {
+            ChatSendError.NOT_MATCHED
+        }
         "RESOURCE_EXHAUSTED" -> {
             val reason = message?.trim()?.lowercase()
             if (reason == "character-quota-daily-exhausted" || reason == "character-quota-monthly-exhausted") {

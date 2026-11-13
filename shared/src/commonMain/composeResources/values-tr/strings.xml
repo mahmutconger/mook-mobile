@@ -475,6 +475,8 @@
     <string name="chat_error_rate_limited">Çok hızlı mesaj gönderiyorsun. Lütfen biraz bekle.</string>
     <string name="chat_error_character_quota_exhausted">Bugünkü çeviri hakkını kullandın. Kota otomatik olarak yenilenecek.</string>
     <string name="chat_error_send_failed">Mesaj gönderilemedi. Lütfen tekrar dene.</string>
+    <string name="chat_error_blocked">Bu sohbete artık mesaj gönderemezsin.</string>
+    <string name="chat_blocked_notice">Bu sohbet artık kullanılamıyor — görüntüleyebilirsin ama yeni mesaj gönderemezsin.</string>
     <string name="chat_list_yesterday">Dün</string>
     <string name="chat_message_deleted">Bu mesaj silindi</string>
     <string name="chat_action_delete">Mesajı sil</string>

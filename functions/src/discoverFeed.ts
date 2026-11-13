@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { resolveTierFor, limitsFor } from "./monetization";
 import { discoverPriority, sortByDiscoverPriority } from "./discoverPriority";
+import { blockedUsersOf } from "./blocking";
 
 if (admin.apps.length === 0) admin.initializeApp();
 const db = admin.firestore();
@@ -124,11 +125,18 @@ export const getDiscoverFeed = onCall(
         const ownUserSnapshot = await db.collection("users").doc(uid).get();
         const ownUser = ownUserSnapshot.data() ?? {};
         const ownRoom = typeof ownUser.roomLanguageCode === "string" ? ownUser.roomLanguageCode : null;
-        const blockedUsers = new Set(
-            Array.isArray(ownUser.blockedUsers)
-                ? (ownUser.blockedUsers as unknown[]).filter((entry): entry is string => typeof entry === "string")
-                : [],
-        );
+        // Engel iki yönlüdür: kullanıcının engelledikleri VE kullanıcıyı engelleyenler
+        // akışta görünmez. İkinci küme `users` koleksiyonunda tek bir `array-contains`
+        // sorgusuyla bulunur (Admin SDK; istemci bu koleksiyonu listeleyemez). Yalnızca
+        // belge kimlikleri gerektiği için alan okunmaz (`select()`).
+        const blockedByMeSnapshot = await db.collection("users")
+            .where("blockedUsers", "array-contains", uid)
+            .select()
+            .get();
+        const blockedUsers = new Set([
+            ...blockedUsersOf(ownUser),
+            ...blockedByMeSnapshot.docs.map((doc) => doc.id),
+        ]);
 
         // 1) Free Roam doğrulaması. Sunucu henüz kullanıcının bir odasını bilmiyorsa
         // (`ownRoom === null`, ör. onboarding sırasında `RoomGate` tamamlanmadan önceki

@@ -23,6 +23,10 @@ import com.mcclabs.mook.domain.model.ChatSendError
  *   among the current user's open room slots — e.g. after a tier downgrade closed it.
  *   The conversation stays visible but the composer is disabled; sending is also
  *   blocked in the ViewModel as a second line of defense.
+ * @property isBlocked `true` when either user has blocked the other: the user blocked
+ *   the peer (read from their own `blockedUsers` list), or the server refused a send
+ *   with [ChatSendError.BLOCKED]. The conversation stays visible but the composer is
+ *   replaced by a neutral notice; the notice never says *who* blocked whom.
  */
 data class ChatUiState(
     /** "Görüldü" etiketinin gösterileceği kendi mesajım (yalnızca Premium; bkz. ReadReceiptRules). */
@@ -37,4 +41,5 @@ data class ChatUiState(
     val sendError: ChatSendError? = null,
     val reportSubmitted: Boolean = false,
     val isReadOnly: Boolean = false,
+    val isBlocked: Boolean = false,
 )

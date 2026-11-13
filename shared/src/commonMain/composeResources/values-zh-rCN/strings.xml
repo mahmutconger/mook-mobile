@@ -20,6 +20,8 @@
     <string name="eula_gate_accept">我已阅读并接受《使用条款》和 EULA</string>
     <string name="eula_gate_continue">接受并继续</string>
     <string name="eula_gate_logout">退出登录</string>
+    <string name="chat_error_blocked">您无法再在此对话中发送消息。</string>
+    <string name="chat_blocked_notice">此对话已不可用——您可以查看，但无法发送新消息。</string>
     <!-- needs-translation:start | Otomatik İngilizce yedek. Bu metinler henüz bu dile çevrilmedi; scripts/l10n/sync_missing_translations.py tarafından eklendi. -->
     <string name="discover_swipe_limit_title">You\'ve hit today\'s limit</string>
     <string name="discover_swipe_limit_body">You\'ve used your %1$d likes for today. They refresh tomorrow — view plans to continue.</string>
