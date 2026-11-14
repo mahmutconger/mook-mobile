@@ -294,6 +294,9 @@ fun AppNavGraph() {
                 onNavigateToPaywall = {
                     navController.navigate(NavRoutes.Paywall.createRoute()) { launchSingleTop = true }
                 },
+                onNavigateToEditProfile = {
+                    navController.navigate(NavRoutes.EditProfile.route) { launchSingleTop = true }
+                },
             )
         }
 

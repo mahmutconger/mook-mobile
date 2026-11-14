@@ -17,6 +17,9 @@ import com.mcclabs.mook.domain.billing.RestoreSubscriptionUseCase
 import com.mcclabs.mook.domain.billing.SubscriptionRepository
 import com.mcclabs.mook.feature.billing.toLocalizedMessage
 import com.mcclabs.mook.domain.repository.AuthRepository
+import com.mcclabs.mook.domain.repository.DiscoverRepository
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
 import com.mcclabs.mook.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,6 +50,8 @@ class SettingsViewModel(
     private val priceChangeConfirmationUseCase: PriceChangeConfirmationUseCase,
     private val exportUserDataUseCase: ExportUserDataUseCase,
     private val logoutUseCase: LogoutUseCase,
+    /** Ayarlar başlığındaki profil kartı (ad + fotoğraf) için. */
+    private val discoverRepository: DiscoverRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsUiState())
@@ -102,6 +107,14 @@ class SettingsViewModel(
                     ageRangeEnd = settings.ageRangeEnd,
                     isLoading = false
                 )
+            }
+            // Profil kartı ayrı yüklenir; okunamazsa başlık yalnızca e-postayı gösterir.
+            Firebase.auth.currentUser?.uid?.let { uid ->
+                discoverRepository.getProfileDetails(uid)?.let { profile ->
+                    _state.update {
+                        it.copy(profileName = profile.name, profilePhotoUrl = profile.photoUrls.firstOrNull())
+                    }
+                }
             }
         }
     }

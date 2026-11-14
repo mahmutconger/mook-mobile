@@ -56,8 +56,25 @@ test("ilk zorunlu oda seçimi ücretsizdir ve limit dolu olsa bile engellenmez",
     assert.deepEqual(plan.rooms, ["DE"]);
 });
 
-test("zaten açık bir odaya geçiş slot değiştirmez ama günlük haktan düşer", () => {
+test("zaten açık bir odaya geçiş slot değiştirmez ve günlük haktan düşmez", () => {
     const plan = planRoomSwitch(input({ rooms: ["TR", "DE"], roomSlots: 3, dailySwitchLimit: 3 }));
+    assert.deepEqual(plan.rooms, ["TR", "DE"]);
+    assert.deepEqual(plan.evictedRooms, []);
+    assert.equal(plan.chargesQuota, false);
+});
+
+test("günlük hak dolu olsa bile açık bir odaya geri dönülebilir", () => {
+    const plan = planRoomSwitch(input({
+        rooms: ["TR", "DE"], activeRoom: "DE", target: "TR", roomSlots: 2, switchesUsedToday: 1,
+    }));
+    assert.equal(plan.kind, "switch");
+    assert.equal(plan.activeRoom, "TR");
+    assert.deepEqual(plan.rooms, ["TR", "DE"]);
+    assert.equal(plan.chargesQuota, false);
+});
+
+test("Ücretsiz kullanıcı 2 slotla yeni odaya geçince önceki odası açık kalır", () => {
+    const plan = planRoomSwitch(input({ roomSlots: 2 }));
     assert.deepEqual(plan.rooms, ["TR", "DE"]);
     assert.deepEqual(plan.evictedRooms, []);
     assert.equal(plan.chargesQuota, true);

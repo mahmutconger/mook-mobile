@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,12 +17,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mcclabs.mook.domain.model.Language
 import com.mcclabs.mook.ui.theme.BrandGradient
+
+/** Bir oda kartında gösterilen erişim durumu rozeti. */
+enum class RoomCardStatus { ACTIVE, OPEN, LOCKED }
 
 /**
  * A grid of language rooms, each shown as a flag + name card. The currently selected
@@ -34,6 +39,10 @@ fun RoomPickerGrid(
     selectedCode: String?,
     onSelect: (Language) -> Unit,
     modifier: Modifier = Modifier,
+    /** `null` dönerse rozet gösterilmez (ör. ilk oda seçimi ekranı). */
+    statusOf: (Language) -> RoomCardStatus? = { null },
+    /** Seçicinin üstünde, ızgarayla birlikte kayan içerik (ör. erişim özeti). */
+    header: (@Composable () -> Unit)? = null,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -42,9 +51,17 @@ fun RoomPickerGrid(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        if (header != null) {
+            item(span = { GridItemSpan(maxLineSpan) }) { header() }
+        }
         items(languages, key = { it.code }) { language ->
             val isSelected = language.code.equals(selectedCode, ignoreCase = true)
-            RoomCard(language = language, isSelected = isSelected, onClick = { onSelect(language) })
+            RoomCard(
+                language = language,
+                isSelected = isSelected,
+                status = statusOf(language),
+                onClick = { onSelect(language) },
+            )
         }
     }
 }
@@ -53,9 +70,11 @@ fun RoomPickerGrid(
 private fun RoomCard(
     language: Language,
     isSelected: Boolean,
+    status: RoomCardStatus?,
     onClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(16.dp)
+    val isLocked = status == RoomCardStatus.LOCKED
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,13 +93,23 @@ private fun RoomCard(
         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Text(text = language.flagEmoji, style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = language.flagEmoji,
+            style = MaterialTheme.typography.headlineMedium,
+            // Kilitli odalar soluk gösterilir; erişimi açık olanlar bir bakışta ayrışır.
+            modifier = Modifier.alpha(if (isLocked) 0.55f else 1f),
+        )
         Text(
             text = language.name,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) LocalAppColors.current.onGradient else MaterialTheme.colorScheme.onSurface,
+            color = when {
+                isSelected -> LocalAppColors.current.onGradient
+                isLocked -> MaterialTheme.colorScheme.onSurfaceVariant
+                else -> MaterialTheme.colorScheme.onSurface
+            },
             textAlign = TextAlign.Center
         )
+        if (status != null) RoomStatusChip(status = status, onGradient = isSelected)
     }
 }

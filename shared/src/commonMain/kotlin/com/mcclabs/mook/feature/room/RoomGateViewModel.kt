@@ -7,6 +7,7 @@ import com.mcclabs.mook.domain.model.Language
 import com.mcclabs.mook.domain.model.Languages
 import com.mcclabs.mook.domain.repository.DiscoverRepository
 import com.mcclabs.mook.domain.repository.SettingsRepository
+import com.mcclabs.mook.util.Log
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,6 +24,8 @@ data class RoomGateUiState(
     val isChecking: Boolean = true,
     val languages: List<Language> = emptyList(),
     val isSubmitting: Boolean = false,
+    /** Doluyken "Oda hazırlanıyor" ilerleme ekranı gösterilir. */
+    val submittingTo: Language? = null,
     val error: RoomSelectionError? = null,
 )
 
@@ -73,12 +76,13 @@ class RoomGateViewModel(
             return
         }
         viewModelScope.launch {
-            _state.update { it.copy(isSubmitting = true, error = null) }
+            _state.update { it.copy(isSubmitting = true, submittingTo = language, error = null) }
             try {
                 settingsRepository.setRoomLanguageCode(language.code)
                 _events.emit(RoomGateEvent.Proceed)
             } catch (error: Exception) {
-                _state.update { it.copy(isSubmitting = false, error = error.toRoomSelectionError()) }
+                Log.e("İlk oda seçimi başarısız: ${language.code}", error)
+                _state.update { it.copy(isSubmitting = false, submittingTo = null, error = error.toRoomSelectionError()) }
             }
         }
     }

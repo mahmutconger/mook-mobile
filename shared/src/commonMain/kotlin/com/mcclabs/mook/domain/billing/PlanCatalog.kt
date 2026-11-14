@@ -25,7 +25,7 @@ data class PlanCatalog(val byTier: Map<Tier, PlanLimits>) {
         val BUNDLED: PlanCatalog = PlanCatalog(
             mapOf(
                 // BEGIN-PLAN-CATALOG
-                Tier.FREE to PlanLimits(dailyLikes = 10, dailyMessages = 50, dailyNewChats = 3, roomSlots = 1, roomSwitchesPerDay = 1, showsAds = true, freeRoam = false, incognito = false, likedMeUnlocksPerDay = 0, rewindsPerDay = 0, boostsPerMonth = 0),
+                Tier.FREE to PlanLimits(dailyLikes = 10, dailyMessages = 50, dailyNewChats = 3, roomSlots = 2, roomSwitchesPerDay = 1, showsAds = true, freeRoam = false, incognito = false, likedMeUnlocksPerDay = 0, rewindsPerDay = 0, boostsPerMonth = 0),
                 Tier.ECONOMY to PlanLimits(dailyLikes = 30, dailyMessages = 200, dailyNewChats = 10, roomSlots = 3, roomSwitchesPerDay = 3, showsAds = false, freeRoam = false, incognito = false, likedMeUnlocksPerDay = 0, rewindsPerDay = 0, boostsPerMonth = 0),
                 Tier.STANDARD to PlanLimits(dailyLikes = 100, dailyMessages = null, dailyNewChats = null, roomSlots = 5, roomSwitchesPerDay = null, showsAds = false, freeRoam = false, incognito = false, likedMeUnlocksPerDay = 5, rewindsPerDay = 3, boostsPerMonth = 1),
                 Tier.PREMIUM to PlanLimits(dailyLikes = null, dailyMessages = null, dailyNewChats = null, roomSlots = null, roomSwitchesPerDay = null, showsAds = false, freeRoam = true, incognito = true, likedMeUnlocksPerDay = null, rewindsPerDay = null, boostsPerMonth = 4),

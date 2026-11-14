@@ -5,6 +5,9 @@ import com.mcclabs.mook.domain.billing.PriceChangeCheckResult
 
 data class SettingsUiState(
     val email: String = "",
+    /** Başlıktaki profil kartı: kullanıcının adı ve ilk profil fotoğrafı (yoksa baş harf gösterilir). */
+    val profileName: String = "",
+    val profilePhotoUrl: String? = null,
     val discoverVisible: Boolean = true,
     /** Gizli mod açık mı (profilin yalnızca beğendiğin kişilere görünür; ziyaretlerin kaydedilmez). */
     val incognitoEnabled: Boolean = false,

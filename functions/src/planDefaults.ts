@@ -24,7 +24,7 @@ export interface PlanLimits {
 
 export const PLAN_DEFAULTS: Record<Tier, PlanLimits> = {
     FREE: {
-        dailyLikes: 10, dailyMessages: 50, dailyNewChats: 3, roomSlots: 1,
+        dailyLikes: 10, dailyMessages: 50, dailyNewChats: 3, roomSlots: 2,
         roomSwitchesPerDay: 1, likedMeUnlocksPerDay: 0, rewindsPerDay: 0,
         boostsPerMonth: 0, showsAds: true, freeRoam: false, incognito: false,
     },

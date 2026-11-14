@@ -96,6 +96,14 @@ fun RoomSwitchScreen(
 
     // Gereksinim 1.7: bir kademe düşüşü açık oda sayısını yeni sınırın üzerine
     // çıkardıysa, kullanıcı hangi fazla odaları kapatacağını seçmeli.
+    state.confirmPrompt?.let { prompt ->
+        RoomSwitchConfirmDialog(
+            prompt = prompt,
+            onConfirm = viewModel::onConfirmSwitch,
+            onDismiss = viewModel::onDismissConfirm,
+        )
+    }
+
     state.downgradePrompt?.let { prompt ->
         RoomDowngradeDialog(
             prompt = prompt,
@@ -105,6 +113,7 @@ fun RoomSwitchScreen(
         )
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -142,7 +151,15 @@ fun RoomSwitchScreen(
                 languages = state.languages,
                 selectedCode = state.selectedCode,
                 onSelect = { viewModel.onRoomSelected(it) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                statusOf = { language ->
+                    when {
+                        language.code.equals(state.selectedCode, ignoreCase = true) -> RoomCardStatus.ACTIVE
+                        state.isOpen(language.code) -> RoomCardStatus.OPEN
+                        else -> RoomCardStatus.LOCKED
+                    }
+                },
+                header = { RoomAccessCard(state = state, onUpgrade = viewModel::onUpgradeClicked) },
             )
             state.error?.let { error ->
                 Text(
@@ -160,6 +177,9 @@ fun RoomSwitchScreen(
                 )
             }
         }
+    }
+    // Oda değişirken "Oda hazırlanıyor" ilerleme ekranı; işlem alınmamış gibi görünmesin.
+    state.switchingTo?.let { RoomPreparingOverlay(language = it) }
     }
 }
 

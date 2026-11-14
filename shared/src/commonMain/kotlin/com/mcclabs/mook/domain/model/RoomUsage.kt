@@ -18,3 +18,18 @@ data class RoomUsage(
     val code: String,
     val lastActiveAtMillis: Long,
 )
+
+/**
+ * Kullanıcının BUGÜNKÜ oda değiştirme kullanımı (sunucunun saat dilimine göre, `getUsage`).
+ *
+ * @property roomSwitches Bugün YENİ oda açmak için harcanan hak sayısı. Açık odalar arası
+ *   geçiş hak düşürmez (bkz. `functions/src/roomSwitch.ts`).
+ * @property rewardedRoomSwitches Bugün ödüllü reklamla kazanılan ek hak sayısı.
+ * @property isKnown Sunucudan okunabildiyse `true`; okunamadıysa arayüz kalan hakkı
+ *   bilinmiyor sayar ve sayıyı göstermez (sunucu yine de kotayı uygular).
+ */
+data class RoomSwitchUsage(
+    val roomSwitches: Int = 0,
+    val rewardedRoomSwitches: Int = 0,
+    val isKnown: Boolean = false,
+)

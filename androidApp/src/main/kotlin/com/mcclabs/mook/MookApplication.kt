@@ -6,6 +6,7 @@ import com.revenuecat.purchases.LogLevel
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import com.mcclabs.mook.appcheck.AppCheckInstaller
+import com.mcclabs.mook.appcheck.appCheckProviderFactory
 import com.mcclabs.mook.platform.AppContextHolder
 
 /**
@@ -21,8 +22,9 @@ class MookApplication : Application() {
 
         // Gereksinim 2 (Faz 6, Kapsamlı App Check Uygulaması): BAŞKA HİÇBİR Firebase
         // ağ çağrısından (RevenueCat yapılandırması dahil) ÖNCE çağrılır -- bkz.
-        // AppCheckInstaller KDoc'u.
-        AppCheckInstaller.installIfNeeded()
+        // AppCheckInstaller KDoc'u. Sağlayıcı derleme türüne göre seçilir (debug: Debug,
+        // release: Play Integrity) — bkz. src/debug ve src/release altındaki AppCheckProviders.kt.
+        AppCheckInstaller.installIfNeeded(appCheckProviderFactory())
 
         // Gereksinim (Zorla Güncelleme): [getAppVersion]'ın (bkz. AppInfo.android.kt) yüklü
         // APK'nın GERÇEK versionName'ini PackageManager üzerinden okuyabilmesi için — herhangi

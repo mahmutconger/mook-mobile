@@ -2,6 +2,7 @@ package com.mcclabs.mook.data.repository
 
 import com.mcclabs.mook.data.appHttpsCallable
 import com.mcclabs.mook.data.appFirestore
+import com.mcclabs.mook.domain.model.RoomSwitchUsage
 import com.mcclabs.mook.domain.model.RoomUsage
 import com.mcclabs.mook.domain.repository.RoomSlotRepository
 import com.mcclabs.mook.util.Log
@@ -12,6 +13,10 @@ import kotlinx.serialization.Serializable
 /** Payload of the `closeRoomSlots` callable. Field names must match `functions/src/index.ts`. */
 @Serializable
 private data class CloseRoomSlotsRequest(val roomCodesToClose: List<String>)
+
+/** `getUsage` yanıtının oda değiştirme ile ilgili alanları (`functions/src/monetization.ts`). */
+@Serializable
+private data class RoomUsageResponse(val roomSwitches: Int = 0, val rewardedRoomSwitches: Int = 0)
 
 /**
  * Firestore/callable-backed [RoomSlotRepository] (Gereksinim 1.7).
@@ -45,5 +50,18 @@ class RoomSlotRepositoryImpl : RoomSlotRepository {
         if (codes.isEmpty()) return
         appHttpsCallable("closeRoomSlots")
             .invoke(CloseRoomSlotsRequest(roomCodesToClose = codes))
+    }
+
+    override suspend fun roomSwitchUsageToday(): RoomSwitchUsage = try {
+        // Sunucunun saat dilimi hesabını kullanır; kotayı uygulayan transaction ile aynı gün.
+        val usage = appHttpsCallable("getUsage").invoke().data<RoomUsageResponse>()
+        RoomSwitchUsage(
+            roomSwitches = usage.roomSwitches,
+            rewardedRoomSwitches = usage.rewardedRoomSwitches,
+            isKnown = true,
+        )
+    } catch (e: Exception) {
+        Log.e("Oda değiştirme kullanımı okunamadı", e)
+        RoomSwitchUsage()
     }
 }

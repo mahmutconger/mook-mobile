@@ -28,6 +28,11 @@ dependencies {
     // RevenueCatWebhookService (FirebaseMessagingService) bu modülde yaşıyor; shared'daki
     // firebase-messaging `implementation` olduğu için buraya geçişli olarak gelmez.
     implementation("com.google.firebase:firebase-messaging")
+    // App Check sağlayıcısı derleme türüne göre seçilir (bkz. src/debug|release/AppCheckProviders.kt):
+    // Play Integrity yalnızca Play'den kurulan derlemeye jeton verir; Android Studio'dan
+    // kurulan debug derlemesi Debug sağlayıcısını kullanır.
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    debugImplementation("com.google.firebase:firebase-appcheck-debug")
     // RevenueCat bundles Google Play Billing. Keeping it in the Android app module
     // makes the iOS target deliberately billing-free until its launch is scoped.
     implementation(libs.revenuecat.purchases)

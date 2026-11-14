@@ -60,6 +60,7 @@ fun RoomGateScreen(
         return
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -103,5 +104,7 @@ fun RoomGateScreen(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             )
         }
+    }
+    state.submittingTo?.let { RoomPreparingOverlay(language = it) }
     }
 }

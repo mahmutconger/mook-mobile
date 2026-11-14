@@ -1,5 +1,6 @@
 package com.mcclabs.mook.domain.repository
 
+import com.mcclabs.mook.domain.model.RoomSwitchUsage
 import com.mcclabs.mook.domain.model.RoomUsage
 
 /**
@@ -28,4 +29,10 @@ interface RoomSlotRepository {
      *   alt kümesi olmalıdır; sunucu bunu doğrular.
      */
     suspend fun closeRooms(codes: List<String>)
+
+    /**
+     * Bugünkü oda değiştirme kullanımı — oda seçicinin "kalan hak" göstergesi ve onay
+     * diyaloğu için. Okunamazsa [RoomSwitchUsage.isKnown] `false` olur.
+     */
+    suspend fun roomSwitchUsageToday(): RoomSwitchUsage = RoomSwitchUsage()
 }

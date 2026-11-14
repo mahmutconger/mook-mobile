@@ -9,9 +9,11 @@
  * KURALLAR ("Atomik Oda Değiştirme"):
  * 1. Hedef oda zaten aktif oda ise hiçbir şey yapılmaz ve hak düşülmez.
  * 2. İlk (zorunlu) oda seçimi onboarding'dir; hak düşülmez.
- * 3. Günlük hak kontrolü kapasite kontrolünden ÖNCE yapılır ve aşılırsa her zaman
- *    `daily-room-switch-limit` hatası verilir (istemci bunu limit sayfasına çevirir).
- * 4. Hedef oda kullanıcının açık odaları arasındaysa yalnızca aktif oda değişir.
+ * 3. Hedef oda kullanıcının AÇIK odaları arasındaysa yalnızca aktif oda değişir ve hak
+ *    DÜŞÜLMEZ: bir kez açılan odaya geri dönmek ücretsizdir (önceki oda "kilitlenmez").
+ * 4. Hak yalnızca YENİ bir oda açarken düşülür; günlük hak kontrolü kapasite kontrolünden
+ *    ÖNCE yapılır ve aşılırsa her zaman `daily-room-switch-limit` hatası verilir (istemci
+ *    bunu limit sayfasına çevirir).
  * 5. Hedef oda yeni ise ve slotlar doluysa, kapasite hatası VERİLMEZ: en uzun süredir
  *    aktif kullanılmayan oda(lar) çıkarılır ve yerine yeni oda eklenir (atomik takas).
  *    Bir kademe düşüşü sonrası slot sayısı aşılmışsa, aynı takas fazlalığı da temizler.
@@ -62,16 +64,16 @@ export function planRoomSwitch(input: RoomSwitchInput): RoomSwitchPlan {
         return { kind: "noop", rooms, activeRoom: input.target };
     }
 
-    // Kural 2: hiç odası olmayan kullanıcının ilk seçimi ücretsizdir.
-    const chargesQuota = rooms.length > 0;
-    // Kural 3: günlük hak, kapasiteden ÖNCE kontrol edilir.
-    if (chargesQuota && input.dailySwitchLimit !== null && input.switchesUsedToday >= input.dailySwitchLimit) {
-        throw new RoomSwitchLimitError();
+    // Kural 3: zaten açık bir odaya geçiş — slot değişmez, hak düşülmez.
+    if (rooms.includes(input.target)) {
+        return { kind: "switch", rooms, activeRoom: input.target, evictedRooms: [], chargesQuota: false };
     }
 
-    // Kural 4: zaten açık bir odaya geçiş — slot değişmez.
-    if (rooms.includes(input.target)) {
-        return { kind: "switch", rooms, activeRoom: input.target, evictedRooms: [], chargesQuota };
+    // Kural 2: hiç odası olmayan kullanıcının ilk seçimi ücretsizdir.
+    const chargesQuota = rooms.length > 0;
+    // Kural 4: yeni oda açılırken günlük hak, kapasiteden ÖNCE kontrol edilir.
+    if (chargesQuota && input.dailySwitchLimit !== null && input.switchesUsedToday >= input.dailySwitchLimit) {
+        throw new RoomSwitchLimitError();
     }
 
     // Kural 5 ve 6: yeni oda için yer aç (gerekirse en eski kullanılanı çıkar).
