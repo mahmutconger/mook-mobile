@@ -26,6 +26,8 @@ class SupportContactConsistencyTest {
         assertFalse("destek@walktalkk.com" in html, "Eski destek adresi silme sayfasında kalmamalı")
         assertTrue("Mook" in html && "WALKTALK" in html, "Sayfa mağazadaki uygulama ve geliştirici adını içermeli")
         assertFalse("konum tercihleri" in html, "Uygulama konum toplamaz; silinen veriler doğru adlandırılmalı")
+        // Play formundaki "hesabı silmeden veri silme" URL'si bu bölüme işaret eder.
+        assertTrue("id=\"veri-silme\"" in html, "Kısmi veri silme bölümü (#veri-silme) bulunmalı")
     }
 
     @Test fun appSourcesHaveNoHardcodedOldSupportEmail() {
