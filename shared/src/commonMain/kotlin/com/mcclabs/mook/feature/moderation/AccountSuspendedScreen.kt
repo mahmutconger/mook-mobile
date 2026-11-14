@@ -1,5 +1,6 @@
 package com.mcclabs.mook.feature.moderation
 
+import com.mcclabs.mook.domain.support.SupportContact
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -79,7 +80,7 @@ fun AccountSuspendedScreen() {
 
             NeonPrimaryButton(
                 text = stringResource(Res.string.moderation_suspended_contact_support),
-                onClick = { uriHandler.openUri("mailto:destek@walktalkk.com") },
+                onClick = { uriHandler.openUri(SupportContact.MAILTO_URI) },
             )
         }
     }
