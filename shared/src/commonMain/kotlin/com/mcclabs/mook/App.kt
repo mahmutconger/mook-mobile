@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.CompositionLocalProvider
 import com.mcclabs.mook.domain.legal.LegalLinksResolver
+import com.mcclabs.mook.domain.support.SupportContact
 import com.mcclabs.mook.ui.legal.LocalLegalLinks
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -222,7 +223,7 @@ fun App(onDarkModeChange: (Boolean) -> Unit = {}) {
                                 onContactSupport = {
                                     pendingConflict = null
                                     conflictUserId = null
-                                    uriHandler.openUri("mailto:destek@walktalkk.com")
+                                    uriHandler.openUri(SupportContact.MAILTO_URI)
                                 },
                             )
                         }
