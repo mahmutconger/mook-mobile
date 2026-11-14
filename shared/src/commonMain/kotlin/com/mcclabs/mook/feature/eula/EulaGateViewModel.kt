@@ -4,6 +4,7 @@ import com.mcclabs.mook.domain.auth.LogoutUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mcclabs.mook.domain.repository.AuthRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,7 +19,14 @@ data class EulaGateUiState(
     val isChecking: Boolean = true,
     val accepted: Boolean = false,
     val isSubmitting: Boolean = false,
-)
+    /** Kullanıcı metni sonuna kadar kaydırdı mı (metin ekrana sığıyorsa hemen `true`). */
+    val hasReadToEnd: Boolean = false,
+    /** Onay kutusu açılmadan önce kalan en kısa okuma süresi (saniye). */
+    val secondsLeft: Int = EulaGateViewModel.MIN_READ_SECONDS,
+) {
+    /** Okuma zorunluluğu: sonuna kadar kaydırılmadan ve süre dolmadan kabul edilemez. */
+    val canAccept: Boolean get() = hasReadToEnd && secondsLeft == 0
+}
 
 sealed class EulaGateEvent {
     /** The user has accepted (now or previously); continue into the app. */
@@ -49,21 +57,45 @@ class EulaGateViewModel(
                 _events.emit(EulaGateEvent.Proceed)
             } else {
                 _state.update { it.copy(isChecking = false) }
+                startReadingTimer()
             }
         }
     }
 
+    /** Metin göründükten sonra en kısa okuma süresini geri sayar. */
+    private fun startReadingTimer() {
+        viewModelScope.launch {
+            while (_state.value.secondsLeft > 0) {
+                delay(1_000)
+                _state.update { it.copy(secondsLeft = (it.secondsLeft - 1).coerceAtLeast(0)) }
+            }
+        }
+    }
+
+    /** Ekran, metnin sonuna ulaşıldığını bildirir. */
+    fun onReadToEnd() {
+        _state.update { it.copy(hasReadToEnd = true) }
+    }
+
     fun onAcceptedChange(accepted: Boolean) {
+        // Okunmadan işaretlenemez (kaldırmak her zaman serbesttir).
+        if (accepted && !_state.value.canAccept) return
         _state.update { it.copy(accepted = accepted) }
     }
 
     fun onContinue() {
-        if (!_state.value.accepted || _state.value.isSubmitting) return
+        val state = _state.value
+        if (!state.accepted || !state.canAccept || state.isSubmitting) return
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true) }
             authRepository.acceptEula()
             _events.emit(EulaGateEvent.Proceed)
         }
+    }
+
+    companion object {
+        /** Metin kısa olsa bile ekranda kalması gereken en kısa okuma süresi. */
+        const val MIN_READ_SECONDS: Int = 8
     }
 
     fun logout() {

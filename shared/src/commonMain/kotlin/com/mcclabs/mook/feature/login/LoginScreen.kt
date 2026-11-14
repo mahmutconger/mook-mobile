@@ -42,6 +42,11 @@ import mook.shared.generated.resources.lock_keyhole_minimalistic_svgrepo_com__1_
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.mcclabs.mook.feature.eula.EulaTermsDialog
+import mook.shared.generated.resources.login_terms_link
 
 @Composable
 fun LoginScreen(
@@ -195,6 +200,17 @@ fun LoginScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+
+        // İlk girişte kabul edilen kullanım şartları buradan istendiği zaman yeniden okunabilir.
+        var showTerms by remember { mutableStateOf(false) }
+        if (showTerms) EulaTermsDialog(onDismiss = { showTerms = false })
+        TextButton(onClick = { showTerms = true }) {
+            Text(
+                text = stringResource(Res.string.login_terms_link),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
         // Sign up prompt
         Row(

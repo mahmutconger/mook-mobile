@@ -596,4 +596,10 @@
     <string name="settings_theme_ocean">Okyanus</string>
     <string name="settings_theme_dialog_title">Tema seç</string>
     <string name="settings_data_section">Verilerin</string>
+    <string name="eula_gate_read_hint">Kabul edebilmek için şartları sonuna kadar oku.</string>
+    <string name="eula_gate_wait">Lütfen okumak için biraz zaman ayır — %1$d sn sonra kabul edebilirsin.</string>
+    <string name="eula_full_terms_link">Kullanım Koşullarının tamamını oku</string>
+    <string name="eula_dialog_title">Kullanım Şartları ve EULA</string>
+    <string name="eula_dialog_close">Kapat</string>
+    <string name="login_terms_link">Kullanım şartları</string>
 </resources>

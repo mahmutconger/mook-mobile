@@ -597,4 +597,10 @@
     <string name="settings_theme_ocean">Ocean</string>
     <string name="settings_theme_dialog_title">Choose theme</string>
     <string name="settings_data_section">Your data</string>
+    <string name="eula_gate_read_hint">Scroll to the end of the terms to enable acceptance.</string>
+    <string name="eula_gate_wait">Please take a moment to read — you can accept in %1$d s.</string>
+    <string name="eula_full_terms_link">Read the full Terms of Use</string>
+    <string name="eula_dialog_title">Terms of Use &amp; EULA</string>
+    <string name="eula_dialog_close">Close</string>
+    <string name="login_terms_link">Terms of Use</string>
 </resources>
